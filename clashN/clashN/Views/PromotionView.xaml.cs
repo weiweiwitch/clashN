@@ -16,7 +16,7 @@ namespace ClashN.Views
             });
         }
 
-        private void btnPromotion_Click(object sender, RoutedEventArgs e)
+        private void BtnPromotion_Click(object sender, RoutedEventArgs e)
         {
             Utils.ProcessStart($"{Utils.Base64Decode(Global.PromotionUrl)}?t={DateTime.Now.Ticks}");
         }

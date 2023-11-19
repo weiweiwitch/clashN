@@ -40,11 +40,11 @@ namespace ClashN.Views
 
             lstKey = Utils.DeepCopy(_config.globalHotkeys);
 
-            txtGlobalHotkey0.KeyDown += TxtGlobalHotkey_KeyDown;
-            txtGlobalHotkey1.KeyDown += TxtGlobalHotkey_KeyDown;
-            txtGlobalHotkey2.KeyDown += TxtGlobalHotkey_KeyDown;
-            txtGlobalHotkey3.KeyDown += TxtGlobalHotkey_KeyDown;
-            txtGlobalHotkey4.KeyDown += TxtGlobalHotkey_KeyDown;
+            TxtGlobalHotkey0.KeyDown += TxtGlobalHotkey_KeyDown;
+            TxtGlobalHotkey1.KeyDown += TxtGlobalHotkey_KeyDown;
+            TxtGlobalHotkey2.KeyDown += TxtGlobalHotkey_KeyDown;
+            TxtGlobalHotkey3.KeyDown += TxtGlobalHotkey_KeyDown;
+            TxtGlobalHotkey4.KeyDown += TxtGlobalHotkey_KeyDown;
 
             BindingData(-1);
 
@@ -103,7 +103,7 @@ namespace ClashN.Views
             }
         }
 
-        private void btnSave_Click(object sender, RoutedEventArgs e)
+        private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
             _config.globalHotkeys.Clear();
             _config.globalHotkeys.AddRange(lstKey);
@@ -118,12 +118,12 @@ namespace ClashN.Views
             }
         }
 
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
-        private void btnReset_Click(object sender, RoutedEventArgs e)
+        private void BtnReset_Click(object sender, RoutedEventArgs e)
         {
             lstKey.Clear();
             foreach (GlobalHotkeyAction it in Enum.GetValues(typeof(GlobalHotkeyAction)))
@@ -147,7 +147,7 @@ namespace ClashN.Views
 
         private void SetText(string name, string txt)
         {
-            foreach (UIElement element in gridText.Children)
+            foreach (UIElement element in GridText.Children)
             {
                 if (element is TextBox)
                 {

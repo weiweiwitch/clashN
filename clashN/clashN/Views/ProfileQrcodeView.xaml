@@ -17,14 +17,14 @@
         </Grid.RowDefinitions>
 
         <Image
-            x:Name="imgQrcode"
+            x:Name="ImgQrcode"
             Grid.Row="0"
             Width="300"
             Height="300"
             Stretch="UniformToFill" />
 
         <TextBox
-            x:Name="txtContent"
+            x:Name="TxtContent"
             Grid.Row="1"
             Width="300"
             Margin="0,8"

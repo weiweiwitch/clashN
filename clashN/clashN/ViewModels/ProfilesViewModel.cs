@@ -375,8 +375,8 @@ namespace ClashN.ViewModels
             var img = QRCodeHelper.GetQRCode(item.url);
             var dialog = new ProfileQrcodeView()
             {
-                imgQrcode = { Source = img },
-                txtContent = { Text = item.url },
+                ImgQrcode = { Source = img },
+                TxtContent = { Text = item.url },
             };
 
             await DialogHost.Show(dialog, "RootDialog");

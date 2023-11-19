@@ -240,7 +240,7 @@
   <data name="menuProxiesDelaytest" xml:space="preserve">
     <value>All Node Latency Test</value>
   </data>
-  <data name="menuProxiesDelaytestPart" xml:space="preserve">
+  <data name="menuProxiesDelayTestPart" xml:space="preserve">
     <value>Part Node Latency Test</value>
   </data>
   <data name="menuRemoveProfile" xml:space="preserve">

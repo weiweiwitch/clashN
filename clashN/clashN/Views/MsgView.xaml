@@ -19,7 +19,7 @@
             Style="{StaticResource ListItemTitle}"
             Text="{x:Static resx:ResUI.TbMsgTitle}" />
         <TextBox
-            Name="txtMsg"
+            Name="TxtMsg"
             BorderThickness="0"
             FontSize="10"
             HorizontalScrollBarVisibility="Auto"

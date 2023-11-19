@@ -21,10 +21,10 @@ namespace ClashN.Views
 
             this.WhenActivated(disposables =>
             {
-                this.Bind(ViewModel, vm => vm.MsgFilter, v => v.txtFilter.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.MsgFilter, v => v.TxtFilter.Text).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.ScrollToEnd, v => v.TogScrollToEnd.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.AutoRefresh, v => v.togAutoRefresh.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.LineCount, v => v.cmbLineCount.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.AutoRefresh, v => v.TogAutoRefresh.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.LineCount, v => v.CmbLineCount.Text).DisposeWith(disposables);
             });
         }
 
@@ -77,7 +77,7 @@ namespace ClashN.Views
             Dispatcher.Invoke((Action)(() => { txtMsg.Clear(); }));
         }
 
-        private void btnDelete_Click(object sender, RoutedEventArgs e)
+        private void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
             ClearMsg();
         }

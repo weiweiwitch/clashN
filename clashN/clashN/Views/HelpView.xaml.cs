@@ -16,13 +16,13 @@ namespace ClashN.Views
 
             this.WhenActivated(disposables =>
             {
-                this.BindCommand(ViewModel, vm => vm.CheckUpdateCmd, v => v.btnCheckUpdateN).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.CheckUpdateClashCoreCmd, v => v.btnCheckUpdateClashCore).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.CheckUpdateClashMetaCoreCmd, v => v.btnCheckUpdateClashMetaCore).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.CheckUpdateCmd, v => v.BtnCheckUpdateN).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.CheckUpdateClashCoreCmd, v => v.BtnCheckUpdateClashCore).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.CheckUpdateClashMetaCoreCmd, v => v.BtnCheckUpdateClashMetaCore).DisposeWith(disposables);
             });
         }
 
-        private void btnAbout_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void BtnAbout_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             Utils.ProcessStart(Global.AboutUrl);
         }

@@ -34,7 +34,7 @@
                 Text="{x:Static resx:ResUI.TbPromotion}" />
 
             <materialDesign:Card
-                Grid.Row="1"
+                Grid.Row="1" Grid.Column="0"
                 Width="300"
                 Margin="8">
                 <Grid>
@@ -59,12 +59,12 @@
 
                         <Grid Width="300">
                             <Button
-                                x:Name="btnPromotion"
+                                x:Name="BtnPromotion"
                                 Margin="2,0"
                                 materialDesign:ButtonProgressAssist.IsIndeterminate="True"
                                 materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
                                 materialDesign:ButtonProgressAssist.Value="-1"
-                                Click="btnPromotion_Click"
+                                Click="BtnPromotion_Click"
                                 Content="{x:Static resx:ResUI.TbPromotion}"
                                 FontSize="{DynamicResource StdFontSize2}"
                                 Style="{StaticResource MaterialDesignRaisedButton}" />

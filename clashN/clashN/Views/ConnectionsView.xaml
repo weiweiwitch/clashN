@@ -21,7 +21,7 @@
             Orientation="Horizontal">
             <TextBlock Style="{StaticResource ModuleTitle}" Text="{x:Static resx:ResUI.TbConnections}" />
             <materialDesign:Chip
-                x:Name="chipCount"
+                x:Name="ChipCount"
                 Height="20"
                 IsEnabled="False"
                 Style="{StaticResource ListItemChip}" />
@@ -39,7 +39,7 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.TbSorting}" />
                 <ComboBox
-                    x:Name="cmbSorting"
+                    x:Name="CmbSorting"
                     Width="100"
                     Margin="8"
                     Style="{StaticResource DefComboBox}">
@@ -51,7 +51,7 @@
                     <ComboBoxItem Content="{x:Static resx:ResUI.TbSortingHost}" />
                 </ComboBox>
                 <Separator />
-                <Button x:Name="btnConnectionCloseAll" ToolTip="{x:Static resx:ResUI.menuConnectionCloseAll}">
+                <Button x:Name="BtnConnectionCloseAll" ToolTip="{x:Static resx:ResUI.menuConnectionCloseAll}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon
                             Margin="0,0,8,0"
@@ -66,13 +66,13 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.TbAutoRefresh}" />
                 <ToggleButton
-                    x:Name="togAutoRefresh"
+                    x:Name="TogAutoRefresh"
                     Margin="8"
                     HorizontalAlignment="Left" />
             </ToolBar>
         </ToolBarTray>
         <DataGrid
-            x:Name="lstConnections"
+            x:Name="LstConnections"
             AutoGenerateColumns="False"
             BorderThickness="1"
             CanUserAddRows="False"
@@ -85,8 +85,8 @@
             Style="{StaticResource DefDataGrid}">
             <DataGrid.ContextMenu>
                 <ContextMenu Style="{StaticResource DefMenu}">
-                    <MenuItem x:Name="menuConnectionClose" Header="{x:Static resx:ResUI.menuConnectionClose}" />
-                    <MenuItem x:Name="menuConnectionCloseAll" Header="{x:Static resx:ResUI.menuConnectionCloseAll}" />
+                    <MenuItem x:Name="MenuConnectionClose" Header="{x:Static resx:ResUI.menuConnectionClose}" />
+                    <MenuItem x:Name="MenuConnectionCloseAll" Header="{x:Static resx:ResUI.menuConnectionCloseAll}" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>

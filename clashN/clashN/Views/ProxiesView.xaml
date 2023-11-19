@@ -40,7 +40,7 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.menuSystemproxy}" />
                 <ComboBox
-                    x:Name="cmbSystemProxy"
+                    x:Name="CmbSystemProxy"
                     Width="110"
                     Margin="8"
                     Style="{StaticResource DefComboBox}">
@@ -55,7 +55,7 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.menuRulemode}" />
                 <ComboBox
-                    x:Name="cmbRulemode"
+                    x:Name="CmbRulemode"
                     Width="80"
                     Margin="8"
                     Style="{StaticResource DefComboBox}">
@@ -70,7 +70,7 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.TbSorting}" />
                 <ComboBox
-                    x:Name="cmbSorting"
+                    x:Name="CmbSorting"
                     Width="60"
                     Margin="8"
                     Style="{StaticResource DefComboBox}">
@@ -84,7 +84,7 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.TbEnableTunAs}" />
                 <ToggleButton
-                    x:Name="togEnableTun"
+                    x:Name="TogEnableTun"
                     Margin="8"
                     HorizontalAlignment="Left" />
                 <Separator />
@@ -93,14 +93,14 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.TbAutoRefresh}" />
                 <ToggleButton
-                    x:Name="togAutoRefresh"
+                    x:Name="TogAutoRefresh"
                     Margin="8"
                     HorizontalAlignment="Left" />
             </ToolBar>
         </ToolBarTray>
         <DockPanel>
             <ListView
-                x:Name="lstProxyGroups"
+                x:Name="LstProxyGroups"
                 Margin="0,0,5,0"
                 BorderThickness="0"
                 DockPanel.Dock="Left"
@@ -110,8 +110,8 @@
                 Style="{StaticResource MaterialDesignListView}">
                 <ListView.ContextMenu>
                     <ContextMenu Style="{StaticResource DefMenu}">
-                        <MenuItem x:Name="menuProxiesReload" Header="{x:Static resx:ResUI.menuProxiesReload}" />
-                        <MenuItem x:Name="menuProxiesDelaytest" Header="{x:Static resx:ResUI.menuProxiesDelaytest}" />
+                        <MenuItem x:Name="MenuProxiesReload" Header="{x:Static resx:ResUI.menuProxiesReload}" />
+                        <MenuItem x:Name="MenuProxiesDelayTest" Header="{x:Static resx:ResUI.menuProxiesDelaytest}" />
                     </ContextMenu>
                 </ListView.ContextMenu>
                 <ListView.ItemsPanel>
@@ -147,7 +147,7 @@
             </ListView>
 
             <ListView
-                x:Name="lstProxyDetails"
+                x:Name="LstProxyDetails"
                 BorderThickness="0"
                 ItemContainerStyle="{StaticResource lvItemSelected}"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -155,8 +155,8 @@
                 Style="{StaticResource MaterialDesignListView}">
                 <ListView.ContextMenu>
                     <ContextMenu Style="{StaticResource DefMenu}">
-                        <MenuItem x:Name="menuProxiesDelaytestPart" Header="{x:Static resx:ResUI.menuProxiesDelaytestPart}" />
-                        <MenuItem x:Name="menuProxiesSelectActivity" Header="{x:Static resx:ResUI.menuProxiesSelectActivity}" />
+                        <MenuItem x:Name="MenuProxiesDelayTestPart" Header="{x:Static resx:ResUI.menuProxiesDelayTestPart}" />
+                        <MenuItem x:Name="MenuProxiesSelectActivity" Header="{x:Static resx:ResUI.menuProxiesSelectActivity}" />
                     </ContextMenu>
                 </ListView.ContextMenu>
                 <ListView.ItemsPanel>

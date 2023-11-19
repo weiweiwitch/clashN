@@ -25,7 +25,7 @@
             Text="{x:Static resx:ResUI.TbProfiles}" />
         <ToolBarTray Margin="0,8,0,8" DockPanel.Dock="Top">
             <ToolBar ClipToBounds="True" Style="{StaticResource MaterialDesignToolBar}">
-                <Button x:Name="btnAddProfile" ToolTip="{x:Static resx:ResUI.menuAddProfile}">
+                <Button x:Name="BtnAddProfile" ToolTip="{x:Static resx:ResUI.menuAddProfile}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon
                             Margin="0,0,8,0"
@@ -35,7 +35,7 @@
                     </StackPanel>
                 </Button>
                 <Separator />
-                <Button x:Name="btnAddProfileViaClipboard" ToolTip="{x:Static resx:ResUI.menuAddProfileViaClipboard}">
+                <Button x:Name="BtnAddProfileViaClipboard" ToolTip="{x:Static resx:ResUI.menuAddProfileViaClipboard}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon
                             Margin="0,0,8,0"
@@ -45,7 +45,7 @@
                     </StackPanel>
                 </Button>
                 <Separator />
-                <Button x:Name="btnSubUpdateViaProxy" ToolTip="{x:Static resx:ResUI.menuSubUpdateViaProxy}">
+                <Button x:Name="BtnSubUpdateViaProxy" ToolTip="{x:Static resx:ResUI.menuSubUpdateViaProxy}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon
                             Margin="0,0,8,0"
@@ -55,7 +55,7 @@
                     </StackPanel>
                 </Button>
                 <Separator />
-                <Button x:Name="btnEditProfile" ToolTip="{x:Static resx:ResUI.menuEditProfile}">
+                <Button x:Name="BtnEditProfile" ToolTip="{x:Static resx:ResUI.menuEditProfile}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon
                             Margin="0,0,8,0"
@@ -65,7 +65,7 @@
                     </StackPanel>
                 </Button>
                 <Separator />
-                <Button x:Name="btnSetDefaultProfile" ToolTip="{x:Static resx:ResUI.menuSetDefaultProfile}">
+                <Button x:Name="BtnSetDefaultProfile" ToolTip="{x:Static resx:ResUI.menuSetDefaultProfile}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon
                             Margin="0,0,8,0"
@@ -75,7 +75,7 @@
                     </StackPanel>
                 </Button>
                 <Separator />
-                <Button x:Name="btnProfileQrcode" ToolTip="{x:Static resx:ResUI.menuProfileQrcode}">
+                <Button x:Name="BtnProfileQrcode" ToolTip="{x:Static resx:ResUI.menuProfileQrcode}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon
                             Margin="0,0,8,0"
@@ -87,7 +87,7 @@
             </ToolBar>
         </ToolBarTray>
         <ListView
-            x:Name="lstProfiles"
+            x:Name="LstProfiles"
             AllowDrop="True"
             BorderThickness="0"
             ItemContainerStyle="{StaticResource lvItemSelected}"
@@ -95,25 +95,25 @@
             ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ListView.ContextMenu>
                 <ContextMenu Style="{StaticResource DefMenu}">
-                    <MenuItem x:Name="menuEditLocalFile" Header="{x:Static resx:ResUI.menuEditLocalFile}" />
-                    <MenuItem x:Name="menuEditProfile" Header="{x:Static resx:ResUI.menuEditProfile}" />
-                    <MenuItem x:Name="menuAddProfile" Header="{x:Static resx:ResUI.menuAddProfile}" />
-                    <MenuItem x:Name="menuAddProfileViaScan" Header="{x:Static resx:ResUI.menuAddProfileViaScan}" />
-                    <MenuItem x:Name="menuAddProfileViaClipboard" Header="{x:Static resx:ResUI.menuAddProfileViaClipboard}" />
-                    <MenuItem x:Name="menuExportProfile" Header="{x:Static resx:ResUI.menuExportProfile}" />
-                    <MenuItem x:Name="menuProfileQrcode" Header="{x:Static resx:ResUI.menuProfileQrcode}" />
+                    <MenuItem x:Name="MenuEditLocalFile" Header="{x:Static resx:ResUI.menuEditLocalFile}" />
+                    <MenuItem x:Name="MenuEditProfile" Header="{x:Static resx:ResUI.menuEditProfile}" />
+                    <MenuItem x:Name="MenuAddProfile" Header="{x:Static resx:ResUI.menuAddProfile}" />
+                    <MenuItem x:Name="MenuAddProfileViaScan" Header="{x:Static resx:ResUI.menuAddProfileViaScan}" />
+                    <MenuItem x:Name="MenuAddProfileViaClipboard" Header="{x:Static resx:ResUI.menuAddProfileViaClipboard}" />
+                    <MenuItem x:Name="MenuExportProfile" Header="{x:Static resx:ResUI.menuExportProfile}" />
+                    <MenuItem x:Name="MenuProfileQrcode" Header="{x:Static resx:ResUI.menuProfileQrcode}" />
                     <Separator />
-                    <MenuItem x:Name="menuSubUpdate" Header="{x:Static resx:ResUI.menuSubUpdate}" />
-                    <MenuItem x:Name="menuSubUpdateSelected" Header="{x:Static resx:ResUI.menuSubUpdateSelected}" />
-                    <MenuItem x:Name="menuSubUpdateViaProxy" Header="{x:Static resx:ResUI.menuSubUpdateViaProxy}" />
-                    <MenuItem x:Name="menuSubUpdateSelectedViaProxy" Header="{x:Static resx:ResUI.menuSubUpdateSelectedViaProxy}" />
+                    <MenuItem x:Name="MenuSubUpdate" Header="{x:Static resx:ResUI.menuSubUpdate}" />
+                    <MenuItem x:Name="MenuSubUpdateSelected" Header="{x:Static resx:ResUI.menuSubUpdateSelected}" />
+                    <MenuItem x:Name="MenuSubUpdateViaProxy" Header="{x:Static resx:ResUI.menuSubUpdateViaProxy}" />
+                    <MenuItem x:Name="MenuSubUpdateSelectedViaProxy" Header="{x:Static resx:ResUI.menuSubUpdateSelectedViaProxy}" />
                     <Separator />
-                    <MenuItem x:Name="menuRemoveProfile" Header="{x:Static resx:ResUI.menuRemoveProfile}" />
-                    <MenuItem x:Name="menuCloneProfile" Header="{x:Static resx:ResUI.menuCloneProfile}" />
-                    <MenuItem x:Name="menuSetDefaultProfile" Header="{x:Static resx:ResUI.menuSetDefaultProfile}" />
+                    <MenuItem x:Name="MenuRemoveProfile" Header="{x:Static resx:ResUI.menuRemoveProfile}" />
+                    <MenuItem x:Name="MenuCloneProfile" Header="{x:Static resx:ResUI.menuCloneProfile}" />
+                    <MenuItem x:Name="MenuSetDefaultProfile" Header="{x:Static resx:ResUI.menuSetDefaultProfile}" />
                     <Separator />
-                    <MenuItem x:Name="menuClearStatistic" Header="{x:Static resx:ResUI.menuClearStatistic}" />
-                    <MenuItem x:Name="menuProfileReload" Header="{x:Static resx:ResUI.menuProfileReload}" />
+                    <MenuItem x:Name="MenuClearStatistic" Header="{x:Static resx:ResUI.menuClearStatistic}" />
+                    <MenuItem x:Name="MenuProfileReload" Header="{x:Static resx:ResUI.menuProfileReload}" />
                 </ContextMenu>
             </ListView.ContextMenu>
             <ListView.ItemsPanel>

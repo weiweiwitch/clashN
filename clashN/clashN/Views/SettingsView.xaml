@@ -21,7 +21,7 @@
             Text="{x:Static resx:ResUI.TbSettings}" />
         <ToolBarTray Margin="0,8,0,8" DockPanel.Dock="Top">
             <ToolBar ClipToBounds="True" Style="{StaticResource MaterialDesignToolBar}">
-                <Button x:Name="btnSave">
+                <Button x:Name="BtnSave">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon
                             Margin="0,0,8,0"
@@ -35,9 +35,9 @@
                     VerticalAlignment="Center"
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.TbSettingsColorMode}" />
-                <ToggleButton x:Name="togDarkMode" />
+                <ToggleButton x:Name="TogDarkMode" />
                 <ComboBox
-                    x:Name="cmbSwatches"
+                    x:Name="CmbSwatches"
                     Width="100"
                     Margin="8"
                     DisplayMemberPath="Name"
@@ -48,7 +48,7 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.TbSettingsLanguage}" />
                 <ComboBox
-                    x:Name="cmbCurrentLanguage"
+                    x:Name="CmbCurrentLanguage"
                     Width="100"
                     Margin="8"
                     materialDesign:HintAssist.Hint="Language"
@@ -59,7 +59,7 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.TbSettingsFontSize}" />
                 <ComboBox
-                    x:Name="cmbCurrentFontSize"
+                    x:Name="CmbCurrentFontSize"
                     Width="100"
                     Margin="8"
                     Style="{StaticResource DefComboBox}" />
@@ -106,7 +106,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsMixedPort}" />
                         <TextBox
-                            x:Name="txtMixedPort"
+                            x:Name="TxtMixedPort"
                             Grid.Row="1"
                             Grid.Column="1"
                             Width="200"
@@ -121,7 +121,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsSocksPort}" />
                         <TextBox
-                            x:Name="txtSocksPort"
+                            x:Name="TxtSocksPort"
                             Grid.Row="2"
                             Grid.Column="1"
                             Width="200"
@@ -136,7 +136,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsHttpPort}" />
                         <TextBox
-                            x:Name="txtHttpPort"
+                            x:Name="TxtHttpPort"
                             Grid.Row="3"
                             Grid.Column="1"
                             Width="200"
@@ -151,7 +151,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsAPIPort}" />
                         <TextBox
-                            x:Name="txtAPIPort"
+                            x:Name="TxtApiPort"
                             Grid.Row="4"
                             Grid.Column="1"
                             Width="200"
@@ -166,7 +166,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsAllowLAN}" />
                         <ToggleButton
-                            x:Name="togAllowLANConn"
+                            x:Name="TogAllowLanConn"
                             Grid.Row="5"
                             Grid.Column="1"
                             Margin="8"
@@ -180,7 +180,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsIpv6}" />
                         <ToggleButton
-                            x:Name="togEnableIpv6"
+                            x:Name="TogEnableIpv6"
                             Grid.Row="6"
                             Grid.Column="1"
                             Margin="8"
@@ -194,7 +194,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsLogLevel}" />
                         <ComboBox
-                            x:Name="cmbLogLevel"
+                            x:Name="CmbLogLevel"
                             Grid.Row="7"
                             Grid.Column="1"
                             Margin="8"
@@ -209,13 +209,13 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsMixin}" />
                         <ToggleButton
-                            x:Name="togEnableMixinContent"
+                            x:Name="TogEnableMixinContent"
                             Grid.Row="8"
                             Grid.Column="1"
                             Margin="8"
                             HorizontalAlignment="Left" />
                         <Button
-                            x:Name="btnEditMixinContent"
+                            x:Name="BtnEditMixinContent"
                             Grid.Row="9"
                             Grid.Column="0"
                             Margin="2,0,8,0"
@@ -263,7 +263,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsStartBoot}" />
                         <ToggleButton
-                            x:Name="togAutoRun"
+                            x:Name="TogAutoRun"
                             Grid.Row="3"
                             Grid.Column="1"
                             Margin="8"
@@ -277,7 +277,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsStatistics}" />
                         <ToggleButton
-                            x:Name="togEnableStatistics"
+                            x:Name="TogEnableStatistics"
                             Grid.Row="4"
                             Grid.Column="1"
                             Margin="8"
@@ -291,7 +291,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsTLS13}" />
                         <ToggleButton
-                            x:Name="togEnableSecurityProtocolTls13"
+                            x:Name="TogEnableSecurityProtocolTls13"
                             Grid.Row="5"
                             Grid.Column="1"
                             Margin="8"
@@ -305,7 +305,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsAutoHideStartup}" />
                         <ToggleButton
-                            x:Name="togAutoHideStartup"
+                            x:Name="TogAutoHideStartup"
                             Grid.Row="6"
                             Grid.Column="1"
                             Margin="8"
@@ -319,7 +319,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsAutoUpdate}" />
                         <TextBox
-                            x:Name="txtautoUpdateSubInterval"
+                            x:Name="TxtAutoUpdateSubInterval"
                             Grid.Row="7"
                             Grid.Column="1"
                             Width="300"
@@ -334,7 +334,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsAutoTest}" />
                         <TextBox
-                            x:Name="txtautoDelayTestInterval"
+                            x:Name="TxtAutoDelayTestInterval"
                             Grid.Row="8"
                             Grid.Column="1"
                             Width="300"
@@ -348,7 +348,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsSubConvert}" />
                         <ComboBox
-                            x:Name="cmbSubConvertUrl"
+                            x:Name="CmbSubConvertUrl"
                             Grid.Row="9"
                             Grid.Column="1"
                             Width="300"
@@ -365,7 +365,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsFontFamily}" />
                         <ComboBox
-                            x:Name="cmbcurrentFontFamily"
+                            x:Name="CmbCurrentFontFamily"
                             Grid.Row="10"
                             Grid.Column="1"
                             Width="300"
@@ -380,14 +380,14 @@
                             Text="{x:Static resx:ResUI.TbSettingsFontFamilyTip}" />
 
                         <Button
-                            x:Name="btnSetLoopback"
+                            x:Name="BtnSetLoopback"
                             Grid.Row="11"
                             Grid.Column="0"
                             Margin="8"
                             Content="{x:Static resx:ResUI.TbSettingsSetUWP}"
                             Style="{StaticResource DefButton}" />
                         <Button
-                            x:Name="btnSetGlobalHotkey"
+                            x:Name="BtnSetGlobalHotkey"
                             Grid.Row="12"
                             Grid.Column="0"
                             Margin="8"
@@ -425,7 +425,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsExceptionTip}" />
                         <TextBox
-                            x:Name="txtsystemProxyExceptions"
+                            x:Name="TxtSystemProxyExceptions"
                             Grid.Row="2"
                             MinWidth="500"
                             MinHeight="240"
@@ -446,7 +446,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsAdvancedProtocol}" />
                         <ComboBox
-                            x:Name="cmbsystemProxyAdvancedProtocol"
+                            x:Name="CmbSystemProxyAdvancedProtocol"
                             Grid.Row="4"
                             Margin="8"
                             materialDesign:HintAssist.Hint="Protocol"
@@ -458,7 +458,7 @@
                             Style="{StaticResource ListItemTitle}"
                             Text="{x:Static resx:ResUI.TbSettingsPacListenPort}" />
                         <TextBox
-                            x:Name="txtPacPort"
+                            x:Name="TxtPacPort"
                             Grid.Row="5"
                             Width="200"
                             Margin="8"

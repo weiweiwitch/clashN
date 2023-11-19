@@ -48,9 +48,9 @@
                                     Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                     Text="" />
                                 <Button
-                                    x:Name="btnAbout"
+                                    x:Name="BtnAbout"
                                     Width="100"
-                                    Click="btnAbout_Click"
+                                    Click="BtnAbout_Click"
                                     Content="{x:Static resx:ResUI.TbHelpProjectGo}"
                                     DockPanel.Dock="Right"
                                     Style="{StaticResource DefButton}" />
@@ -86,7 +86,7 @@
                                     Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                     Text="" />
                                 <Button
-                                    x:Name="btnCheckUpdateN"
+                                    x:Name="BtnCheckUpdateN"
                                     Width="100"
                                     Content="{x:Static resx:ResUI.TbHelpCheck}"
                                     DockPanel.Dock="Right"
@@ -123,7 +123,7 @@
                                     Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                     Text="" />
                                 <Button
-                                    x:Name="btnCheckUpdateClashCore"
+                                    x:Name="BtnCheckUpdateClashCore"
                                     Width="100"
                                     Content="{x:Static resx:ResUI.TbHelpCheck}"
                                     DockPanel.Dock="Right"
@@ -160,7 +160,7 @@
                                     Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                     Text="" />
                                 <Button
-                                    x:Name="btnCheckUpdateClashMetaCore"
+                                    x:Name="BtnCheckUpdateClashMetaCore"
                                     Width="100"
                                     Content="{x:Static resx:ResUI.TbHelpCheck}"
                                     DockPanel.Dock="Right"

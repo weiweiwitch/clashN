@@ -35,23 +35,23 @@ namespace ClashN.Views
 
         private void ShowMsg(string msg)
         {
-            if (txtMsg.LineCount > 999)
+            if (TxtMsg.LineCount > 999)
             {
                 ClearMsg();
             }
-            this.txtMsg.AppendText(msg);
+            this.TxtMsg.AppendText(msg);
             if (!msg.EndsWith(Environment.NewLine))
             {
-                this.txtMsg.AppendText(Environment.NewLine);
+                this.TxtMsg.AppendText(Environment.NewLine);
             }
-            txtMsg.ScrollToEnd();
+            TxtMsg.ScrollToEnd();
         }
 
         public void ClearMsg()
         {
             Dispatcher.Invoke((Action)(() =>
             {
-                txtMsg.Clear();
+                TxtMsg.Clear();
             }));
         }
     }

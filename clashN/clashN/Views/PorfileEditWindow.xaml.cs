@@ -17,26 +17,26 @@ namespace ClashN.Views
             ViewModel = new ProfileEditViewModel(profileItem, this);
             Global.coreTypes.ForEach(it =>
             {
-                cmbCoreType.Items.Add(it);
+                CmbCoreType.Items.Add(it);
             });
             this.WhenActivated(disposables =>
             {
-                this.Bind(ViewModel, vm => vm.SelectedSource.remarks, v => v.txtRemarks.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedSource.url, v => v.txtUrl.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedSource.address, v => v.txtAddress.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedSource.userAgent, v => v.txtUserAgent.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.remarks, v => v.TxtRemarks.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.url, v => v.TxtUrl.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.address, v => v.TxtAddress.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.userAgent, v => v.TxtUserAgent.Text).DisposeWith(disposables);
 
-                this.Bind(ViewModel, vm => vm.CoreType, v => v.cmbCoreType.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedSource.enabled, v => v.togEnabled.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedSource.enableConvert, v => v.togEnableConvert.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.CoreType, v => v.CmbCoreType.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.enabled, v => v.TogEnabled.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.enableConvert, v => v.TogEnableConvert.IsChecked).DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.BrowseProfileCmd, v => v.btnBrowse).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.EditProfileCmd, v => v.btnEdit).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.SaveProfileCmd, v => v.btnSave).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.BrowseProfileCmd, v => v.BtnBrowse).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.EditProfileCmd, v => v.BtnEdit).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.SaveProfileCmd, v => v.BtnSave).DisposeWith(disposables);
             });
         }
 
-        private void btnCancel_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void BtnCancel_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             this.Close();
         }

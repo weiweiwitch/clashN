@@ -21,45 +21,45 @@ namespace ClashN.Views
             ViewModel = new ProfilesViewModel();
             Locator.CurrentMutable.RegisterLazySingleton(() => ViewModel, typeof(ProfilesViewModel));
 
-            lstProfiles.PreviewMouseDoubleClick += lstProfiles_PreviewMouseDoubleClick;
-            lstProfiles.PreviewMouseLeftButtonDown += LstProfiles_PreviewMouseLeftButtonDown;
-            lstProfiles.MouseMove += LstProfiles_MouseMove;
-            lstProfiles.DragEnter += LstProfiles_DragEnter;
-            lstProfiles.Drop += LstProfiles_Drop;
+            LstProfiles.PreviewMouseDoubleClick += lstProfiles_PreviewMouseDoubleClick;
+            LstProfiles.PreviewMouseLeftButtonDown += LstProfiles_PreviewMouseLeftButtonDown;
+            LstProfiles.MouseMove += LstProfiles_MouseMove;
+            LstProfiles.DragEnter += LstProfiles_DragEnter;
+            LstProfiles.Drop += LstProfiles_Drop;
 
             this.WhenActivated(disposables =>
             {
-                this.OneWayBind(ViewModel, vm => vm.ProfileItems, v => v.lstProfiles.ItemsSource).DisposeWith(disposables);
+                this.OneWayBind(ViewModel, vm => vm.ProfileItems, v => v.LstProfiles.ItemsSource).DisposeWith(disposables);
 
-                this.Bind(ViewModel, vm => vm.SelectedSource, v => v.lstProfiles.SelectedItem).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource, v => v.LstProfiles.SelectedItem).DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.EditLocalFileCmd, v => v.menuEditLocalFile).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.EditProfileCmd, v => v.menuEditProfile).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.AddProfileCmd, v => v.menuAddProfile).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.AddProfileViaScanCmd, v => v.menuAddProfileViaScan).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.AddProfileViaClipboardCmd, v => v.menuAddProfileViaClipboard).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.ExportProfileCmd, v => v.menuExportProfile).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.ProfileQrcodeCmd, v => v.menuProfileQrcode).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.EditLocalFileCmd, v => v.MenuEditLocalFile).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.EditProfileCmd, v => v.MenuEditProfile).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.AddProfileCmd, v => v.MenuAddProfile).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.AddProfileViaScanCmd, v => v.MenuAddProfileViaScan).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.AddProfileViaClipboardCmd, v => v.MenuAddProfileViaClipboard).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ExportProfileCmd, v => v.MenuExportProfile).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ProfileQrcodeCmd, v => v.MenuProfileQrcode).DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.SubUpdateCmd, v => v.menuSubUpdate).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.SubUpdateSelectedCmd, v => v.menuSubUpdateSelected).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.SubUpdateViaProxyCmd, v => v.menuSubUpdateViaProxy).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.SubUpdateSelectedViaProxyCmd, v => v.menuSubUpdateSelectedViaProxy).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.SubUpdateCmd, v => v.MenuSubUpdate).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.SubUpdateSelectedCmd, v => v.MenuSubUpdateSelected).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.SubUpdateViaProxyCmd, v => v.MenuSubUpdateViaProxy).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.SubUpdateSelectedViaProxyCmd, v => v.MenuSubUpdateSelectedViaProxy).DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.RemoveProfileCmd, v => v.menuRemoveProfile).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.CloneProfileCmd, v => v.menuCloneProfile).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.SetDefaultProfileCmd, v => v.menuSetDefaultProfile).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.EditLocalFileCmd, v => v.menuEditLocalFile).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.RemoveProfileCmd, v => v.MenuRemoveProfile).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.CloneProfileCmd, v => v.MenuCloneProfile).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.SetDefaultProfileCmd, v => v.MenuSetDefaultProfile).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.EditLocalFileCmd, v => v.MenuEditLocalFile).DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.ClearStatisticCmd, v => v.menuClearStatistic).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.ProfileReloadCmd, v => v.menuProfileReload).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ClearStatisticCmd, v => v.MenuClearStatistic).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ProfileReloadCmd, v => v.MenuProfileReload).DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.AddProfileCmd, v => v.btnAddProfile).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.AddProfileViaClipboardCmd, v => v.btnAddProfileViaClipboard).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.SubUpdateViaProxyCmd, v => v.btnSubUpdateViaProxy).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.EditProfileCmd, v => v.btnEditProfile).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.SetDefaultProfileCmd, v => v.btnSetDefaultProfile).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.ProfileQrcodeCmd, v => v.btnProfileQrcode).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.AddProfileCmd, v => v.BtnAddProfile).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.AddProfileViaClipboardCmd, v => v.BtnAddProfileViaClipboard).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.SubUpdateViaProxyCmd, v => v.BtnSubUpdateViaProxy).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.EditProfileCmd, v => v.BtnEditProfile).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.SetDefaultProfileCmd, v => v.BtnSetDefaultProfile).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ProfileQrcodeCmd, v => v.BtnProfileQrcode).DisposeWith(disposables);
             });
         }
 
@@ -149,7 +149,7 @@ namespace ClashN.Views
                 ProfileItemModel item = (ProfileItemModel)listView.ItemContainerGenerator.ItemFromContainer(listViewItem);
                 if (item == null) return;                   // Abort
                                                             // Initialize the drag & drop operation
-                startIndex = lstProfiles.SelectedIndex;
+                startIndex = LstProfiles.SelectedIndex;
                 DataObject dragData = new DataObject(formatData, item);
                 DragDrop.DoDragDrop(listViewItem, dragData, DragDropEffects.Copy | DragDropEffects.Move);
             }

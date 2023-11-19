@@ -52,7 +52,7 @@
                                     Grid.Column="0"
                                     Kind="ArrowUpThin" />
                                 <TextBlock
-                                    x:Name="txtSpeedUpload"
+                                    x:Name="TxtSpeedUpload"
                                     Grid.Row="0"
                                     Grid.Column="1"
                                     Margin="8,0,0,0"
@@ -63,7 +63,7 @@
                                     Grid.Column="0"
                                     Kind="ArrowDownThin" />
                                 <TextBlock
-                                    x:Name="txtSpeedDownload"
+                                    x:Name="TxtSpeedDownload"
                                     Grid.Row="1"
                                     Grid.Column="1"
                                     Margin="8,0,0,0"
@@ -71,7 +71,7 @@
                                     Style="{StaticResource ToolbarItem}" />
                             </Grid>
                             <Button
-                                x:Name="btnReload"
+                                x:Name="BtnReload"
                                 Content="{materialDesign:PackIcon Kind=Reload}"
                                 Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
                                 ToolTip="{x:Static resx:ResUI.TbReloadCore}" />
@@ -97,7 +97,7 @@
                         </StackPanel>
                     </TabItem.Header>
                 </TabItem>-->
-                    <TabItem x:Name="proxiesTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
+                    <TabItem x:Name="ProxiesTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
                         <TabItem.Header>
                             <StackPanel Width="auto" Height="auto">
                                 <materialDesign:PackIcon
@@ -112,7 +112,7 @@
                             </StackPanel>
                         </TabItem.Header>
                     </TabItem>
-                    <TabItem x:Name="profilesTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
+                    <TabItem x:Name="ProfilesTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
                         <TabItem.Header>
                             <StackPanel Width="auto" Height="auto">
                                 <materialDesign:PackIcon
@@ -127,7 +127,7 @@
                             </StackPanel>
                         </TabItem.Header>
                     </TabItem>
-                    <TabItem x:Name="logsTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
+                    <TabItem x:Name="LogsTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
                         <TabItem.Header>
                             <StackPanel Width="auto" Height="auto">
                                 <materialDesign:PackIcon
@@ -142,7 +142,7 @@
                             </StackPanel>
                         </TabItem.Header>
                     </TabItem>
-                    <TabItem x:Name="connectionsTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
+                    <TabItem x:Name="ConnectionsTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
                         <TabItem.Header>
                             <StackPanel Width="auto" Height="auto">
                                 <materialDesign:PackIcon
@@ -157,7 +157,7 @@
                             </StackPanel>
                         </TabItem.Header>
                     </TabItem>
-                    <TabItem x:Name="settingsTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
+                    <TabItem x:Name="SettingsTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
                         <TabItem.Header>
                             <StackPanel Width="auto" Height="auto">
                                 <materialDesign:PackIcon
@@ -172,7 +172,7 @@
                             </StackPanel>
                         </TabItem.Header>
                     </TabItem>
-                    <TabItem x:Name="helpTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
+                    <TabItem x:Name="HelpTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
                         <TabItem.Header>
                             <StackPanel Width="auto" Height="auto">
                                 <materialDesign:PackIcon
@@ -187,7 +187,7 @@
                             </StackPanel>
                         </TabItem.Header>
                     </TabItem>
-                    <TabItem x:Name="promotionTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
+                    <TabItem x:Name="PromotionTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
                         <TabItem.Header>
                             <StackPanel Width="auto" Height="auto">
                                 <materialDesign:PackIcon
@@ -205,49 +205,49 @@
                 </TabControl>
 
                 <tb:TaskbarIcon
-                    x:Name="tbNotify"
+                    x:Name="TbNotify"
                     IconSource="/ClashN.ico"
                     NoLeftClickDelay="True">
                     <tb:TaskbarIcon.ContextMenu>
                         <ContextMenu Style="{StaticResource DefMenu}">
-                            <MenuItem x:Name="menuSystemProxyClear">
+                            <MenuItem x:Name="MenuSystemProxyClear">
                                 <MenuItem.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon
-                                            x:Name="menuSystemProxyClear2"
+                                            x:Name="MenuSystemProxyClear2"
                                             Margin="0,0,8,0"
                                             Kind="Check" />
                                         <TextBlock Text="{x:Static resx:ResUI.menuSystemProxyClear}" />
                                     </StackPanel>
                                 </MenuItem.Header>
                             </MenuItem>
-                            <MenuItem x:Name="menuSystemProxySet">
+                            <MenuItem x:Name="MenuSystemProxySet">
                                 <MenuItem.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon
-                                            x:Name="menuSystemProxySet2"
+                                            x:Name="MenuSystemProxySet2"
                                             Margin="0,0,8,0"
                                             Kind="Check" />
                                         <TextBlock Text="{x:Static resx:ResUI.menuSystemProxySet}" />
                                     </StackPanel>
                                 </MenuItem.Header>
                             </MenuItem>
-                            <MenuItem x:Name="menuSystemProxyNothing">
+                            <MenuItem x:Name="MenuSystemProxyNothing">
                                 <MenuItem.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon
-                                            x:Name="menuSystemProxyNothing2"
+                                            x:Name="MenuSystemProxyNothing2"
                                             Margin="0,0,8,0"
                                             Kind="Check" />
                                         <TextBlock Text="{x:Static resx:ResUI.menuSystemProxyNothing}" />
                                     </StackPanel>
                                 </MenuItem.Header>
                             </MenuItem>
-                            <MenuItem x:Name="menuSystemProxyPac">
+                            <MenuItem x:Name="MenuSystemProxyPac">
                                 <MenuItem.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon
-                                            x:Name="menuSystemProxyPac2"
+                                            x:Name="MenuSystemProxyPac2"
                                             Margin="0,0,8,0"
                                             Kind="Check" />
                                         <TextBlock Text="{x:Static resx:ResUI.menuSystemProxyPac}" />
@@ -256,44 +256,44 @@
                             </MenuItem>
                             <Separator />
 
-                            <MenuItem x:Name="menuModeRule">
+                            <MenuItem x:Name="MenuModeRule">
                                 <MenuItem.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon
-                                            x:Name="menuModeRule2"
+                                            x:Name="MenuModeRule2"
                                             Margin="0,0,8,0"
                                             Kind="Check" />
                                         <TextBlock Text="{x:Static resx:ResUI.menuModeRule}" />
                                     </StackPanel>
                                 </MenuItem.Header>
                             </MenuItem>
-                            <MenuItem x:Name="menuModeGlobal">
+                            <MenuItem x:Name="MenuModeGlobal">
                                 <MenuItem.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon
-                                            x:Name="menuModeGlobal2"
+                                            x:Name="MenuModeGlobal2"
                                             Margin="0,0,8,0"
                                             Kind="Check" />
                                         <TextBlock Text="{x:Static resx:ResUI.menuModeGlobal}" />
                                     </StackPanel>
                                 </MenuItem.Header>
                             </MenuItem>
-                            <MenuItem x:Name="menuModeDirect">
+                            <MenuItem x:Name="MenuModeDirect">
                                 <MenuItem.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon
-                                            x:Name="menuModeDirect2"
+                                            x:Name="MenuModeDirect2"
                                             Margin="0,0,8,0"
                                             Kind="Check" />
                                         <TextBlock Text="{x:Static resx:ResUI.menuModeDirect}" />
                                     </StackPanel>
                                 </MenuItem.Header>
                             </MenuItem>
-                            <MenuItem x:Name="menuModeNothing">
+                            <MenuItem x:Name="MenuModeNothing">
                                 <MenuItem.Header>
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon
-                                            x:Name="menuModeNothing2"
+                                            x:Name="MenuModeNothing2"
                                             Margin="0,0,8,0"
                                             Kind="Check" />
                                         <TextBlock Text="{x:Static resx:ResUI.menuModeNothing}" />
@@ -302,13 +302,13 @@
                             </MenuItem>
 
                             <Separator />
-                            <MenuItem x:Name="menuAddProfileViaScan" Header="{x:Static resx:ResUI.menuAddProfileViaScan}" />
-                            <MenuItem x:Name="menuSubUpdate" Header="{x:Static resx:ResUI.menuSubUpdate}" />
-                            <MenuItem x:Name="menuSubUpdateViaProxy" Header="{x:Static resx:ResUI.menuSubUpdateViaProxy}" />
+                            <MenuItem x:Name="MenuAddProfileViaScan" Header="{x:Static resx:ResUI.menuAddProfileViaScan}" />
+                            <MenuItem x:Name="MenuSubUpdate" Header="{x:Static resx:ResUI.menuSubUpdate}" />
+                            <MenuItem x:Name="MenuSubUpdateViaProxy" Header="{x:Static resx:ResUI.menuSubUpdateViaProxy}" />
                             <Separator />
                             <MenuItem
-                                x:Name="menuExit"
-                                Click="menuExit_Click"
+                                x:Name="MenuExit"
+                                Click="MenuExit_Click"
                                 Header="{x:Static resx:ResUI.menuExit}" />
                         </ContextMenu>
                     </tb:TaskbarIcon.ContextMenu>

@@ -16,27 +16,27 @@ namespace ClashN.Views
             InitializeComponent();
             ViewModel = new ProxiesViewModel();
             Locator.CurrentMutable.RegisterLazySingleton(() => ViewModel, typeof(ProxiesViewModel));
-            lstProxyDetails.PreviewMouseDoubleClick += lstProxyDetails_PreviewMouseDoubleClick;
+            LstProxyDetails.PreviewMouseDoubleClick += lstProxyDetails_PreviewMouseDoubleClick;
 
             this.WhenActivated(disposables =>
             {
-                this.OneWayBind(ViewModel, vm => vm.ProxyGroups, v => v.lstProxyGroups.ItemsSource).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedGroup, v => v.lstProxyGroups.SelectedItem).DisposeWith(disposables);
+                this.OneWayBind(ViewModel, vm => vm.ProxyGroups, v => v.LstProxyGroups.ItemsSource).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedGroup, v => v.LstProxyGroups.SelectedItem).DisposeWith(disposables);
 
-                this.OneWayBind(ViewModel, vm => vm.ProxyDetails, v => v.lstProxyDetails.ItemsSource).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedDetail, v => v.lstProxyDetails.SelectedItem).DisposeWith(disposables);
+                this.OneWayBind(ViewModel, vm => vm.ProxyDetails, v => v.LstProxyDetails.ItemsSource).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedDetail, v => v.LstProxyDetails.SelectedItem).DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.ProxiesReloadCmd, v => v.menuProxiesReload).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.ProxiesDelaytestCmd, v => v.menuProxiesDelaytest).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ProxiesReloadCmd, v => v.MenuProxiesReload).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ProxiesDelaytestCmd, v => v.MenuProxiesDelayTest).DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.ProxiesDelaytestPartCmd, v => v.menuProxiesDelaytestPart).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.ProxiesSelectActivityCmd, v => v.menuProxiesSelectActivity).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ProxiesDelaytestPartCmd, v => v.MenuProxiesDelayTestPart).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ProxiesSelectActivityCmd, v => v.MenuProxiesSelectActivity).DisposeWith(disposables);
 
-                this.Bind(ViewModel, vm => vm.SystemProxySelected, v => v.cmbSystemProxy.SelectedIndex).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.RuleModeSelected, v => v.cmbRulemode.SelectedIndex).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SortingSelected, v => v.cmbSorting.SelectedIndex).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.AutoRefresh, v => v.togAutoRefresh.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.EnableTun, v => v.togEnableTun.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SystemProxySelected, v => v.CmbSystemProxy.SelectedIndex).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.RuleModeSelected, v => v.CmbRulemode.SelectedIndex).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SortingSelected, v => v.CmbSorting.SelectedIndex).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.AutoRefresh, v => v.TogAutoRefresh.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.EnableTun, v => v.TogEnableTun.IsChecked).DisposeWith(disposables);
             });
         }
 

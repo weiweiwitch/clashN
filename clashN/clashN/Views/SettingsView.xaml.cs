@@ -24,24 +24,24 @@ namespace ClashN.Views
 
             Global.SubConvertUrls.ForEach(it =>
             {
-                cmbSubConvertUrl.Items.Add(it);
+                CmbSubConvertUrl.Items.Add(it);
             });
             Global.Languages.ForEach(it =>
             {
-                cmbCurrentLanguage.Items.Add(it);
+                CmbCurrentLanguage.Items.Add(it);
             });
             Global.IEProxyProtocols.ForEach(it =>
             {
-                cmbsystemProxyAdvancedProtocol.Items.Add(it);
+                CmbSystemProxyAdvancedProtocol.Items.Add(it);
             });
             Global.LogLevel.ForEach(it =>
             {
-                cmbLogLevel.Items.Add(it);
+                CmbLogLevel.Items.Add(it);
             });
 
             for (int i = Global.MinFontSize; i <= Global.MinFontSize + 8; i++)
             {
-                cmbCurrentFontSize.Items.Add(i.ToString());
+                CmbCurrentFontSize.Items.Add(i.ToString());
             }
 
             //fill fonts
@@ -74,7 +74,7 @@ namespace ClashN.Views
                                     continue;
                                 }
                             }
-                            cmbcurrentFontFamily.Items.Add(fontFamily);
+                            CmbCurrentFontFamily.Items.Add(fontFamily);
                             break;
                         }
                     }
@@ -84,41 +84,41 @@ namespace ClashN.Views
             {
                 Utils.SaveLog("fill fonts error", ex);
             }
-            cmbcurrentFontFamily.Items.Add(string.Empty);
+            CmbCurrentFontFamily.Items.Add(string.Empty);
 
             this.WhenActivated(disposables =>
             {
-                this.Bind(ViewModel, vm => vm.MixedPort, v => v.txtMixedPort.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SocksPort, v => v.txtSocksPort.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.HttpPort, v => v.txtHttpPort.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.APIPort, v => v.txtAPIPort.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.AllowLANConn, v => v.togAllowLANConn.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.EnableIpv6, v => v.togEnableIpv6.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.LogLevel, v => v.cmbLogLevel.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.EnableMixinContent, v => v.togEnableMixinContent.IsChecked).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.EditMixinContentCmd, v => v.btnEditMixinContent).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.MixedPort, v => v.TxtMixedPort.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SocksPort, v => v.TxtSocksPort.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.HttpPort, v => v.TxtHttpPort.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.APIPort, v => v.TxtApiPort.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.AllowLANConn, v => v.TogAllowLanConn.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.EnableIpv6, v => v.TogEnableIpv6.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.LogLevel, v => v.CmbLogLevel.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.EnableMixinContent, v => v.TogEnableMixinContent.IsChecked).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.EditMixinContentCmd, v => v.BtnEditMixinContent).DisposeWith(disposables);
 
-                this.OneWayBind(ViewModel, vm => vm.Swatches, v => v.cmbSwatches.ItemsSource).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedSwatch, v => v.cmbSwatches.SelectedItem).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.ColorModeDark, v => v.togDarkMode.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.CurrentLanguage, v => v.cmbCurrentLanguage.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.CurrentFontSize, v => v.cmbCurrentFontSize.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.AutoRun, v => v.togAutoRun.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.EnableStatistics, v => v.togEnableStatistics.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.EnableSecurityProtocolTls13, v => v.togEnableSecurityProtocolTls13.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.AutoHideStartup, v => v.togAutoHideStartup.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.autoUpdateSubInterval, v => v.txtautoUpdateSubInterval.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.autoDelayTestInterval, v => v.txtautoDelayTestInterval.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SubConvertUrl, v => v.cmbSubConvertUrl.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.currentFontFamily, v => v.cmbcurrentFontFamily.Text).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.SetLoopbackCmd, v => v.btnSetLoopback).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.SetGlobalHotkeyCmd, v => v.btnSetGlobalHotkey).DisposeWith(disposables);
+                this.OneWayBind(ViewModel, vm => vm.Swatches, v => v.CmbSwatches.ItemsSource).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSwatch, v => v.CmbSwatches.SelectedItem).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.ColorModeDark, v => v.TogDarkMode.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.CurrentLanguage, v => v.CmbCurrentLanguage.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.CurrentFontSize, v => v.CmbCurrentFontSize.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.AutoRun, v => v.TogAutoRun.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.EnableStatistics, v => v.TogEnableStatistics.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.EnableSecurityProtocolTls13, v => v.TogEnableSecurityProtocolTls13.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.AutoHideStartup, v => v.TogAutoHideStartup.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.autoUpdateSubInterval, v => v.TxtAutoUpdateSubInterval.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.autoDelayTestInterval, v => v.TxtAutoDelayTestInterval.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SubConvertUrl, v => v.CmbSubConvertUrl.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.currentFontFamily, v => v.CmbCurrentFontFamily.Text).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.SetLoopbackCmd, v => v.BtnSetLoopback).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.SetGlobalHotkeyCmd, v => v.BtnSetGlobalHotkey).DisposeWith(disposables);
 
-                this.Bind(ViewModel, vm => vm.systemProxyExceptions, v => v.txtsystemProxyExceptions.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.systemProxyAdvancedProtocol, v => v.cmbsystemProxyAdvancedProtocol.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.PacPort, v => v.txtPacPort.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.systemProxyExceptions, v => v.TxtSystemProxyExceptions.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.systemProxyAdvancedProtocol, v => v.CmbSystemProxyAdvancedProtocol.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.PacPort, v => v.TxtPacPort.Text).DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.SaveCommand, v => v.btnSave).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.SaveCommand, v => v.BtnSave).DisposeWith(disposables);
             });
         }
     }

@@ -34,11 +34,11 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.TbFilter}" />
                 <TextBox
-                    x:Name="txtFilter"
+                    x:Name="TxtFilter"
                     Width="200"
                     Margin="8" />
                 <Separator />
-                <Button x:Name="btnDelete" Click="btnDelete_Click">
+                <Button x:Name="BtnDelete" Click="BtnDelete_Click">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon
                             Margin="0,0,8,0"
@@ -61,7 +61,7 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.TbAutoRefresh}" />
                 <ToggleButton
-                    x:Name="togAutoRefresh"
+                    x:Name="TogAutoRefresh"
                     Margin="8"
                     HorizontalAlignment="Left" />
                 <Separator />
@@ -70,7 +70,7 @@
                     Style="{StaticResource ToolbarItem}"
                     Text="{x:Static resx:ResUI.TbLineCount}" />
                 <ComboBox
-                    x:Name="cmbLineCount"
+                    x:Name="CmbLineCount"
                     Width="80"
                     Margin="8"
                     Style="{StaticResource DefComboBox}">

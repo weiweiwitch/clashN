@@ -422,9 +422,9 @@ namespace ClashN.Resx {
         /// <summary>
         ///   Looks up a localized string similar to Part Node Latency Test.
         /// </summary>
-        public static string menuProxiesDelaytestPart {
+        public static string menuProxiesDelayTestPart {
             get {
-                return ResourceManager.GetString("menuProxiesDelaytestPart", resourceCulture);
+                return ResourceManager.GetString("menuProxiesDelayTestPart", resourceCulture);
             }
         }
         
