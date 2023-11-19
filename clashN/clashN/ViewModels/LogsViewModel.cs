@@ -9,6 +9,9 @@ namespace ClashN.ViewModels
         public int SortingSelected { get; set; }
 
         [Reactive]
+        public bool ScrollToEnd { get; set; }
+        
+        [Reactive]
         public bool AutoRefresh { get; set; }
 
         [Reactive]
@@ -19,6 +22,7 @@ namespace ClashN.ViewModels
 
         public LogsViewModel()
         {
+            ScrollToEnd = true;
             AutoRefresh = true;
             MsgFilter = string.Empty;
             LineCount = 1000;

@@ -22,6 +22,7 @@ namespace ClashN.Views
             this.WhenActivated(disposables =>
             {
                 this.Bind(ViewModel, vm => vm.MsgFilter, v => v.txtFilter.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.ScrollToEnd, v => v.TogScrollToEnd.IsChecked).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.AutoRefresh, v => v.togAutoRefresh.IsChecked).DisposeWith(disposables);
                 this.Bind(ViewModel, vm => vm.LineCount, v => v.cmbLineCount.Text).DisposeWith(disposables);
             });
@@ -38,6 +39,7 @@ namespace ClashN.Views
             {
                 return;
             }
+
             string? msgFilter = ViewModel?.MsgFilter;
             if (!string.IsNullOrEmpty(msgFilter))
             {
@@ -56,20 +58,23 @@ namespace ClashN.Views
             {
                 ClearMsg();
             }
-            this.txtMsg.AppendText(msg);
+
+            txtMsg.AppendText(msg);
+
             if (!msg.EndsWith(Environment.NewLine))
             {
-                this.txtMsg.AppendText(Environment.NewLine);
+                txtMsg.AppendText(Environment.NewLine);
             }
-            txtMsg.ScrollToEnd();
+
+            if (ViewModel?.ScrollToEnd == true)
+            {
+                txtMsg.ScrollToEnd();
+            }
         }
 
         public void ClearMsg()
         {
-            Dispatcher.Invoke((Action)(() =>
-            {
-                txtMsg.Clear();
-            }));
+            Dispatcher.Invoke((Action)(() => { txtMsg.Clear(); }));
         }
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)

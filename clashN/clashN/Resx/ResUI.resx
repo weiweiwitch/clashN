@@ -409,6 +409,9 @@
   <data name="TbRemark" xml:space="preserve">
     <value>Remark</value>
   </data>
+  <data name="TbScrollToEnd" xml:space="preserve">
+    <value>ScrollToEnd</value>
+  </data>
   <data name="TbAutoRefresh" xml:space="preserve">
     <value>AutoRefresh</value>
   </data>
