@@ -552,7 +552,7 @@ internal class ConfigProc
         }
 
         //maybe url
-        if (string.IsNullOrEmpty(indexId) && (clipboardData.StartsWith(Global.httpsProtocol) || clipboardData.StartsWith(Global.httpProtocol)))
+        if (string.IsNullOrEmpty(indexId) && (clipboardData.StartsWith(Global.HttpsProtocol) || clipboardData.StartsWith(Global.HttpProtocol)))
         {
             ProfileItem item = new ProfileItem()
             {
@@ -568,7 +568,7 @@ internal class ConfigProc
         }
 
         //maybe clashProtocol
-        if (string.IsNullOrEmpty(indexId) && (clipboardData.StartsWith(Global.clashProtocol)))
+        if (string.IsNullOrEmpty(indexId) && (clipboardData.StartsWith(Global.ClashProtocol)))
         {
             Uri url = new Uri(clipboardData);
             if (url.Host == "install-config")

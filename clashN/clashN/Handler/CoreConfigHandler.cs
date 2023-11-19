@@ -157,13 +157,13 @@ internal class CoreConfigHandler
             return;
         }
 
-        var path = Utils.GetConfigPath(Global.mixinConfigFileName);
+        var path = Utils.GetConfigPath(Global.MixinConfigFileName);
         if (!File.Exists(path))
         {
             return;
         }
 
-        var txtFile = File.ReadAllText(Utils.GetConfigPath(Global.mixinConfigFileName));
+        var txtFile = File.ReadAllText(Utils.GetConfigPath(Global.MixinConfigFileName));
         //txtFile = txtFile.Replace("!<str>", "");
 
         var mixinContent = Utils.FromYaml<Dictionary<string, object>>(txtFile);

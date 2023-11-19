@@ -71,10 +71,10 @@ namespace ClashN.Handler
                 coreType = CoreKind.Clash,
                 coreExes = new List<string> { "clash-windows-amd64-v3", "clash-windows-amd64", "clash-windows-386", "clash" },
                 arguments = "-f config.yaml",
-                coreUrl = Global.clashCoreUrl,
-                coreLatestUrl = Global.clashCoreUrl + "/latest",
-                coreDownloadUrl32 = Global.clashCoreUrl + "/download/{0}/clash-windows-386-{0}.zip",
-                coreDownloadUrl64 = Global.clashCoreUrl + "/download/{0}/clash-windows-amd64-{0}.zip",
+                coreUrl = Global.ClashCoreUrl,
+                coreLatestUrl = Global.ClashCoreUrl + "/latest",
+                coreDownloadUrl32 = Global.ClashCoreUrl + "/download/{0}/clash-windows-386-{0}.zip",
+                coreDownloadUrl64 = Global.ClashCoreUrl + "/download/{0}/clash-windows-amd64-{0}.zip",
                 match = "Clash"
             });
 
@@ -83,10 +83,10 @@ namespace ClashN.Handler
                 coreType = CoreKind.ClashMeta,
                 coreExes = new List<string> { $"Clash.Meta-windows-amd64{(Avx2.X64.IsSupported ? "" : "-compatible")}", "Clash.Meta-windows-amd64-compatible", "Clash.Meta-windows-amd64", "Clash.Meta-windows-386", "Clash.Meta", "clash" },
                 arguments = "-f config.yaml",
-                coreUrl = Global.clashMetaCoreUrl,
-                coreLatestUrl = Global.clashMetaCoreUrl + "/latest",
-                coreDownloadUrl32 = Global.clashMetaCoreUrl + "/download/{0}/Clash.Meta-windows-386-{0}.zip",
-                coreDownloadUrl64 = Global.clashMetaCoreUrl + "/download/{0}/Clash.Meta-windows-amd64" + (Avx2.X64.IsSupported ? "" : "-compatible") + "-{0}.zip",
+                coreUrl = Global.ClashMetaCoreUrl,
+                coreLatestUrl = Global.ClashMetaCoreUrl + "/latest",
+                coreDownloadUrl32 = Global.ClashMetaCoreUrl + "/download/{0}/Clash.Meta-windows-386-{0}.zip",
+                coreDownloadUrl64 = Global.ClashMetaCoreUrl + "/download/{0}/Clash.Meta-windows-amd64" + (Avx2.X64.IsSupported ? "" : "-compatible") + "-{0}.zip",
                 match = "Clash Meta"
             });
 
@@ -95,10 +95,10 @@ namespace ClashN.Handler
                 coreType = CoreKind.ClashPremium,
                 coreExes = new List<string> { "clash-windows-amd64-v3", "clash-windows-amd64", "clash-windows-386", "clash" },
                 arguments = "-f config.yaml",
-                coreUrl = Global.clashCoreUrl,
-                coreLatestUrl = Global.clashCoreUrl + "/latest",
-                coreDownloadUrl32 = Global.clashCoreUrl + "/download/{0}/clash-windows-386-{0}.zip",
-                coreDownloadUrl64 = Global.clashCoreUrl + "/download/{0}/clash-windows-amd64-{0}.zip",
+                coreUrl = Global.ClashCoreUrl,
+                coreLatestUrl = Global.ClashCoreUrl + "/latest",
+                coreDownloadUrl32 = Global.ClashCoreUrl + "/download/{0}/clash-windows-386-{0}.zip",
+                coreDownloadUrl64 = Global.ClashCoreUrl + "/download/{0}/clash-windows-amd64-{0}.zip",
                 match = "Clash"
             });
         }

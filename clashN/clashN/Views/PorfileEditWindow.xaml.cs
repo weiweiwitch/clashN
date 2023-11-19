@@ -15,7 +15,7 @@ namespace ClashN.Views
         {
             InitializeComponent();
             ViewModel = new ProfileEditViewModel(profileItem, this);
-            Global.coreTypes.ForEach(it =>
+            Global.CoreTypes.ForEach(it =>
             {
                 CmbCoreType.Items.Add(it);
             });

@@ -78,7 +78,7 @@ namespace ClashN.Handler
                 else if (type == SysProxyType.Pac)
                 {
                     PacHandler.Start(Utils.GetConfigPath(), port, config.PacPort);
-                    var strProxy = $"{Global.httpProtocol}{Global.Loopback}:{config.PacPort}/pac?t={DateTime.Now.Ticks}";
+                    var strProxy = $"{Global.HttpProtocol}{Global.Loopback}:{config.PacPort}/pac?t={DateTime.Now.Ticks}";
                     SetIEProxy(false, strProxy, "");
                 }
 

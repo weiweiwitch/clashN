@@ -255,7 +255,7 @@ public class ProxiesViewModel : ReactiveObject
                     continue;
                 }
                 var item = proxies[it.name];
-                if (!Global.allowSelectType.Contains(item.type.ToLower()))
+                if (!Global.AllowSelectType.Contains(item.type.ToLower()))
                 {
                     continue;
                 }
@@ -271,7 +271,7 @@ public class ProxiesViewModel : ReactiveObject
         //from api
         foreach (KeyValuePair<string, ProxiesItem> kv in proxies)
         {
-            if (!Global.allowSelectType.Contains(kv.Value.type.ToLower()))
+            if (!Global.AllowSelectType.Contains(kv.Value.type.ToLower()))
             {
                 continue;
             }
@@ -381,7 +381,7 @@ public class ProxiesViewModel : ReactiveObject
         {
             foreach (KeyValuePair<string, ProvidersItem> kv in providers)
             {
-                if (Global.proxyVehicleType.Contains(kv.Value.vehicleType.ToLower()))
+                if (Global.ProxyVehicleType.Contains(kv.Value.vehicleType.ToLower()))
                 {
                     var proxy3 = kv.Value.proxies.FirstOrDefault(t => t.name == name);
                     if (proxy3 != null)

@@ -214,7 +214,7 @@ namespace ClashN.ViewModels
                 string? clipboardData = Utils.GetClipboardData();
                 if (state != null && clipboardData != null)
                 {
-                    if (string.IsNullOrEmpty(clipboardData) || !clipboardData.StartsWith(Global.clashProtocol))
+                    if (string.IsNullOrEmpty(clipboardData) || !clipboardData.StartsWith(Global.ClashProtocol))
                     {
                         return;
                     }

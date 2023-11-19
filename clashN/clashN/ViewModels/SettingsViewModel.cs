@@ -296,7 +296,7 @@ namespace ClashN.ViewModels
 
         private void EditMixinContent()
         {
-            var address = Utils.GetConfigPath(Global.mixinConfigFileName);
+            var address = Utils.GetConfigPath(Global.MixinConfigFileName);
             if (!File.Exists(address))
             {
                 string contents = Utils.GetEmbedText(Global.SampleMixin);

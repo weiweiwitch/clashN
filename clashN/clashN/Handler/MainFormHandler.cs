@@ -250,7 +250,7 @@ namespace ClashN.Handler
                     lstProxy = new List<ProxyModel>();
                     foreach (KeyValuePair<string, ProxiesItem> kv in proxies)
                     {
-                        if (Global.notAllowTestType.Contains(kv.Value.type.ToLower()))
+                        if (Global.NotAllowTestType.Contains(kv.Value.type.ToLower()))
                         {
                             continue;
                         }
@@ -272,7 +272,7 @@ namespace ClashN.Handler
                 List<Task> tasks = new List<Task>();
                 foreach (var it in lstProxy)
                 {
-                    if (Global.notAllowTestType.Contains(it.type.ToLower()))
+                    if (Global.NotAllowTestType.Contains(it.type.ToLower()))
                     {
                         continue;
                     }
@@ -403,7 +403,7 @@ namespace ClashN.Handler
 
         private string GetApiUrl()
         {
-            return $"{Global.httpProtocol}{Global.Loopback}:{LazyConfig.Instance.Config.ApiPort}";
+            return $"{Global.HttpProtocol}{Global.Loopback}:{LazyConfig.Instance.Config.ApiPort}";
         }
     }
 }

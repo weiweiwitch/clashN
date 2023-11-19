@@ -301,7 +301,7 @@ internal class UpdateHandle
     {
         _config = config;
         _updateFunc = update;
-        var url = string.Format(Global.geoUrl, geoName);
+        var url = string.Format(Global.GeoUrl, geoName);
 
         DownloadHandle downloadHandle = null;
         if (downloadHandle == null)
