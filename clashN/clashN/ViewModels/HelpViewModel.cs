@@ -6,77 +6,71 @@ using ReactiveUI;
 using Splat;
 using System.Reactive;
 
-namespace ClashN.ViewModels
+namespace ClashN.ViewModels;
+
+public class HelpViewModel : ReactiveObject
 {
-    public class HelpViewModel : ReactiveObject
+    private static Config _config;
+    private NoticeHandler? _noticeHandler;
+
+    public ReactiveCommand<Unit, Unit> CheckUpdateCmd { get; }
+    public ReactiveCommand<Unit, Unit> CheckUpdateClashCoreCmd { get; }
+    public ReactiveCommand<Unit, Unit> CheckUpdateClashMetaCoreCmd { get; }
+
+    public HelpViewModel()
     {
-        private static Config _config;
-        private NoticeHandler? _noticeHandler;
+        _config = LazyConfig.Instance.Config;
+        _noticeHandler = Locator.Current.GetService<NoticeHandler>();
 
-        public ReactiveCommand<Unit, Unit> CheckUpdateCmd { get; }
-        public ReactiveCommand<Unit, Unit> CheckUpdateClashCoreCmd { get; }
-        public ReactiveCommand<Unit, Unit> CheckUpdateClashMetaCoreCmd { get; }
+        CheckUpdateCmd = ReactiveCommand.Create(() => { CheckUpdateN(); });
+        CheckUpdateClashCoreCmd = ReactiveCommand.Create(() => { CheckUpdateCore(CoreKind.Clash); });
+        CheckUpdateClashMetaCoreCmd = ReactiveCommand.Create(() => { CheckUpdateCore(CoreKind.ClashMeta); });
+    }
 
-        public HelpViewModel()
+    private void CheckUpdateN()
+    {
+        new UpdateHandle().CheckUpdateGuiN(_config, UpdateUi);
+        return;
+
+        void UpdateUi(bool success, string msg)
         {
-            _config = LazyConfig.Instance.Config;
-            _noticeHandler = Locator.Current.GetService<NoticeHandler>();
-
-            CheckUpdateCmd = ReactiveCommand.Create(() =>
+            _noticeHandler?.SendMessage(msg);
+            if (success)
             {
-                CheckUpdateN();
-            });
-            CheckUpdateClashCoreCmd = ReactiveCommand.Create(() =>
-            {
-                CheckUpdateCore(CoreKind.Clash);
-            });
-            CheckUpdateClashMetaCoreCmd = ReactiveCommand.Create(() =>
-            {
-                CheckUpdateCore(CoreKind.ClashMeta);
-            });
+                Locator.Current.GetService<MainWindowViewModel>()?.MyAppExit(false);
+            }
         }
+    }
 
-        private void CheckUpdateN()
+    private void CheckUpdateCore(CoreKind type)
+    {
+        new UpdateHandle().CheckUpdateCore(type, _config, UpdateUi);
+        return;
+
+        void UpdateUi(bool success, string msg)
         {
-            void _updateUI(bool success, string msg)
+            _noticeHandler?.SendMessage(msg);
+            if (success)
             {
-                _noticeHandler?.SendMessage(msg);
-                if (success)
+                Locator.Current.GetService<MainWindowViewModel>()?.CloseCore();
+
+                var fileName = Utils.GetTempPath(Utils.GetDownloadFileName(msg));
+                var toPath = Utils.GetBinPath("", type);
+                if (FileManager.ZipExtractToFile(fileName, toPath, "") == false)
                 {
-                    Locator.Current.GetService<MainWindowViewModel>()?.MyAppExit(false);
+                    Global.reloadCore = true;
+                    _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
+                    _noticeHandler?.Enqueue(ResUI.MsgUpdateCoreCoreFailed);
                 }
-            };
-            (new UpdateHandle()).CheckUpdateGuiN(_config, _updateUI);
-        }
-
-        private void CheckUpdateCore(CoreKind type)
-        {
-            void _updateUI(bool success, string msg)
-            {
-                _noticeHandler?.SendMessage(msg);
-                if (success)
+                else
                 {
-                    Locator.Current.GetService<MainWindowViewModel>()?.CloseCore();
+                    _noticeHandler?.Enqueue(ResUI.MsgUpdateCoreCoreSuccessfullyMore);
 
-                    string fileName = Utils.GetTempPath(Utils.GetDownloadFileName(msg));
-                    string toPath = Utils.GetBinPath("", type);
-                    if (FileManager.ZipExtractToFile(fileName, toPath, "") == false)
-                    {
-                        Global.reloadCore = true;
-                        _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
-                        _noticeHandler?.Enqueue(ResUI.MsgUpdateCoreCoreFailed);
-                    }
-                    else
-                    {
-                        _noticeHandler?.Enqueue(ResUI.MsgUpdateCoreCoreSuccessfullyMore);
-
-                        Global.reloadCore = true;
-                        _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
-                        _noticeHandler?.Enqueue(ResUI.MsgUpdateCoreCoreSuccessfully);
-                    }
+                    Global.reloadCore = true;
+                    _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
+                    _noticeHandler?.Enqueue(ResUI.MsgUpdateCoreCoreSuccessfully);
                 }
-            };
-            (new UpdateHandle()).CheckUpdateCore(type, _config, _updateUI);
+            }
         }
     }
 }

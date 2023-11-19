@@ -81,7 +81,7 @@
             </ToolBar>
         </ToolBarTray>
         <TextBox
-            Name="txtMsg"
+            Name="TxtMsg"
             BorderThickness="0"
             FontSize="{DynamicResource StdFontSize}"
             HorizontalScrollBarVisibility="Auto"
