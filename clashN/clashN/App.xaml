@@ -64,7 +64,7 @@
             <Style TargetType="{x:Type TextElement}">
                 <Setter Property="FontWeight" Value="Regular" />
             </Style>
-            <Style x:Key="lvItemSelected" TargetType="{x:Type ListViewItem}">
+            <Style x:Key="LvItemSelected" TargetType="{x:Type ListViewItem}">
                 <Setter Property="Margin" Value="2" />
                 <Setter Property="Template">
                     <Setter.Value>

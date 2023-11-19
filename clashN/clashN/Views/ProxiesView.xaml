@@ -104,7 +104,7 @@
                 Margin="0,0,5,0"
                 BorderThickness="0"
                 DockPanel.Dock="Left"
-                ItemContainerStyle="{StaticResource lvItemSelected}"
+                ItemContainerStyle="{StaticResource LvItemSelected}"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
                 Style="{StaticResource MaterialDesignListView}">
@@ -149,7 +149,7 @@
             <ListView
                 x:Name="LstProxyDetails"
                 BorderThickness="0"
-                ItemContainerStyle="{StaticResource lvItemSelected}"
+                ItemContainerStyle="{StaticResource LvItemSelected}"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
                 Style="{StaticResource MaterialDesignListView}">

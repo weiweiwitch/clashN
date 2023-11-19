@@ -90,7 +90,7 @@
             x:Name="LstProfiles"
             AllowDrop="True"
             BorderThickness="0"
-            ItemContainerStyle="{StaticResource lvItemSelected}"
+            ItemContainerStyle="{StaticResource LvItemSelected}"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             ScrollViewer.VerticalScrollBarVisibility="Auto">
             <ListView.ContextMenu>
