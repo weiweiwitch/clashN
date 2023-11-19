@@ -38,27 +38,21 @@ namespace ClashN.ViewModels
         public HelpView GetHelpView { get; }
         public PromotionView GetPromotionView { get; }
 
-        [Reactive]
-        public string SpeedUpload { get; set; } = "0.00";
+        [Reactive] public string SpeedUpload { get; set; } = "0.00";
 
-        [Reactive]
-        public string SpeedDownload { get; set; } = "0.00";
+        [Reactive] public string SpeedDownload { get; set; } = "0.00";
 
         #endregion Views
 
         #region System Proxy
 
-        [Reactive]
-        public bool BlSystemProxyClear { get; set; }
+        [Reactive] public bool BlSystemProxyClear { get; set; }
 
-        [Reactive]
-        public bool BlSystemProxySet { get; set; }
+        [Reactive] public bool BlSystemProxySet { get; set; }
 
-        [Reactive]
-        public bool BlSystemProxyNothing { get; set; }
+        [Reactive] public bool BlSystemProxyNothing { get; set; }
 
-        [Reactive]
-        public bool BlSystemProxyPac { get; set; }
+        [Reactive] public bool BlSystemProxyPac { get; set; }
 
         public ReactiveCommand<Unit, Unit> SystemProxyClearCmd { get; }
         public ReactiveCommand<Unit, Unit> SystemProxySetCmd { get; }
@@ -70,17 +64,13 @@ namespace ClashN.ViewModels
 
         #region Rule mode
 
-        [Reactive]
-        public bool BlModeRule { get; set; }
+        [Reactive] public bool BlModeRule { get; set; }
 
-        [Reactive]
-        public bool BlModeGlobal { get; set; }
+        [Reactive] public bool BlModeGlobal { get; set; }
 
-        [Reactive]
-        public bool BlModeDirect { get; set; }
+        [Reactive] public bool BlModeDirect { get; set; }
 
-        [Reactive]
-        public bool BlModeNothing { get; set; }
+        [Reactive] public bool BlModeNothing { get; set; }
 
         public ReactiveCommand<Unit, Unit> ModeRuleCmd { get; }
         public ReactiveCommand<Unit, Unit> ModeGlobalCmd { get; }
@@ -99,8 +89,7 @@ namespace ClashN.ViewModels
         public ReactiveCommand<Unit, Unit> ReloadCmd { get; }
         public ReactiveCommand<Unit, Unit> NotifyLeftClickCmd { get; }
 
-        [Reactive]
-        public Icon NotifyIcon { get; set; }
+        [Reactive] public Icon NotifyIcon { get; set; }
 
         #endregion Other
 
@@ -110,7 +99,8 @@ namespace ClashN.ViewModels
         {
             _config = LazyConfig.Instance.Config;
 
-            Locator.CurrentMutable.RegisterLazySingleton(() => new NoticeHandler(snackbarMessageQueue), typeof(NoticeHandler));
+            Locator.CurrentMutable.RegisterLazySingleton(() => new NoticeHandler(snackbarMessageQueue),
+                typeof(NoticeHandler));
             _noticeHandler = Locator.Current.GetService<NoticeHandler>();
 
             ThreadPool.RegisterWaitForSingleObject(App.ProgramStarted, OnProgramStarted, null, -1, false);
@@ -131,51 +121,48 @@ namespace ClashN.ViewModels
             if (_config.AutoHideStartup)
             {
                 Observable.Range(1, 1)
-                 .Delay(TimeSpan.FromSeconds(1))
-                 .Subscribe(x =>
-                 {
-                     Application.Current.Dispatcher.Invoke((Action)(() =>
-                     {
-                         ShowHideWindow(false);
-                     }));
-                 });
+                    .Delay(TimeSpan.FromSeconds(1))
+                    .Subscribe(x =>
+                    {
+                        Application.Current.Dispatcher.Invoke((Action)(() => { ShowHideWindow(false); }));
+                    });
             }
 
             //System proxy
             SystemProxyClearCmd = ReactiveCommand.Create(() =>
             {
                 SetListenerType(SysProxyType.ForcedClear);
-            });//, this.WhenAnyValue(x => x.BlSystemProxyClear, y => !y));
+            }); //, this.WhenAnyValue(x => x.BlSystemProxyClear, y => !y));
             SystemProxySetCmd = ReactiveCommand.Create(() =>
             {
                 SetListenerType(SysProxyType.ForcedChange);
-            });//, this.WhenAnyValue(x => x.BlSystemProxySet, y => !y));
+            }); //, this.WhenAnyValue(x => x.BlSystemProxySet, y => !y));
             SystemProxyNothingCmd = ReactiveCommand.Create(() =>
             {
                 SetListenerType(SysProxyType.Unchanged);
-            });//, this.WhenAnyValue(x => x.BlSystemProxyNothing, y => !y));
+            }); //, this.WhenAnyValue(x => x.BlSystemProxyNothing, y => !y));
             SystemProxyPacCmd = ReactiveCommand.Create(() =>
             {
                 SetListenerType(SysProxyType.Pac);
-            });//, this.WhenAnyValue(x => x.BlSystemProxyNothing, y => !y));
+            }); //, this.WhenAnyValue(x => x.BlSystemProxyNothing, y => !y));
 
             //Rule mode
             ModeRuleCmd = ReactiveCommand.Create(() =>
             {
                 SetRuleModeCheck(ERuleMode.Rule);
-            });//, this.WhenAnyValue(x => x.BlModeRule, y => !y));
+            }); //, this.WhenAnyValue(x => x.BlModeRule, y => !y));
             ModeGlobalCmd = ReactiveCommand.Create(() =>
             {
                 SetRuleModeCheck(ERuleMode.Global);
-            });//, this.WhenAnyValue(x => x.BlModeGlobal, y => !y));
+            }); //, this.WhenAnyValue(x => x.BlModeGlobal, y => !y));
             ModeDirectCmd = ReactiveCommand.Create(() =>
             {
                 SetRuleModeCheck(ERuleMode.Direct);
-            });//, this.WhenAnyValue(x => x.BlModeDirect, y => !y));
+            }); //, this.WhenAnyValue(x => x.BlModeDirect, y => !y));
             ModeNothingCmd = ReactiveCommand.Create(() =>
             {
                 SetRuleModeCheck(ERuleMode.Unchanged);
-            });//, this.WhenAnyValue(x => x.BlModeNothing, y => !y));
+            }); //, this.WhenAnyValue(x => x.BlModeNothing, y => !y));
 
             //Other
             AddProfileViaScanCmd = ReactiveCommand.CreateFromTask(() =>
@@ -199,12 +186,9 @@ namespace ClashN.ViewModels
                 Global.reloadCore = true;
                 _ = LoadCore();
             });
-            NotifyLeftClickCmd = ReactiveCommand.Create(() =>
-            {
-                ShowHideWindow(null);
-            });
+            NotifyLeftClickCmd = ReactiveCommand.Create(() => { ShowHideWindow(null); });
 
-            Global.ShowInTaskbar = true;//Application.Current.MainWindow.ShowInTaskbar;
+            Global.ShowInTaskbar = true; //Application.Current.MainWindow.ShowInTaskbar;
         }
 
         private void OnProgramStarted(object state, bool timeout)
@@ -247,7 +231,9 @@ namespace ClashN.ViewModels
                 //statistics?.SaveToFile();
                 statistics?.Close();
             }
-            catch { }
+            catch
+            {
+            }
             finally
             {
                 Application.Current.Shutdown();
@@ -279,6 +265,7 @@ namespace ClashN.ViewModels
                     SetListenerType(SysProxyType.Pac);
                     break;
             }
+
             e.Handled = true;
         }
 
@@ -307,12 +294,9 @@ namespace ClashN.ViewModels
             if (notify)
             {
                 _noticeHandler?.Enqueue(msg);
-                _noticeHandler?.SendMessage(msg);
             }
-            else
-            {
-                _noticeHandler?.SendMessage(msg);
-            }
+
+            _noticeHandler?.SendMessage(msg);
         }
 
         private async void UpdateTaskHandler(bool success, string msg)
@@ -358,10 +342,7 @@ namespace ClashN.ViewModels
             //{
             //    mainMsgControl.ClearMsg();
             //}
-            await Task.Run(() =>
-            {
-                coreHandler.LoadCore(_config);
-            });
+            await Task.Run(() => { coreHandler.LoadCore(_config); });
 
             Global.reloadCore = false;
             ConfigProc.SaveConfig(_config, false);
@@ -395,6 +376,7 @@ namespace ClashN.ViewModels
             {
                 return;
             }
+
             _config.SysProxyType = type;
             ChangePACButtonStatus(type);
 
@@ -425,6 +407,7 @@ namespace ClashN.ViewModels
             {
                 return;
             }
+
             SetRuleMode(mode);
 
             Locator.Current.GetService<ProxiesViewModel>()?.ReloadRulemodeSelected();
@@ -439,7 +422,8 @@ namespace ClashN.ViewModels
 
             //mainMsgControl.SetToolSslInfo("routing", mode.ToString());
 
-            _noticeHandler?.SendMessage4ClashNWithTime($"Set rule mode {_config.ruleMode.ToString()}->{mode.ToString()}");
+            _noticeHandler?.SendMessage4ClashNWithTime(
+                $"Set rule mode {_config.ruleMode.ToString()}->{mode.ToString()}");
             _config.ruleMode = mode;
             ConfigProc.SaveConfig(_config, false);
 
@@ -466,6 +450,7 @@ namespace ClashN.ViewModels
                 {
                     Application.Current.MainWindow.WindowState = WindowState.Normal;
                 }
+
                 Application.Current.MainWindow.Activate();
                 Application.Current.MainWindow.Focus();
             }
@@ -473,7 +458,9 @@ namespace ClashN.ViewModels
             {
                 Application.Current.MainWindow.Hide();
                 //Application.Current.MainWindow.ShowInTaskbar = false;
-            };
+            }
+
+            ;
             Global.ShowInTaskbar = bl;
         }
 
@@ -483,10 +470,11 @@ namespace ClashN.ViewModels
 
             if (!string.IsNullOrEmpty(_config.UiItem.colorPrimaryName))
             {
-                var swatch = new SwatchesProvider().Swatches.FirstOrDefault(t => t.Name == _config.UiItem.colorPrimaryName);
+                var swatch =
+                    new SwatchesProvider().Swatches.FirstOrDefault(t => t.Name == _config.UiItem.colorPrimaryName);
                 if (swatch != null
-                   && swatch.ExemplarHue != null
-                   && swatch.ExemplarHue?.Color != null)
+                    && swatch.ExemplarHue != null
+                    && swatch.ExemplarHue?.Color != null)
                 {
                     ChangePrimaryColor(swatch.ExemplarHue.Color);
                 }
@@ -509,6 +497,7 @@ namespace ClashN.ViewModels
             {
                 Application.Current.MainWindow.Width = SystemInformation.WorkingArea.Width * 96 / g.DpiX;
             }
+
             if (Application.Current.MainWindow.Height > SystemInformation.WorkingArea.Height * 96 / g.DpiY)
             {
                 Application.Current.MainWindow.Height = SystemInformation.WorkingArea.Height * 96 / g.DpiY;

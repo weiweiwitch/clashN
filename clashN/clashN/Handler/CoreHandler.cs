@@ -49,10 +49,11 @@ internal class CoreHandler
             }
 
             SetCore(config, item, out bool blChanged);
-            string fileName = Utils.GetConfigPath(CoreConfigRes);
-            if (CoreConfigHandler.GenerateClientConfig(item, fileName, false, out string msg) != 0)
+            var fileName = Utils.GetConfigPath(CoreConfigRes);
+            if (CoreConfigHandler.GenerateClientConfig(item, fileName, false, out var msg) != 0)
             {
                 CoreStop();
+                
                 ShowMsg(false, msg);
             }
             else
