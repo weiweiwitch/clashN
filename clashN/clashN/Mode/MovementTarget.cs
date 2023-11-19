@@ -1,11 +1,10 @@
-﻿namespace ClashN.Mode
+﻿namespace ClashN.Mode;
+
+public enum MovementTarget
 {
-    public enum MovementTarget
-    {
-        Top = 1,
-        Up = 2,
-        Down = 3,
-        Bottom = 4,
-        Position = 5
-    }
+    Top = 1,
+    Up = 2,
+    Down = 3,
+    Bottom = 4,
+    Position = 5
 }

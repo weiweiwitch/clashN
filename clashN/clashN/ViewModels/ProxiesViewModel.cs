@@ -162,7 +162,7 @@ namespace ClashN.ViewModels
 
         private void UpdateHandler(bool notify, string msg)
         {
-            _noticeHandler?.SendMessage(msg, true);
+            _noticeHandler?.SendMessage4ClashNWithTime(msg);
         }
 
         public void ProxiesReload()
@@ -221,6 +221,7 @@ namespace ClashN.ViewModels
             MainFormHandler.Instance.GetClashProxies(_config, (it, it2) =>
             {
                 UpdateHandler(false, "Refresh Clash Proxies");
+                
                 proxies = it?.proxies;
                 providers = it2?.providers;
 

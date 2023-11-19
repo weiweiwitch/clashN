@@ -102,10 +102,10 @@ namespace ClashN.Handler
 
                     foreach (string vName in coreInfo.coreExes)
                     {
-                        Process[] existing = Process.GetProcessesByName(vName);
+                        var existing = Process.GetProcessesByName(vName);
                         foreach (Process p in existing)
                         {
-                            string path = p.MainModule.FileName;
+                            var path = p.MainModule.FileName;
                             if (path == $"{Utils.GetBinPath(vName, coreInfo.coreType)}.exe")
                             {
                                 KillProcess(p);
@@ -173,7 +173,7 @@ namespace ClashN.Handler
             }
             if (string.IsNullOrEmpty(fileName))
             {
-                string msg = string.Format(ResUI.NotFoundCore, coreInfo.coreUrl);
+                var msg = string.Format(ResUI.NotFoundCore, coreInfo.coreUrl);
                 ShowMsg(false, msg);
             }
             return fileName;
@@ -189,7 +189,7 @@ namespace ClashN.Handler
 
             try
             {
-                string fileName = FindCoreExe();
+                var fileName = FindCoreExe();
                 if (fileName == "") return;
 
                 //Portable Mode
@@ -200,7 +200,7 @@ namespace ClashN.Handler
                     arguments += $" -d \"{data}\"";
                 }
 
-                Process p = new Process
+                var p = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {

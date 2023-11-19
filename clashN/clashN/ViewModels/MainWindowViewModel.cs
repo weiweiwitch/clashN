@@ -410,7 +410,7 @@ namespace ClashN.ViewModels
             BlSystemProxyNothing = (type == SysProxyType.Unchanged);
             BlSystemProxyPac = (type == SysProxyType.Pac);
 
-            _noticeHandler?.SendMessage($"Change system proxy", true);
+            _noticeHandler?.SendMessage4ClashNWithTime($"Change system proxy");
 
             ConfigProc.SaveConfig(_config, false);
 
@@ -439,7 +439,7 @@ namespace ClashN.ViewModels
 
             //mainMsgControl.SetToolSslInfo("routing", mode.ToString());
 
-            _noticeHandler?.SendMessage($"Set rule mode {_config.ruleMode.ToString()}->{mode.ToString()}", true);
+            _noticeHandler?.SendMessage4ClashNWithTime($"Set rule mode {_config.ruleMode.ToString()}->{mode.ToString()}");
             _config.ruleMode = mode;
             ConfigProc.SaveConfig(_config, false);
 

@@ -1150,6 +1150,24 @@ namespace ClashN.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Clash&apos;s Logs.
+        /// </summary>
+        public static string TbLog4Clash {
+            get {
+                return ResourceManager.GetString("TbLog4Clash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ClashN&apos;s Logs.
+        /// </summary>
+        public static string TbLog4ClashN {
+            get {
+                return ResourceManager.GetString("TbLog4ClashN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Logs.
         /// </summary>
         public static string TbLogs {

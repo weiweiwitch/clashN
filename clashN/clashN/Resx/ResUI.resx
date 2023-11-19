@@ -676,4 +676,10 @@
   <data name="TbSettingsFontSize" xml:space="preserve">
     <value>FontSize</value>
   </data>
+  <data name="TbLog4Clash" xml:space="preserve">
+    <value>Clash's Logs</value>
+  </data>
+  <data name="TbLog4ClashN" xml:space="preserve">
+    <value>ClashN's Logs</value>
+  </data>
 </root>

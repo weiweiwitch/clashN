@@ -17,7 +17,8 @@ public partial class LogsView
         InitializeComponent();
         ViewModel = new LogsViewModel();
 
-        MessageBus.Current.Listen<string>("MsgView").Subscribe(x => DelegateAppendText(x));
+        MessageBus.Current.Listen<string>("MsgView").Subscribe(DelegateAppendText4Clash);
+        MessageBus.Current.Listen<string>("MsgView4ClashN").Subscribe(DelegateAppendText4ClashN);
 
         this.WhenActivated(disposables =>
         {
@@ -28,12 +29,19 @@ public partial class LogsView
         });
     }
 
-    private void DelegateAppendText(string msg)
+    private void DelegateAppendText4Clash(string msg)
     {
-        Dispatcher.BeginInvoke(new Action<string>(AppendText), DispatcherPriority.Send, msg);
+        Dispatcher.BeginInvoke(new Action<string>(logMsg => { ShowMsg(LogType.Log4Clash, logMsg); }),
+            DispatcherPriority.Send, msg);
     }
 
-    private void AppendText(string msg)
+    private void DelegateAppendText4ClashN(string msg)
+    {
+        Dispatcher.BeginInvoke(new Action<string>(logMsg => { ShowMsg(LogType.Log4ClashN, logMsg); }),
+            DispatcherPriority.Send, msg);
+    }
+
+    private void ShowMsg(LogType logType, string msg)
     {
         if (ViewModel?.AutoRefresh == false)
         {
@@ -49,26 +57,22 @@ public partial class LogsView
             }
         }
 
-        ShowMsg(msg);
-    }
-
-    private void ShowMsg(string msg)
-    {
-        if (TxtMsg.LineCount > ViewModel?.LineCount)
+        var compLog = logType == LogType.Log4Clash ? TxtMsg : TxtMsg4ClashN;
+        if (compLog.LineCount > ViewModel?.LineCount)
         {
             ClearMsg();
         }
 
-        TxtMsg.AppendText(msg);
+        compLog.AppendText(msg);
 
         if (!msg.EndsWith(Environment.NewLine))
         {
-            TxtMsg.AppendText(Environment.NewLine);
+            compLog.AppendText(Environment.NewLine);
         }
 
         if (ViewModel?.ScrollToEnd == true)
         {
-            TxtMsg.ScrollToEnd();
+            compLog.ScrollToEnd();
         }
     }
 

@@ -80,13 +80,27 @@
                 </ComboBox>
             </ToolBar>
         </ToolBarTray>
-        <TextBox
-            Name="TxtMsg"
-            BorderThickness="0"
-            FontSize="{DynamicResource StdFontSize}"
-            HorizontalScrollBarVisibility="Auto"
-            IsReadOnly="True"
-            TextWrapping="Wrap"
-            VerticalScrollBarVisibility="Visible" />
+        <TabControl>
+            <TabItem Header="{x:Static resx:ResUI.TbLog4Clash}">
+                <TextBox
+                    Name="TxtMsg"
+                    BorderThickness="0"
+                    FontSize="{DynamicResource StdFontSize}"
+                    HorizontalScrollBarVisibility="Auto"
+                    IsReadOnly="True"
+                    TextWrapping="Wrap"
+                    VerticalScrollBarVisibility="Visible" />
+            </TabItem>
+            <TabItem Header="{x:Static resx:ResUI.TbLog4ClashN}">
+                <TextBox
+                    Name="TxtMsg4ClashN"
+                    BorderThickness="0"
+                    FontSize="{DynamicResource StdFontSize}"
+                    HorizontalScrollBarVisibility="Auto"
+                    IsReadOnly="True"
+                    TextWrapping="Wrap"
+                    VerticalScrollBarVisibility="Visible" />
+            </TabItem>
+        </TabControl>
     </DockPanel>
 </reactiveui:ReactiveUserControl>

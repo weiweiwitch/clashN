@@ -49,9 +49,9 @@ internal class UpdateHandle
 
                     try
                     {
-                        string fileName = Utils.GetTempPath(Utils.GetDownloadFileName(url));
+                        var fileName = Utils.GetTempPath(Utils.GetDownloadFileName(url));
                         fileName = Utils.UrlEncode(fileName);
-                        Process process = new Process
+                        var process = new Process
                         {
                             StartInfo = new ProcessStartInfo
                             {
@@ -206,7 +206,7 @@ internal class UpdateHandle
                     url = String.Format(config.ConstItem.subConvertUrl, Utils.UrlEncode(url));
                     if (!url.Contains("config="))
                     {
-                        url += String.Format("&config={0}", Global.SubConvertConfig[0]);
+                        url += $"&config={Global.SubConvertConfig[0]}";
                     }
                 }
 

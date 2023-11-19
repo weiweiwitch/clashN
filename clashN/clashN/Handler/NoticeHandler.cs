@@ -23,10 +23,21 @@ public class NoticeHandler
     {
         MessageBus.Current.SendMessage(msg, "MsgView");
     }
+    
+    public void SendMessage4ClashN(string msg)
+    {
+        MessageBus.Current.SendMessage(msg, "MsgView4ClashN");
+    }
 
-    public void SendMessage(string msg, bool time)
+    public void SendMessageWithTime(string msg)
     {
         msg = $"{DateTime.Now} {msg}";
         MessageBus.Current.SendMessage(msg, "MsgView");
+    }
+    
+    public void SendMessage4ClashNWithTime(string msg)
+    {
+        msg = $"{DateTime.Now} {msg}";
+        MessageBus.Current.SendMessage(msg, "MsgView4ClashN");
     }
 }
