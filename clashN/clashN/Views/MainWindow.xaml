@@ -27,6 +27,7 @@
     TextOptions.TextRenderingMode="Auto"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
+
     <materialDesign:DialogHost
         Identifier="RootDialog"
         SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}"
@@ -303,9 +304,11 @@
                             </MenuItem>
 
                             <Separator />
-                            <MenuItem x:Name="MenuAddProfileViaScan" Header="{x:Static resx:ResUI.menuAddProfileViaScan}" />
+                            <MenuItem x:Name="MenuAddProfileViaScan"
+                                      Header="{x:Static resx:ResUI.menuAddProfileViaScan}" />
                             <MenuItem x:Name="MenuSubUpdate" Header="{x:Static resx:ResUI.menuSubUpdate}" />
-                            <MenuItem x:Name="MenuSubUpdateViaProxy" Header="{x:Static resx:ResUI.menuSubUpdateViaProxy}" />
+                            <MenuItem x:Name="MenuSubUpdateViaProxy"
+                                      Header="{x:Static resx:ResUI.menuSubUpdateViaProxy}" />
                             <Separator />
                             <MenuItem
                                 x:Name="MenuExit"
