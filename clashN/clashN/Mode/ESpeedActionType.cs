@@ -1,10 +1,9 @@
-﻿namespace ClashN.Mode
+﻿namespace ClashN.Mode;
+
+public enum ESpeedActionType
 {
-    public enum ESpeedActionType
-    {
-        Ping,
-        Tcping,
-        Realping,
-        Speedtest
-    }
+    Ping,
+    Tcping,
+    Realping,
+    Speedtest
 }

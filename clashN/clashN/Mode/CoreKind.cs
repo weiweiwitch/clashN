@@ -1,10 +1,9 @@
-﻿namespace ClashN.Mode
+﻿namespace ClashN.Mode;
+
+public enum CoreKind
 {
-    public enum CoreKind
-    {
-        Clash = 1,
-        ClashMeta = 2,
-        ClashPremium = 3,
-        ClashN = 99
-    }
+    Clash = 1,
+    ClashMeta = 2,
+    ClashPremium = 3,
+    ClashN = 99
 }

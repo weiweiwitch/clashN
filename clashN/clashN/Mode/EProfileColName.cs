@@ -1,18 +1,17 @@
-﻿namespace ClashN.Mode
-{
-    public enum EProfileColName
-    {
-        def = 0,
-        remarks,
-        url,
-        address,
-        enableUpdateSub,
-        testResult,
-        updateTime,
+﻿namespace ClashN.Mode;
 
-        todayDown,
-        todayUp,
-        totalDown,
-        totalUp
-    }
+public enum EProfileColName
+{
+    def = 0,
+    remarks,
+    url,
+    address,
+    enableUpdateSub,
+    testResult,
+    updateTime,
+
+    todayDown,
+    todayUp,
+    totalDown,
+    totalUp
 }

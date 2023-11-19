@@ -1,10 +1,9 @@
-﻿namespace ClashN.Mode
+﻿namespace ClashN.Mode;
+
+public enum SysProxyType
 {
-    public enum SysProxyType
-    {
-        ForcedClear = 0,
-        ForcedChange = 1,
-        Unchanged = 2,
-        Pac = 3
-    }
+    ForcedClear = 0,
+    ForcedChange = 1,
+    Unchanged = 2,
+    Pac = 3
 }

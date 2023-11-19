@@ -1,59 +1,58 @@
-﻿namespace ClashN.Mode
+﻿namespace ClashN.Mode;
+
+[Serializable]
+public class ServerStatistics
 {
-    [Serializable]
-    public class ServerStatistics
+    public List<ProfileStatItem> profileStat
     {
-        public List<ProfileStatItem> profileStat
-        {
-            get; set;
-        }
+        get; set;
+    }
+}
+
+[Serializable]
+public class ProfileStatItem
+{
+    public string indexId
+    {
+        get; set;
     }
 
-    [Serializable]
-    public class ProfileStatItem
+    public ulong totalUp
     {
-        public string indexId
-        {
-            get; set;
-        }
-
-        public ulong totalUp
-        {
-            get; set;
-        }
-
-        public ulong totalDown
-        {
-            get; set;
-        }
-
-        public ulong todayUp
-        {
-            get; set;
-        }
-
-        public ulong todayDown
-        {
-            get; set;
-        }
-
-        public long dateNow
-        {
-            get; set;
-        }
+        get; set;
     }
 
-    [Serializable]
-    public class TrafficItem
+    public ulong totalDown
     {
-        public ulong up
-        {
-            get; set;
-        }
+        get; set;
+    }
 
-        public ulong down
-        {
-            get; set;
-        }
+    public ulong todayUp
+    {
+        get; set;
+    }
+
+    public ulong todayDown
+    {
+        get; set;
+    }
+
+    public long dateNow
+    {
+        get; set;
+    }
+}
+
+[Serializable]
+public class TrafficItem
+{
+    public ulong up
+    {
+        get; set;
+    }
+
+    public ulong down
+    {
+        get; set;
     }
 }
