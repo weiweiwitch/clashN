@@ -9,6 +9,10 @@
 /clashN/clashN/obj/
 /clashN/.vs/clashN/DesignTimeBuild
 /clashN/packages
+/clashN/clashN/backend
+/clashN/clashN/data
+/clashN/clashN/guiConfigs
+/clashN/clashN/guiTemps
 .vs/ProjectSettings.json
 .vs/slnx.sqlite
 .vs/VSWorkspaceState.json

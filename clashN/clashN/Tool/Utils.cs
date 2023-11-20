@@ -1135,7 +1135,7 @@ internal static class Utils
 
     public static string GetBinPath(string filename, CoreKind? coreType = null)
     {
-        var tempPath = Path.Combine(StartupPath(), "bin");
+        var tempPath = Path.Combine(StartupPath(), "backend");
         if (!Directory.Exists(tempPath))
         {
             Directory.CreateDirectory(tempPath);

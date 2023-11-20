@@ -58,4 +58,103 @@
           <Generator>PublicResXFileCodeGenerator</Generator>
         </EmbeddedResource>
     </ItemGroup>
+	
+	<ItemGroup>
+	  <None Remove="data\cache.db" />
+	  <Content Include="data\cache.db">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\clash-socloud.yaml" />
+	  <Content Include="data\clash-socloud.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\Country.mmdb" />
+	  <Content Include="data\Country.mmdb">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\GeoSite.dat" />
+	  <Content Include="data\GeoSite.dat">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\other-direct.yaml" />
+	  <Content Include="data\other-direct.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\rules-my-170-v2ray.yaml" />
+	  <Content Include="data\rules-my-170-v2ray.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\rules-my-clash-out.yaml" />
+	  <Content Include="data\rules-my-clash-out.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\rules-my-cn-spec-domain.yaml" />
+	  <Content Include="data\rules-my-cn-spec-domain.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\rules-my-cn-spec-ip.yaml" />
+	  <Content Include="data\rules-my-cn-spec-ip.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\rules-my-direct.yaml" />
+	  <Content Include="data\rules-my-direct.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\rules-process-clash.yaml" />
+	  <Content Include="data\rules-process-clash.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\rules-process-direct.yaml" />
+	  <Content Include="data\rules-process-direct.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\rules-process-mygate.yaml" />
+	  <Content Include="data\rules-process-mygate.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="data\wintun.dll" />
+	  <Content Include="data\wintun.dll">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="guiConfigs\9a62be67-a254-4275-8839-79720640cba6.yaml" />
+	  <Content Include="guiConfigs\9a62be67-a254-4275-8839-79720640cba6.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="guiConfigs\085e33e6-d1eb-46f8-9b53-018e1d28481f.exe" />
+	  <Content Include="guiConfigs\085e33e6-d1eb-46f8-9b53-018e1d28481f.exe">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="guiConfigs\57965672-4a67-4161-9aab-a20c5997a8f4.yaml" />
+	  <Content Include="guiConfigs\57965672-4a67-4161-9aab-a20c5997a8f4.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="guiConfigs\bcab1d0f-66a9-4508-8544-180bfb049215.yaml" />
+	  <Content Include="guiConfigs\bcab1d0f-66a9-4508-8544-180bfb049215.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="guiConfigs\config.yaml" />
+	  <Content Include="guiConfigs\config.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="guiConfigs\guiNConfig.json" />
+	  <Content Include="guiConfigs\guiNConfig.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="guiConfigs\Mixin.yaml" />
+	  <Content Include="guiConfigs\Mixin.yaml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="guiConfigs\readme.txt" />
+	  <Content Include="guiConfigs\readme.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="backend\ClashMeta\clash.exe" />
+	  <Content Include="backend\ClashMeta\clash.exe">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <None Remove="backend\EnableLoopback.exe" />
+	  <Content Include="backend\EnableLoopback.exe">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
 </Project>
