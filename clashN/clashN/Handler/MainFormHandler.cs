@@ -8,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Windows.Input;
+using ClashN.Tool;
 using static ClashN.Mode.ClashProxies;
 
 namespace ClashN.Handler

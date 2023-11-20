@@ -384,6 +384,9 @@
   <data name="SpeedProfileTips" xml:space="preserve">
     <value>Note: After this function relies on the Http global proxy test, please manually adjust the Http global proxy and active node!</value>
   </data>
+  <data name="StopService" xml:space="preserve">
+    <value>Stop service ({0})...</value>
+  </data>
   <data name="StartService" xml:space="preserve">
     <value>Start service ({0})...</value>
   </data>

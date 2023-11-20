@@ -1,6 +1,7 @@
 ﻿using ClashN.Mode;
 using System.Net.WebSockets;
 using System.Text;
+using ClashN.Tool;
 
 namespace ClashN.Handler
 {

@@ -5,6 +5,7 @@ using Splat;
 using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Windows;
+using ClashN.Tool;
 
 namespace ClashN.Views;
 

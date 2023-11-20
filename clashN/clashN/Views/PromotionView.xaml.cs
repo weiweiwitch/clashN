@@ -1,5 +1,6 @@
 using ReactiveUI;
 using System.Windows;
+using ClashN.Tool;
 
 namespace ClashN.Views
 {

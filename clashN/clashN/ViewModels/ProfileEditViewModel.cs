@@ -9,6 +9,7 @@ using Splat;
 using System.IO;
 using System.Reactive;
 using System.Windows.Forms;
+using ClashN.Tool;
 
 namespace ClashN.ViewModels
 {

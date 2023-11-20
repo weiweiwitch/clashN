@@ -34,7 +34,7 @@ public class HelpViewModel : ReactiveObject
 
         void UpdateUi(bool success, string msg)
         {
-            _noticeHandler?.SendMessage4ClashN(msg);
+            NoticeHandler.SendMessage4ClashN(msg);
             if (success)
             {
                 Locator.Current.GetService<MainWindowViewModel>()?.MyAppExit(false);
@@ -49,7 +49,7 @@ public class HelpViewModel : ReactiveObject
 
         void UpdateUi(bool success, string msg)
         {
-            _noticeHandler?.SendMessage4ClashN(msg);
+            NoticeHandler.SendMessage4ClashN(msg);
             if (success)
             {
                 Locator.Current.GetService<MainWindowViewModel>()?.CloseCore();

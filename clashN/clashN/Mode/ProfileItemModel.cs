@@ -1,4 +1,6 @@
-﻿namespace ClashN.Mode;
+﻿using ClashN.Tool;
+
+namespace ClashN.Mode;
 
 public class ProfileItemModel : ProfileItem
 {
@@ -12,7 +14,7 @@ public class ProfileItemModel : ProfileItem
         {
             if (updateTime <= 0)
             {
-                return String.Empty;
+                return string.Empty;
             }
             var dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             return dateTime.AddSeconds(updateTime).ToLocalTime().ToString("MM-dd HH:mm");
@@ -28,7 +30,7 @@ public class ProfileItemModel : ProfileItem
         {
             if (expireRemote <= 0)
             {
-                return String.Empty;
+                return string.Empty;
             }
             var dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             return dateTime.AddSeconds(expireRemote).ToLocalTime().ToString("yyyy-MM-dd");

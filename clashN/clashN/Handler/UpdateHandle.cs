@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using ClashN.Tool;
 
 namespace ClashN.Handler;
 
@@ -25,8 +26,8 @@ internal class UpdateHandle
 
         public ResultEventArgs(bool success, string msg)
         {
-            this.Success = success;
-            this.Msg = msg;
+            Success = success;
+            Msg = msg;
         }
     }
 
@@ -203,7 +204,7 @@ internal class UpdateHandle
                         config.ConstItem.subConvertUrl = Global.SubConvertUrls[0];
                     }
 
-                    url = String.Format(config.ConstItem.subConvertUrl, Utils.UrlEncode(url));
+                    url = string.Format(config.ConstItem.subConvertUrl, Utils.UrlEncode(url));
                     if (!url.Contains("config="))
                     {
                         url += $"&config={Global.SubConvertConfig[0]}";

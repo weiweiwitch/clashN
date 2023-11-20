@@ -4,6 +4,7 @@ using ClashN.Resx;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using ClashN.Tool;
 using Forms = System.Windows.Forms;
 
 namespace ClashN.Views

@@ -1,8 +1,10 @@
 ﻿using ClashN.Mode;
 using ClashN.Resx;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
+using ClashN.Tool;
 
 namespace ClashN.Handler;
 
@@ -12,10 +14,10 @@ namespace ClashN.Handler;
 internal class CoreHandler
 {
     private const string CoreConfigRes = Global.CoreConfigFileName;
-        
+
     private CoreInfo _coreInfo;
     private Process _process;
-    
+
     private readonly Action<bool, string> _showMsgHandler;
 
     public CoreHandler(Action<bool, string> showMsgHandler)
@@ -28,16 +30,18 @@ internal class CoreHandler
     /// </summary>
     public void LoadCore(Config config)
     {
+        ShowMsg(false, $"Load Core: {Global.reloadCore}");
+        
         if (!Global.reloadCore)
         {
             return;
         }
-        
+
         var item = ConfigProc.GetDefaultProfile(ref config);
         if (item == null)
         {
             CoreStop();
-            
+
             ShowMsg(false, ResUI.CheckProfileSettings);
             return;
         }
@@ -47,33 +51,34 @@ internal class CoreHandler
             ShowMsg(true, ResUI.EnableTunModeFailed);
             return;
         }
+
         if (config.EnableTun && item.coreType == CoreKind.Clash)
         {
             ShowMsg(true, ResUI.TunModeCoreTip);
             return;
         }
 
-        SetCore(config, item, out bool blChanged);
-        
+        SetCore(config, item, out var blChanged);
+
         var fileName = Utils.GetConfigPath(CoreConfigRes);
+        ShowMsg(false, $"Load file: {fileName}");
         if (CoreConfigHandler.GenerateClientConfig(item, fileName, false, out var msg) != 0)
         {
             CoreStop();
-                
+
             ShowMsg(false, msg);
+            return;
+        }
+
+        ShowMsg(true, msg);
+
+        if (_process != null && !_process.HasExited && !blChanged)
+        {
+            MainFormHandler.Instance.ClashConfigReload(fileName);
         }
         else
         {
-            ShowMsg(true, msg);
-
-            if (_process != null && !_process.HasExited && !blChanged)
-            {
-                MainFormHandler.Instance.ClashConfigReload(fileName);
-            }
-            else
-            {
-                CoreRestart(item);
-            }
+            CoreRestart(item);
         }
     }
 
@@ -83,7 +88,9 @@ internal class CoreHandler
     private void CoreRestart(ProfileItem item)
     {
         CoreStop();
+
         Thread.Sleep(1000);
+
         CoreStart(item);
     }
 
@@ -92,6 +99,8 @@ internal class CoreHandler
     /// </summary>
     public void CoreStop()
     {
+        ShowMsg(false, string.Format(ResUI.StopService, DateTime.Now.ToString(CultureInfo.CurrentCulture)));
+        
         try
         {
             if (_process != null)
@@ -110,7 +119,7 @@ internal class CoreHandler
                 foreach (var vName in _coreInfo.coreExes)
                 {
                     var existing = Process.GetProcessesByName(vName);
-                    foreach (Process p in existing)
+                    foreach (var p in existing)
                     {
                         var path = p.MainModule.FileName;
                         if (path == $"{Utils.GetBinPath(vName, _coreInfo.coreType)}.exe")
@@ -156,7 +165,7 @@ internal class CoreHandler
     {
         try
         {
-            Process _p = Process.GetProcessById(pid);
+            var _p = Process.GetProcessById(pid);
             KillProcess(_p);
         }
         catch (Exception ex)
@@ -178,11 +187,13 @@ internal class CoreHandler
                 break;
             }
         }
+
         if (string.IsNullOrEmpty(fileName))
         {
             var msg = string.Format(ResUI.NotFoundCore, _coreInfo.coreUrl);
             ShowMsg(false, msg);
         }
+
         return fileName;
     }
 
@@ -250,7 +261,7 @@ internal class CoreHandler
         catch (Exception ex)
         {
             Utils.SaveLog(ex.Message, ex);
-                
+
             var msg = ex.Message;
             ShowMsg(true, msg);
         }
@@ -286,6 +297,7 @@ internal class CoreHandler
         {
             return -1;
         }
+
         var coreType = LazyConfig.Instance.GetCoreType(item);
         var tempInfo = LazyConfig.Instance.GetCoreInfo(coreType);
         if (tempInfo != null && _coreInfo != null && tempInfo.coreType == _coreInfo.coreType)
@@ -298,6 +310,7 @@ internal class CoreHandler
         {
             return -1;
         }
+
         return 0;
     }
 }

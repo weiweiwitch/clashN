@@ -4,7 +4,7 @@ namespace ClashN.Mode;
 
 public class ClashProviders
 {
-    public Dictionary<String, ProvidersItem> providers { get; set; }
+    public Dictionary<string, ProvidersItem> providers { get; set; }
 
     public class ProvidersItem
     {

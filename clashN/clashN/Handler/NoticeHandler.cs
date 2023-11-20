@@ -20,23 +20,17 @@ public class NoticeHandler
         _snackbarMessageQueue.Enqueue(content);
     }
 
-    public void SendMessage(string msg)
+    public static void SendMessage(LogType logType, string msg)
     {
-        MessageBus.Current.SendMessage(msg, LogType.Log4Clash.ToString());
+        MessageBus.Current.SendMessage(msg, logType.ToString());
     }
 
-    public void SendMessage4ClashN(string msg)
+    public static void SendMessage4ClashN(string msg)
     {
         MessageBus.Current.SendMessage(msg, LogType.Log4ClashN.ToString());
     }
 
-    public void SendMessageWithTime(string msg)
-    {
-        msg = $"{DateTime.Now} {msg}";
-        MessageBus.Current.SendMessage(msg, LogType.Log4Clash.ToString());
-    }
-
-    public void SendMessage4ClashNWithTime(string msg)
+    public static void SendMessage4ClashNWithTime(string msg)
     {
         msg = $"{DateTime.Now} {msg}";
         MessageBus.Current.SendMessage(msg, LogType.Log4ClashN.ToString());

@@ -888,6 +888,15 @@ namespace ClashN.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Stop service ({0})....
+        /// </summary>
+        public static string StopService {
+            get {
+                return ResourceManager.GetString("StopService", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Successful configuration
         ///{0}.
         /// </summary>

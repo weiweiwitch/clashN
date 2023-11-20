@@ -9,6 +9,7 @@ using Splat;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows;
+using ClashN.Tool;
 using static ClashN.Mode.ClashProviders;
 using static ClashN.Mode.ClashProxies;
 
@@ -18,8 +19,8 @@ public class ProxiesViewModel : ReactiveObject
 {
     private static Config _config;
     private NoticeHandler? _noticeHandler;
-    private Dictionary<String, ProxiesItem> proxies;
-    private Dictionary<String, ProvidersItem> providers;
+    private Dictionary<string, ProxiesItem> proxies;
+    private Dictionary<string, ProvidersItem> providers;
     private int delayTimeout = 99999999;
 
     private IObservableCollection<ProxyModel> _proxyGroups = new ObservableCollectionExtended<ProxyModel>();
@@ -162,7 +163,7 @@ public class ProxiesViewModel : ReactiveObject
 
     private void UpdateHandler(bool notify, string msg)
     {
-        _noticeHandler?.SendMessage4ClashNWithTime(msg);
+        NoticeHandler.SendMessage4ClashNWithTime(msg);
     }
 
     public void ProxiesReload()

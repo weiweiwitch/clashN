@@ -1,6 +1,7 @@
 using ClashN.ViewModels;
 using ReactiveUI;
 using System.Reactive.Disposables;
+using ClashN.Tool;
 
 namespace ClashN.Views
 {

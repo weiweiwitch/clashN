@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using ClashN.Tool;
 
 namespace ClashN.Handler
 {

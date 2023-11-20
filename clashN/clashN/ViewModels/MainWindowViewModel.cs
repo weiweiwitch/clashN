@@ -14,6 +14,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
+using ClashN.Tool;
 using Application = System.Windows.Application;
 
 namespace ClashN.ViewModels;
@@ -23,7 +24,9 @@ public class MainWindowViewModel : ReactiveObject
     private static Config _config;
 
     private CoreHandler _coreHandler;
+    
     private readonly NoticeHandler? _noticeHandler;
+    
     private StatisticsHandler? _statistics;
     private readonly PaletteHelper _paletteHelper = new();
 
@@ -295,13 +298,13 @@ public class MainWindowViewModel : ReactiveObject
             _noticeHandler?.Enqueue(msg);
         }
 
-        _noticeHandler?.SendMessage(msg);
+        NoticeHandler.SendMessage(LogType.Log4ClashN, msg);
     }
 
     private async void UpdateTaskHandler(bool success, string msg)
     {
-        _noticeHandler?.SendMessage(msg);
-        
+        NoticeHandler.SendMessage(LogType.Log4ClashN, msg);
+
         if (success)
         {
             Global.reloadCore = true;
@@ -345,7 +348,7 @@ public class MainWindowViewModel : ReactiveObject
         await Task.Run(() => { _coreHandler.LoadCore(_config); });
 
         Global.reloadCore = false;
-        
+
         ConfigProc.SaveConfig(_config, false);
         //statistics?.SaveToFile();
 
@@ -393,7 +396,7 @@ public class MainWindowViewModel : ReactiveObject
         BlSystemProxyNothing = (type == SysProxyType.Unchanged);
         BlSystemProxyPac = (type == SysProxyType.Pac);
 
-        _noticeHandler?.SendMessage4ClashNWithTime($"Change system proxy");
+        NoticeHandler.SendMessage4ClashNWithTime($"Change system proxy");
 
         ConfigProc.SaveConfig(_config, false);
 
@@ -416,14 +419,14 @@ public class MainWindowViewModel : ReactiveObject
 
     private void SetRuleMode(ERuleMode mode)
     {
-        BlModeRule = (mode == ERuleMode.Rule);
-        BlModeGlobal = (mode == ERuleMode.Global);
-        BlModeDirect = (mode == ERuleMode.Direct);
-        BlModeNothing = (mode == ERuleMode.Unchanged);
+        BlModeRule = mode == ERuleMode.Rule;
+        BlModeGlobal = mode == ERuleMode.Global;
+        BlModeDirect = mode == ERuleMode.Direct;
+        BlModeNothing = mode == ERuleMode.Unchanged;
 
         //mainMsgControl.SetToolSslInfo("routing", mode.ToString());
 
-        _noticeHandler?.SendMessage4ClashNWithTime(
+        NoticeHandler.SendMessage4ClashNWithTime(
             $"Set rule mode {_config.ruleMode.ToString()}->{mode.ToString()}");
 
         _config.ruleMode = mode;

@@ -1,5 +1,6 @@
 ﻿using ClashN.Handler;
 using System.Windows.Media;
+using ClashN.Tool;
 
 namespace ClashN.Converters
 {

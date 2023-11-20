@@ -8,6 +8,7 @@ using Splat;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows;
+using ClashN.Tool;
 
 namespace ClashN.ViewModels
 {
