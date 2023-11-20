@@ -202,7 +202,7 @@ internal class CoreHandler
     /// </summary>
     private void CoreStart(ProfileItem item)
     {
-        ShowMsg(false, string.Format(ResUI.StartService, DateTime.Now.ToString()));
+        ShowMsg(false, string.Format(ResUI.StartService, DateTime.Now.ToString(CultureInfo.CurrentCulture)));
         ShowMsg(false, $"{ResUI.TbCoreType} {_coreInfo.coreType.ToString()}");
 
         try

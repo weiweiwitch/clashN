@@ -24,9 +24,9 @@ public class MainWindowViewModel : ReactiveObject
     private static Config _config;
 
     private CoreHandler _coreHandler;
-    
+
     private readonly NoticeHandler? _noticeHandler;
-    
+
     private StatisticsHandler? _statistics;
     private readonly PaletteHelper _paletteHelper = new();
 
@@ -308,6 +308,7 @@ public class MainWindowViewModel : ReactiveObject
         if (success)
         {
             Global.reloadCore = true;
+
             await LoadCore();
         }
     }

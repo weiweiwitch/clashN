@@ -64,6 +64,7 @@ public partial class App : Application
     {
         if (ConfigProc.LoadConfig(ref _config) != 0)
         {
+            Utils.SaveLogError($"Loading GUI configuration file is abnormal, please restart the application {Environment.NewLine} 加载GUI配置文件异常,请重启应用");
             UI.ShowWarning($"Loading GUI configuration file is abnormal,please restart the application{Environment.NewLine}加载GUI配置文件异常,请重启应用");
             
             Current.Shutdown();

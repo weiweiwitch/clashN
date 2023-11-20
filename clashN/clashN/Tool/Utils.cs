@@ -55,6 +55,7 @@ internal static class Utils
         {
             SaveLog(ex.Message, ex);
         }
+
         return result;
     }
 
@@ -77,6 +78,7 @@ internal static class Utils
         {
             SaveLog(ex.Message, ex);
         }
+
         return result;
     }
 
@@ -117,6 +119,7 @@ internal static class Utils
         {
             SaveLog(ex.Message, ex);
         }
+
         return result;
     }
 
@@ -140,11 +143,13 @@ internal static class Utils
                 }
                 else
                 {
-                    serializer = new JsonSerializer() { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
+                    serializer = new JsonSerializer()
+                        { Formatting = Formatting.Indented, NullValueHandling = NullValueHandling.Ignore };
                 }
 
                 serializer.Serialize(file, obj);
             }
+
             result = 0;
         }
         catch (Exception ex)
@@ -152,6 +157,7 @@ internal static class Utils
             SaveLog(ex.Message, ex);
             result = -1;
         }
+
         return result;
     }
 
@@ -187,6 +193,7 @@ internal static class Utils
             {
                 return string.Empty;
             }
+
             if (wrap)
             {
                 return string.Join("," + Environment.NewLine, lst.ToArray());
@@ -344,14 +351,17 @@ internal static class Utils
                         unit = "TB";
                         return;
                     }
+
                     result = GBs + (MBs % factor / (factor + 0.0));
                     unit = "GB";
                     return;
                 }
+
                 result = MBs + (KBs % factor / (factor + 0.0));
                 unit = "MB";
                 return;
             }
+
             result = KBs + (amount % factor / (factor + 0.0));
             unit = "KB";
             return;
@@ -413,10 +423,12 @@ internal static class Utils
         {
             return true;
         }
+
         if (text.Equals("null"))
         {
             return true;
         }
+
         return false;
     }
 
@@ -444,6 +456,7 @@ internal static class Utils
                 {
                     return false;
                 }
+
                 ip = cidr[0];
             }
         }
@@ -504,6 +517,7 @@ internal static class Utils
                     return false;
             }
         }
+
         return false;
     }
 
@@ -583,6 +597,7 @@ internal static class Utils
         {
             SaveLog(ex.Message, ex);
         }
+
         return false;
     }
 
@@ -597,6 +612,7 @@ internal static class Utils
         {
             return startupPath;
         }
+
         return Path.Combine(startupPath, fileName);
     }
 
@@ -638,6 +654,7 @@ internal static class Utils
         {
             regKey?.Close();
         }
+
         return def;
     }
 
@@ -675,12 +692,14 @@ internal static class Utils
     public static bool GetDotNetRelease(int release)
     {
         const string subkey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
-        using (RegistryKey ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(subkey))
+        using (RegistryKey ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
+                   .OpenSubKey(subkey))
         {
             if (ndpKey != null && ndpKey.GetValue("Release") != null)
             {
                 return (int)ndpKey.GetValue("Release") >= release ? true : false;
             }
+
             return false;
         }
     }
@@ -698,6 +717,7 @@ internal static class Utils
         {
             return;
         }
+
         string TaskName = taskName;
         var logonUser = WindowsIdentity.GetCurrent().Name;
         string taskDescription = description;
@@ -710,6 +730,7 @@ internal static class Utils
             {
                 taskService.RootFolder.DeleteTask(t.Name);
             }
+
             if (string.IsNullOrEmpty(fileName))
             {
                 return;
@@ -756,6 +777,7 @@ internal static class Utils
                     {
                         continue;
                     }
+
                     if (roundtripTime < 0 || reply.RoundtripTime < roundtripTime)
                     {
                         roundtripTime = reply.RoundtripTime;
@@ -768,6 +790,7 @@ internal static class Utils
             SaveLog(ex.Message, ex);
             return -1;
         }
+
         return roundtripTime;
     }
 
@@ -791,6 +814,7 @@ internal static class Utils
         {
             SaveLog(ex.Message, ex);
         }
+
         return lstIPAddress;
     }
 
@@ -805,6 +829,7 @@ internal static class Utils
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         }
+
         ServicePointManager.DefaultConnectionLimit = 256;
     }
 
@@ -816,7 +841,8 @@ internal static class Utils
             IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
             IPEndPoint[] ipEndPoints = ipProperties.GetActiveTcpListeners();
 
-            var lstIpEndPoints = new List<IPEndPoint>(IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners());
+            var lstIpEndPoints =
+                new List<IPEndPoint>(IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners());
 
             foreach (IPEndPoint endPoint in ipEndPoints)
             {
@@ -831,6 +857,7 @@ internal static class Utils
         {
             SaveLog(ex.Message, ex);
         }
+
         return inUse;
     }
 
@@ -846,7 +873,7 @@ internal static class Utils
     {
         try
         {
-            string location = GetExePath();
+            var location = GetExePath();
             if (blFull)
             {
                 return string.Format("ClashN - V{0} - {1}",
@@ -875,9 +902,9 @@ internal static class Utils
     public static T DeepCopy<T>(T obj)
     {
         object retval;
-        using (MemoryStream ms = new MemoryStream())
+        using (var ms = new MemoryStream())
         {
-            BinaryFormatter bf = new BinaryFormatter();
+            var bf = new BinaryFormatter();
             //序列化成流
             bf.Serialize(ms, obj);
             ms.Seek(0, SeekOrigin.Begin);
@@ -885,6 +912,7 @@ internal static class Utils
             retval = bf.Deserialize(ms);
             ms.Close();
         }
+
         return (T)retval;
     }
 
@@ -897,7 +925,7 @@ internal static class Utils
         string? strData = null;
         try
         {
-            IDataObject data = Clipboard.GetDataObject();
+            var data = Clipboard.GetDataObject();
             if (data.GetDataPresent(DataFormats.UnicodeText))
             {
                 strData = data.GetData(DataFormats.UnicodeText).ToString();
@@ -965,6 +993,7 @@ internal static class Utils
         {
             SaveLog(ex.Message, ex);
         }
+
         return string.Empty;
     }
 
@@ -1035,10 +1064,11 @@ internal static class Utils
     public static void SetDarkBorder(System.Windows.Window window, bool dark)
     {
         // Make sure the handle is created before the window is shown
-        IntPtr hWnd = new System.Windows.Interop.WindowInteropHelper(window).EnsureHandle();
-        int attribute = dark ? 1 : 0;
-        uint attributeSize = (uint)Marshal.SizeOf(attribute);
-        DwmSetWindowAttribute(hWnd, DWMWINDOWATTRIBUTE.DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1, ref attribute, attributeSize);
+        var hWnd = new System.Windows.Interop.WindowInteropHelper(window).EnsureHandle();
+        var attribute = dark ? 1 : 0;
+        var attributeSize = (uint)Marshal.SizeOf(attribute);
+        DwmSetWindowAttribute(hWnd, DWMWINDOWATTRIBUTE.DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1, ref attribute,
+            attributeSize);
         DwmSetWindowAttribute(hWnd, DWMWINDOWATTRIBUTE.DWMWA_USE_IMMERSIVE_DARK_MODE, ref attribute, attributeSize);
     }
 
@@ -1049,93 +1079,94 @@ internal static class Utils
     // return path to store temporary files
     public static string GetTempPath(string filename = "")
     {
-        string _tempPath = Path.Combine(StartupPath(), "guiTemps");
-        if (!Directory.Exists(_tempPath))
+        var tempPath = Path.Combine(StartupPath(), "guiTemps");
+        if (!Directory.Exists(tempPath))
         {
-            Directory.CreateDirectory(_tempPath);
+            Directory.CreateDirectory(tempPath);
         }
+
         if (string.IsNullOrEmpty(filename))
         {
-            return _tempPath;
+            return tempPath;
         }
-        else
-        {
-            return Path.Combine(_tempPath, filename);
-        }
+
+        return Path.Combine(tempPath, filename);
     }
 
     public static string UnGzip(byte[] buf)
     {
-        MemoryStream sb = new MemoryStream();
-        using (GZipStream input = new GZipStream(new MemoryStream(buf),
+        var sb = new MemoryStream();
+        using (var input = new GZipStream(new MemoryStream(buf),
                    CompressionMode.Decompress,
                    false))
         {
             input.CopyTo(sb);
         }
+
         return Encoding.UTF8.GetString(sb.ToArray());
     }
 
     public static string GetBackupPath(string filename)
     {
-        string _tempPath = Path.Combine(StartupPath(), "guiBackups");
-        if (!Directory.Exists(_tempPath))
+        var tempPath = Path.Combine(StartupPath(), "guiBackups");
+        if (!Directory.Exists(tempPath))
         {
-            Directory.CreateDirectory(_tempPath);
+            Directory.CreateDirectory(tempPath);
         }
-        return Path.Combine(_tempPath, filename);
+
+        return Path.Combine(tempPath, filename);
     }
 
     public static string GetConfigPath(string filename = "")
     {
-        string _tempPath = Path.Combine(StartupPath(), "guiConfigs");
-        if (!Directory.Exists(_tempPath))
+        var tempPath = Path.Combine(StartupPath(), "guiConfigs");
+        if (!Directory.Exists(tempPath))
         {
-            Directory.CreateDirectory(_tempPath);
+            Directory.CreateDirectory(tempPath);
         }
+
         if (string.IsNullOrEmpty(filename))
         {
-            return _tempPath;
+            return tempPath;
         }
-        else
-        {
-            return Path.Combine(_tempPath, filename);
-        }
+
+        return Path.Combine(tempPath, filename);
     }
 
     public static string GetBinPath(string filename, CoreKind? coreType = null)
     {
-        string _tempPath = Path.Combine(StartupPath(), "bin");
-        if (!Directory.Exists(_tempPath))
+        var tempPath = Path.Combine(StartupPath(), "bin");
+        if (!Directory.Exists(tempPath))
         {
-            Directory.CreateDirectory(_tempPath);
+            Directory.CreateDirectory(tempPath);
         }
+
         if (coreType != null)
         {
-            _tempPath = Path.Combine(_tempPath, coreType.ToString()!);
-            if (!Directory.Exists(_tempPath))
+            tempPath = Path.Combine(tempPath, coreType.ToString()!);
+            if (!Directory.Exists(tempPath))
             {
-                Directory.CreateDirectory(_tempPath);
+                Directory.CreateDirectory(tempPath);
             }
         }
-        return Path.Combine(_tempPath, filename);
+
+        return Path.Combine(tempPath, filename);
     }
 
     public static string GetFontsPath(string filename = "")
     {
-        string _tempPath = Path.Combine(StartupPath(), "guiFonts");
-        if (!Directory.Exists(_tempPath))
+        var tempPath = Path.Combine(StartupPath(), "guiFonts");
+        if (!Directory.Exists(tempPath))
         {
-            Directory.CreateDirectory(_tempPath);
+            Directory.CreateDirectory(tempPath);
         }
+
         if (string.IsNullOrEmpty(filename))
         {
-            return _tempPath;
+            return tempPath;
         }
-        else
-        {
-            return Path.Combine(_tempPath, filename);
-        }
+
+        return Path.Combine(tempPath, filename);
     }
 
     #endregion TempPath
@@ -1147,13 +1178,25 @@ internal static class Utils
         var logger = LogManager.GetLogger("Log1");
         logger.Info(strContent);
     }
+    
+    public static void SaveLogDebug(string strContent)
+    {
+        var logger = LogManager.GetLogger("Log1");
+        logger.Debug(strContent);
+    }
+    
+    public static void SaveLogError(string strContent)
+    {
+        var logger = LogManager.GetLogger("Log1");
+        logger.Error(strContent);
+    }
 
     public static void SaveLog(string strTitle, Exception ex)
     {
         var logger = LogManager.GetLogger("Log2");
         logger.Debug(strTitle);
         logger.Debug(ex);
-        if (ex != null && ex.InnerException != null)
+        if (ex.InnerException != null)
         {
             logger.Error(ex.InnerException);
         }
@@ -1180,12 +1223,14 @@ internal static class Utils
                             fullImage.Size,
                             CopyPixelOperation.SourceCopy);
                     }
+
                     int maxTry = 10;
                     for (int i = 0; i < maxTry; i++)
                     {
                         int marginLeft = (int)((double)fullImage.Width * i / 2.5 / maxTry);
                         int marginTop = (int)((double)fullImage.Height * i / 2.5 / maxTry);
-                        Rectangle cropRect = new Rectangle(marginLeft, marginTop, fullImage.Width - (marginLeft * 2), fullImage.Height - (marginTop * 2));
+                        Rectangle cropRect = new Rectangle(marginLeft, marginTop, fullImage.Width - (marginLeft * 2),
+                            fullImage.Height - (marginTop * 2));
                         Bitmap target = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
 
                         double imageScale = (double)screen.Bounds.Width / (double)cropRect.Width;
@@ -1213,6 +1258,7 @@ internal static class Utils
         {
             SaveLog(ex.Message, ex);
         }
+
         return string.Empty;
     }
 
@@ -1263,6 +1309,7 @@ internal static class Utils
         {
             SaveLog(ex.Message, ex);
         }
+
         return result;
     }
 
@@ -1278,7 +1325,8 @@ internal static class Utils
     }
 
     [DllImport("dwmapi.dll")]
-    public static extern int DwmSetWindowAttribute(IntPtr hwnd, DWMWINDOWATTRIBUTE attribute, ref int attributeValue, uint attributeSize);
+    public static extern int DwmSetWindowAttribute(IntPtr hwnd, DWMWINDOWATTRIBUTE attribute, ref int attributeValue,
+        uint attributeSize);
 
     #endregion Interop
 
