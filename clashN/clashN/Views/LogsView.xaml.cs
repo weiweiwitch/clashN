@@ -15,10 +15,11 @@ public partial class LogsView
     public LogsView()
     {
         InitializeComponent();
+
         ViewModel = new LogsViewModel();
 
-        MessageBus.Current.Listen<string>("MsgView").Subscribe(DelegateAppendText4Clash);
-        MessageBus.Current.Listen<string>("MsgView4ClashN").Subscribe(DelegateAppendText4ClashN);
+        MessageBus.Current.Listen<string>(LogType.Log4Clash.ToString()).Subscribe(DelegateAppendText4Clash);
+        MessageBus.Current.Listen<string>(LogType.Log4ClashN.ToString()).Subscribe(DelegateAppendText4ClashN);
 
         this.WhenActivated(disposables =>
         {
@@ -76,7 +77,7 @@ public partial class LogsView
         }
     }
 
-    public void ClearMsg()
+    private void ClearMsg()
     {
         Dispatcher.Invoke((Action)(() => { TxtMsg.Clear(); }));
     }

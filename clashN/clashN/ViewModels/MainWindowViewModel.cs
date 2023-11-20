@@ -21,7 +21,7 @@ namespace ClashN.ViewModels;
 public class MainWindowViewModel : ReactiveObject
 {
     private static Config _config;
-    
+
     private CoreHandler _coreHandler;
     private readonly NoticeHandler? _noticeHandler;
     private StatisticsHandler? _statistics;
@@ -110,23 +110,21 @@ public class MainWindowViewModel : ReactiveObject
 
         //Views
         //GetDashboardView = new();
-        GetProxyView = new();
-        GetProfilesView = new();
-        GetLogsView = new();
-        GetConnectionsView = new();
-        GetSettingsView = new();
-        GetHelpView = new();
-        GetPromotionView = new();
+        GetProxyView = new ProxiesView();
+        GetProfilesView = new ProfilesView();
+        GetLogsView = new LogsView();
+        GetConnectionsView = new ConnectionsView();
+        GetSettingsView = new SettingsView();
+        GetHelpView = new HelpView();
+        GetPromotionView = new PromotionView();
 
         RestoreUI();
+
         if (_config.AutoHideStartup)
         {
             Observable.Range(1, 1)
                 .Delay(TimeSpan.FromSeconds(1))
-                .Subscribe(x =>
-                {
-                    Application.Current.Dispatcher.Invoke((Action)(() => { ShowHideWindow(false); }));
-                });
+                .Subscribe(x => { Application.Current.Dispatcher.Invoke((Action)(() => { ShowHideWindow(false); })); });
         }
 
         //System proxy
@@ -275,7 +273,7 @@ public class MainWindowViewModel : ReactiveObject
         MainFormHandler.Instance.BackupGuiNConfig(_config, true);
         MainFormHandler.Instance.InitRegister(_config);
 
-        _coreHandler = new CoreHandler(UpdateHandler);
+        _coreHandler = new CoreHandler(ShowMsgHandler);
 
         if (_config.EnableStatistics)
         {
@@ -290,7 +288,7 @@ public class MainWindowViewModel : ReactiveObject
         _ = LoadCore();
     }
 
-    private void UpdateHandler(bool notify, string msg)
+    private void ShowMsgHandler(bool notify, string msg)
     {
         if (notify)
         {
@@ -303,6 +301,7 @@ public class MainWindowViewModel : ReactiveObject
     private async void UpdateTaskHandler(bool success, string msg)
     {
         _noticeHandler?.SendMessage(msg);
+        
         if (success)
         {
             Global.reloadCore = true;
@@ -346,6 +345,7 @@ public class MainWindowViewModel : ReactiveObject
         await Task.Run(() => { _coreHandler.LoadCore(_config); });
 
         Global.reloadCore = false;
+        
         ConfigProc.SaveConfig(_config, false);
         //statistics?.SaveToFile();
 
@@ -425,6 +425,7 @@ public class MainWindowViewModel : ReactiveObject
 
         _noticeHandler?.SendMessage4ClashNWithTime(
             $"Set rule mode {_config.ruleMode.ToString()}->{mode.ToString()}");
+
         _config.ruleMode = mode;
         ConfigProc.SaveConfig(_config, false);
 

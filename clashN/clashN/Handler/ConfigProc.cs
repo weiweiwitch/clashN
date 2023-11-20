@@ -24,7 +24,7 @@ internal class ConfigProc
     public static int LoadConfig(ref Config? config)
     {
         //载入配置文件
-        string result = Utils.LoadResource(Utils.GetConfigPath(configRes));
+        var result = Utils.LoadResource(Utils.GetConfigPath(configRes));
         if (!string.IsNullOrEmpty(result))
         {
             //转成Json
@@ -77,6 +77,7 @@ internal class ConfigProc
         {
             config.ConstItem = new ConstItem();
         }
+
         //if (string.IsNullOrEmpty(config.constItem.subConvertUrl))
         //{
         //    config.constItem.subConvertUrl = Global.SubConvertUrl;
@@ -85,10 +86,12 @@ internal class ConfigProc
         {
             config.ConstItem.speedTestUrl = Global.SpeedTestUrl;
         }
+
         if (string.IsNullOrEmpty(config.ConstItem.speedPingTestUrl))
         {
             config.ConstItem.speedPingTestUrl = Global.SpeedPingTestUrl;
         }
+
         if (string.IsNullOrEmpty(config.ConstItem.defIEProxyExceptions))
         {
             config.ConstItem.defIEProxyExceptions = Global.IEProxyExceptions;
@@ -102,9 +105,9 @@ internal class ConfigProc
         {
             Global.reloadCore = true;
 
-            for (int i = 0; i < config.ProfileItems.Count; i++)
+            for (var i = 0; i < config.ProfileItems.Count; i++)
             {
-                ProfileItem profileItem = config.ProfileItems[i];
+                var profileItem = config.ProfileItems[i];
 
                 if (string.IsNullOrEmpty(profileItem.indexId))
                 {
@@ -114,6 +117,7 @@ internal class ConfigProc
         }
 
         LazyConfig.Instance.SetConfig(config);
+
         return 0;
     }
 
@@ -153,6 +157,7 @@ internal class ConfigProc
                 {
                     File.Delete(resPath);
                 }
+
                 //rename
                 File.Move(tempPath, resPath);
             }
@@ -201,7 +206,7 @@ internal class ConfigProc
         {
             ProfileItem profileItem = Utils.DeepCopy(item);
             profileItem.indexId = string.Empty;
-            profileItem.remarks = string.Format("{0}-clone", item.remarks);
+            profileItem.remarks = $"{item.remarks}-clone";
 
             if (string.IsNullOrEmpty(profileItem.address) || !File.Exists(Utils.GetConfigPath(profileItem.address)))
             {
@@ -248,18 +253,22 @@ internal class ConfigProc
         {
             return 0;
         }
+
         if (config.ProfileItems.Exists(t => t.indexId == config.IndexId))
         {
             return 0;
         }
+
         if (lstProfile.Count > 0)
         {
             return SetDefaultProfile(ref config, lstProfile[0]);
         }
+
         if (config.ProfileItems.Count > 0)
         {
             return SetDefaultProfile(ref config, config.ProfileItems[0]);
         }
+
         return -1;
     }
 
@@ -269,6 +278,7 @@ internal class ConfigProc
         {
             return null;
         }
+
         var index = config.FindIndexId(config.IndexId);
         if (index < 0)
         {
@@ -288,8 +298,8 @@ internal class ConfigProc
     /// <returns></returns>
     public static int MoveProfile(ref Config config, int index, MovementTarget eMove, int pos = -1)
     {
-        List<ProfileItem> lstProfile = config.ProfileItems.OrderBy(it => it.sort).ToList();
-        int count = lstProfile.Count;
+        var lstProfile = config.ProfileItems.OrderBy(it => it.sort).ToList();
+        var count = lstProfile.Count;
         if (index < 0 || index > lstProfile.Count - 1)
         {
             return -1;
@@ -308,6 +318,7 @@ internal class ConfigProc
                 {
                     return 0;
                 }
+
                 lstProfile[index].sort = lstProfile[0].sort - 1;
 
                 break;
@@ -318,6 +329,7 @@ internal class ConfigProc
                 {
                     return 0;
                 }
+
                 lstProfile[index].sort = lstProfile[index - 1].sort - 1;
 
                 break;
@@ -329,6 +341,7 @@ internal class ConfigProc
                 {
                     return 0;
                 }
+
                 lstProfile[index].sort = lstProfile[index + 1].sort + 1;
 
                 break;
@@ -339,6 +352,7 @@ internal class ConfigProc
                 {
                     return 0;
                 }
+
                 lstProfile[index].sort = lstProfile[lstProfile.Count - 1].sort + 1;
 
                 break;
@@ -353,20 +367,21 @@ internal class ConfigProc
         return 0;
     }
 
-    public static int AddProfileViaContent(ref Config config, ProfileItem profileItem, string content)
+    private static int AddProfileViaContent(ref Config config, ProfileItem profileItem, string content)
     {
         if (string.IsNullOrEmpty(content))
         {
             return -1;
         }
 
-        string newFileName = profileItem.address;
+        var newFileName = profileItem.address;
         if (string.IsNullOrEmpty(newFileName))
         {
-            var ext = ".yaml";
-            newFileName = string.Format("{0}{1}", Utils.GetGUID(), ext);
+            const string ext = ".yaml";
+            newFileName = $"{Utils.GetGUID()}{ext}";
             profileItem.address = newFileName;
         }
+
         if (string.IsNullOrEmpty(profileItem.remarks))
         {
             profileItem.remarks = "clash_local_file";
@@ -383,8 +398,9 @@ internal class ConfigProc
 
         if (string.IsNullOrEmpty(profileItem.remarks))
         {
-            profileItem.remarks = string.Format("import custom@{0}", DateTime.Now.ToShortDateString());
+            profileItem.remarks = $"import custom@{DateTime.Now.ToShortDateString()}";
         }
+
         profileItem.enabled = true;
         AddProfileCommon(ref config, profileItem);
 
@@ -399,8 +415,9 @@ internal class ConfigProc
         {
             return -1;
         }
+
         var ext = Path.GetExtension(fileName);
-        string newFileName = string.Format("{0}{1}", Utils.GetGUID(), ext);
+        var newFileName = $"{Utils.GetGUID()}{ext}";
 
         try
         {
@@ -418,7 +435,7 @@ internal class ConfigProc
         profileItem.address = newFileName;
         if (string.IsNullOrEmpty(profileItem.remarks))
         {
-            profileItem.remarks = string.Format("import custom@{0}", DateTime.Now.ToShortDateString());
+            profileItem.remarks = $"import custom@{DateTime.Now.ToShortDateString()}";
         }
 
         AddProfileCommon(ref config, profileItem);
@@ -457,6 +474,7 @@ internal class ConfigProc
         {
             return -1;
         }
+
         var propertyName = string.Empty;
         switch (name)
         {
@@ -481,7 +499,8 @@ internal class ConfigProc
         {
             lstProfile = items.OrderByDescending(propertyName).ToList();
         }
-        for (int i = 0; i < lstProfile.Count; i++)
+
+        for (var i = 0; i < lstProfile.Count; i++)
         {
             lstProfile[i].sort = (i + 1) * 10;
         }
@@ -490,16 +509,18 @@ internal class ConfigProc
         return 0;
     }
 
-    public static int AddProfileCommon(ref Config config, ProfileItem profileItem)
+    private static int AddProfileCommon(ref Config config, ProfileItem profileItem)
     {
         if (string.IsNullOrEmpty(profileItem.indexId))
         {
             profileItem.indexId = Utils.GetGUID(false);
         }
+
         if (profileItem.coreType is null)
         {
             profileItem.coreType = CoreKind.ClashMeta;
         }
+
         if (!config.ProfileItems.Exists(it => it.indexId == profileItem.indexId))
         {
             var maxSort = config.ProfileItems.Any() ? config.ProfileItems.Max(t => t.sort) : 0;
@@ -524,6 +545,7 @@ internal class ConfigProc
         {
             Utils.SaveLog("RemoveProfileItem", ex);
         }
+
         config.ProfileItems.RemoveAt(index);
 
         return 0;
@@ -535,10 +557,12 @@ internal class ConfigProc
         {
             return string.Empty;
         }
+
         if (string.IsNullOrEmpty(item.address))
         {
             return string.Empty;
         }
+
         var content = File.ReadAllText(Utils.GetConfigPath(item.address));
 
         return content;
@@ -552,7 +576,8 @@ internal class ConfigProc
         }
 
         //maybe url
-        if (string.IsNullOrEmpty(indexId) && (clipboardData.StartsWith(Global.HttpsProtocol) || clipboardData.StartsWith(Global.HttpProtocol)))
+        if (string.IsNullOrEmpty(indexId) && (clipboardData.StartsWith(Global.HttpsProtocol) ||
+                                              clipboardData.StartsWith(Global.HttpProtocol)))
         {
             ProfileItem item = new ProfileItem()
             {
@@ -570,7 +595,7 @@ internal class ConfigProc
         //maybe clashProtocol
         if (string.IsNullOrEmpty(indexId) && (clipboardData.StartsWith(Global.ClashProtocol)))
         {
-            Uri url = new Uri(clipboardData);
+            var url = new Uri(clipboardData);
             if (url.Host == "install-config")
             {
                 NameValueCollection query =
@@ -596,7 +621,7 @@ internal class ConfigProc
         //maybe file
         if (File.Exists(clipboardData))
         {
-            ProfileItem item = new ProfileItem()
+            var item = new ProfileItem()
             {
                 groupId = groupId,
                 url = "",
@@ -613,16 +638,22 @@ internal class ConfigProc
              || clipboardData.IndexOf("mixed-port") >= 0)
             && clipboardData.IndexOf("proxies") >= 0
             && clipboardData.IndexOf("rules") >= 0)
-        { }
+        {
+        }
         else
-        { return -1; }
+        {
+            return -1;
+        }
 
         ProfileItem? profileItem = null;
         if (!string.IsNullOrEmpty(indexId))
             profileItem = config.GetProfileItem(indexId);
 
         if (profileItem == null)
+        {
             profileItem = new ProfileItem();
+        }
+
         profileItem.groupId = groupId;
 
         if (AddProfileViaContent(ref config, profileItem, clipboardData) == 0)

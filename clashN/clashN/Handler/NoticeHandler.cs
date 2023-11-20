@@ -1,4 +1,5 @@
-﻿using MaterialDesignThemes.Wpf;
+﻿using ClashN.ViewModels;
+using MaterialDesignThemes.Wpf;
 using ReactiveUI;
 
 namespace ClashN.Handler;
@@ -16,28 +17,28 @@ public class NoticeHandler
 
     public void Enqueue(object content)
     {
-        _snackbarMessageQueue?.Enqueue(content);
+        _snackbarMessageQueue.Enqueue(content);
     }
 
     public void SendMessage(string msg)
     {
-        MessageBus.Current.SendMessage(msg, "MsgView");
+        MessageBus.Current.SendMessage(msg, LogType.Log4Clash.ToString());
     }
-    
+
     public void SendMessage4ClashN(string msg)
     {
-        MessageBus.Current.SendMessage(msg, "MsgView4ClashN");
+        MessageBus.Current.SendMessage(msg, LogType.Log4ClashN.ToString());
     }
 
     public void SendMessageWithTime(string msg)
     {
         msg = $"{DateTime.Now} {msg}";
-        MessageBus.Current.SendMessage(msg, "MsgView");
+        MessageBus.Current.SendMessage(msg, LogType.Log4Clash.ToString());
     }
-    
+
     public void SendMessage4ClashNWithTime(string msg)
     {
         msg = $"{DateTime.Now} {msg}";
-        MessageBus.Current.SendMessage(msg, "MsgView4ClashN");
+        MessageBus.Current.SendMessage(msg, LogType.Log4ClashN.ToString());
     }
 }

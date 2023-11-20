@@ -15,11 +15,12 @@ internal class CoreHandler
         
     private CoreInfo _coreInfo;
     private Process _process;
-    private readonly Action<bool, string> _updateFunc;
+    
+    private readonly Action<bool, string> _showMsgHandler;
 
-    public CoreHandler(Action<bool, string> update)
+    public CoreHandler(Action<bool, string> showMsgHandler)
     {
-        _updateFunc = update;
+        _showMsgHandler = showMsgHandler;
     }
 
     /// <summary>
@@ -27,47 +28,51 @@ internal class CoreHandler
     /// </summary>
     public void LoadCore(Config config)
     {
-        if (Global.reloadCore)
+        if (!Global.reloadCore)
         {
-            var item = ConfigProc.GetDefaultProfile(ref config);
-            if (item == null)
-            {
-                CoreStop();
-                ShowMsg(false, ResUI.CheckProfileSettings);
-                return;
-            }
+            return;
+        }
+        
+        var item = ConfigProc.GetDefaultProfile(ref config);
+        if (item == null)
+        {
+            CoreStop();
+            
+            ShowMsg(false, ResUI.CheckProfileSettings);
+            return;
+        }
 
-            if (config.EnableTun && !Utils.IsAdministrator())
-            {
-                ShowMsg(true, ResUI.EnableTunModeFailed);
-                return;
-            }
-            if (config.EnableTun && item.coreType == CoreKind.Clash)
-            {
-                ShowMsg(true, ResUI.TunModeCoreTip);
-                return;
-            }
+        if (config.EnableTun && !Utils.IsAdministrator())
+        {
+            ShowMsg(true, ResUI.EnableTunModeFailed);
+            return;
+        }
+        if (config.EnableTun && item.coreType == CoreKind.Clash)
+        {
+            ShowMsg(true, ResUI.TunModeCoreTip);
+            return;
+        }
 
-            SetCore(config, item, out bool blChanged);
-            var fileName = Utils.GetConfigPath(CoreConfigRes);
-            if (CoreConfigHandler.GenerateClientConfig(item, fileName, false, out var msg) != 0)
-            {
-                CoreStop();
+        SetCore(config, item, out bool blChanged);
+        
+        var fileName = Utils.GetConfigPath(CoreConfigRes);
+        if (CoreConfigHandler.GenerateClientConfig(item, fileName, false, out var msg) != 0)
+        {
+            CoreStop();
                 
-                ShowMsg(false, msg);
+            ShowMsg(false, msg);
+        }
+        else
+        {
+            ShowMsg(true, msg);
+
+            if (_process != null && !_process.HasExited && !blChanged)
+            {
+                MainFormHandler.Instance.ClashConfigReload(fileName);
             }
             else
             {
-                ShowMsg(true, msg);
-
-                if (_process != null && !_process.HasExited && !blChanged)
-                {
-                    MainFormHandler.Instance.ClashConfigReload(fileName);
-                }
-                else
-                {
-                    CoreRestart(item);
-                }
+                CoreRestart(item);
             }
         }
     }
@@ -253,7 +258,7 @@ internal class CoreHandler
 
     private void ShowMsg(bool updateToTrayTooltip, string msg)
     {
-        _updateFunc(updateToTrayTooltip, msg);
+        _showMsgHandler(updateToTrayTooltip, msg);
     }
 
     private void KillProcess(Process p)
