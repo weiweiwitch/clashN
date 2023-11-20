@@ -1,10 +1,9 @@
-using ClashN.ViewModels;
-using ReactiveUI;
 using System.Reactive.Disposables;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Threading;
 using ClashN.Mode;
+using ClashN.ViewModels;
+using ReactiveUI;
 
 namespace ClashN.Views;
 
@@ -52,18 +51,9 @@ public partial class LogsView
             return;
         }
 
-        var msgFilter = ViewModel?.MsgFilter;
-        if (!string.IsNullOrEmpty(msgFilter))
-        {
-            if (!Regex.IsMatch(msg, msgFilter))
-            {
-                return;
-            }
-        }
-
         if (logType == LogType.Log4ClashN)
         {
-            var compLog =  TxtMsg4ClashN;
+            var compLog = TxtMsg4ClashN;
             if (compLog.LineCount > ViewModel?.LineCount)
             {
                 Dispatcher.Invoke((Action)(() => { TxtMsg4ClashN.Clear(); }));
@@ -81,9 +71,34 @@ public partial class LogsView
                 compLog.ScrollToEnd();
             }
         }
-        
+
         if (logType == LogType.Log4Clash)
         {
+            var vm = ViewModel;
+            if (vm != null)
+            {
+                var msgFilter = vm.MsgFilter;
+                if (msgFilter != vm.OldMsgFilterStr)
+                {
+                    // update
+                    vm.OldMsgFilterStr = msgFilter;
+
+                    if (!string.IsNullOrEmpty(msgFilter))
+                    {
+                        vm.MetaLogItems.Filter = item => (item as MetaLogModel).Msg.Contains(msgFilter);
+
+                        // if (!Regex.IsMatch(msg, msgFilter))
+                        // {
+                        //     return;
+                        // }
+                    }
+                    else
+                    {
+                        vm.MetaLogItems.Filter = _ => true;
+                    }
+                }
+            }
+            
             var metaLogInfos = msg.Split(" ", 3);
             if (metaLogInfos.Length >= 3)
             {
@@ -93,20 +108,20 @@ public partial class LogsView
                     LogLevel = metaLogInfos[1],
                     Msg = metaLogInfos[2],
                 };
-                ViewModel?.MetaLogItems.Add(metaLog);
+                ViewModel?.AddLog(metaLog);
             }
             else
             {
                 TxtMsg4ClashN.AppendText($"Error: Can't split Clash Meta Log: {msg}{Environment.NewLine}");
             }
 
-            var count = ViewModel?.MetaLogItems.Count;
+            var count = ViewModel?.MetaLogCount();
             if (count > ViewModel?.LineCount)
             {
                 var diff = count - ViewModel?.LineCount;
                 for (var i = 0; i < diff; i++)
                 {
-                    ViewModel?.MetaLogItems.RemoveAt(0);
+                    ViewModel?.RemoveTop();
                 }
             }
 
@@ -122,7 +137,7 @@ public partial class LogsView
 
     private void ClearMsg()
     {
-        Dispatcher.Invoke((Action)(() => { ViewModel?.MetaLogItems.Clear(); }));
+        Dispatcher.Invoke((Action)(() => { ViewModel?.MetaLogClear(); }));
         Dispatcher.Invoke((Action)(() => { TxtMsg4ClashN.Clear(); }));
     }
 

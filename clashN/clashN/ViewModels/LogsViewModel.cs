@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Windows.Data;
 using ClashN.Mode;
 using DynamicData.Binding;
 using ReactiveUI;
@@ -15,22 +17,38 @@ public class LogsViewModel : ReactiveObject
 {
     private IObservableCollection<MetaLogModel> _metaLogItems = new ObservableCollectionExtended<MetaLogModel>();
 
-    public IObservableCollection<MetaLogModel> MetaLogItems => _metaLogItems;
+    public ICollectionView MetaLogItems => CollectionViewSource.GetDefaultView(_metaLogItems);
+
+    [Reactive] public int SortingSelected { get; set; }
+
+    [Reactive] public bool ScrollToEnd { get; set; }
+
+    [Reactive] public bool AutoRefresh { get; set; }
+
+    [Reactive] public string MsgFilter { get; set; }
+    public string OldMsgFilterStr { get; set; }
     
-    [Reactive]
-    public int SortingSelected { get; set; }
+    [Reactive] public int LineCount { get; set; }
 
-    [Reactive]
-    public bool ScrollToEnd { get; set; }
-        
-    [Reactive]
-    public bool AutoRefresh { get; set; }
+    public void AddLog(MetaLogModel metaLog)
+    {
+        _metaLogItems.Add(metaLog);
+    }
 
-    [Reactive]
-    public string MsgFilter { get; set; }
+    public void RemoveTop()
+    {
+        _metaLogItems.RemoveAt(0);
+    }
 
-    [Reactive]
-    public int LineCount { get; set; }
+    public int MetaLogCount()
+    {
+        return _metaLogItems.Count;
+    }
+
+    public void MetaLogClear()
+    {
+        _metaLogItems.Clear();
+    }
 
     public LogsViewModel()
     {
