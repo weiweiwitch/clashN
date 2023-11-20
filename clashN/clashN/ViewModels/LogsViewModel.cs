@@ -1,3 +1,5 @@
+using ClashN.Mode;
+using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -11,6 +13,10 @@ public enum LogType
 
 public class LogsViewModel : ReactiveObject
 {
+    private IObservableCollection<MetaLogModel> _metaLogItems = new ObservableCollectionExtended<MetaLogModel>();
+
+    public IObservableCollection<MetaLogModel> MetaLogItems => _metaLogItems;
+    
     [Reactive]
     public int SortingSelected { get; set; }
 

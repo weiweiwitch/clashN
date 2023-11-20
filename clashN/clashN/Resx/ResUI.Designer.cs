@@ -1645,6 +1645,24 @@ namespace ClashN.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Log Level.
+        /// </summary>
+        public static string TbSortingLogLevel {
+            get {
+                return ResourceManager.GetString("TbSortingLogLevel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Log Msg.
+        /// </summary>
+        public static string TbSortingLogMsg {
+            get {
+                return ResourceManager.GetString("TbSortingLogMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
         public static string TbSortingName {

@@ -81,15 +81,49 @@
             </ToolBar>
         </ToolBarTray>
         <TabControl>
+            <!-- <TabItem Header="{x:Static resx:ResUI.TbLog4Clash}"> -->
+            <!--     <TextBox -->
+            <!--         Name="TxtMsg" -->
+            <!--         BorderThickness="0" -->
+            <!--         FontSize="{DynamicResource StdFontSize}" -->
+            <!--         HorizontalScrollBarVisibility="Auto" -->
+            <!--         IsReadOnly="True" -->
+            <!--         TextWrapping="Wrap" -->
+            <!--         VerticalScrollBarVisibility="Visible" /> -->
+            <!-- </TabItem> -->
             <TabItem Header="{x:Static resx:ResUI.TbLog4Clash}">
-                <TextBox
-                    Name="TxtMsg"
-                    BorderThickness="0"
-                    FontSize="{DynamicResource StdFontSize}"
-                    HorizontalScrollBarVisibility="Auto"
+                <DataGrid
+                    x:Name="ListMetaLogs"
+                    AutoGenerateColumns="False"
+                    BorderThickness="1"
+                    CanUserAddRows="False"
+                    CanUserResizeRows="False"
+                    CanUserSortColumns="False"
+                    EnableRowVirtualization="True"
+                    GridLinesVisibility="All"
+                    HeadersVisibility="Column"
                     IsReadOnly="True"
-                    TextWrapping="Wrap"
-                    VerticalScrollBarVisibility="Visible" />
+                    Style="{StaticResource LogDataGrid}">
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Padding" Value="0" />
+                        </Style>
+                    </DataGrid.CellStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="300"
+                            Binding="{Binding Time}"
+                            Header="{x:Static resx:ResUI.TbSortingTime}" />
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding LogLevel}"
+                            Header="{x:Static resx:ResUI.TbSortingLogLevel}" />
+                        <DataGridTextColumn
+                            Width="Auto"
+                            Binding="{Binding Msg}"
+                            Header="{x:Static resx:ResUI.TbSortingLogMsg}" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </TabItem>
             <TabItem Header="{x:Static resx:ResUI.TbLog4ClashN}">
                 <TextBox

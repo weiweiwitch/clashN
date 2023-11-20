@@ -22,6 +22,7 @@ namespace ClashN.ViewModels
         }
 
         private NoticeHandler? _noticeHandler;
+        
         private IObservableCollection<ConnectionModel> _connectionItems = new ObservableCollectionExtended<ConnectionModel>();
 
         public IObservableCollection<ConnectionModel> ConnectionItems => _connectionItems;

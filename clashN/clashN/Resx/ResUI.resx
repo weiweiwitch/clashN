@@ -670,6 +670,12 @@
   <data name="TbSortingType" xml:space="preserve">
     <value>Type</value>
   </data>
+  <data name="TbSortingLogLevel" xml:space="preserve">
+    <value>Log Level</value>
+  </data>
+  <data name="TbSortingLogMsg" xml:space="preserve">
+    <value>Log Msg</value>
+  </data>
   <data name="TbSettingsFontFamily" xml:space="preserve">
     <value>FontFamily(Require restart)</value>
   </data>

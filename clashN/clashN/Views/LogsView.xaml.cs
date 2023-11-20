@@ -4,6 +4,7 @@ using System.Reactive.Disposables;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Threading;
+using ClashN.Mode;
 
 namespace ClashN.Views;
 
@@ -23,6 +24,8 @@ public partial class LogsView
 
         this.WhenActivated(disposables =>
         {
+            this.OneWayBind(ViewModel, vm => vm.MetaLogItems, v => v.ListMetaLogs.ItemsSource).DisposeWith(disposables);
+
             this.Bind(ViewModel, vm => vm.MsgFilter, v => v.TxtFilter.Text).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.ScrollToEnd, v => v.TogScrollToEnd.IsChecked).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.AutoRefresh, v => v.TogAutoRefresh.IsChecked).DisposeWith(disposables);
@@ -58,28 +61,69 @@ public partial class LogsView
             }
         }
 
-        var compLog = logType == LogType.Log4Clash ? TxtMsg : TxtMsg4ClashN;
-        if (compLog.LineCount > ViewModel?.LineCount)
+        if (logType == LogType.Log4ClashN)
         {
-            ClearMsg();
+            var compLog =  TxtMsg4ClashN;
+            if (compLog.LineCount > ViewModel?.LineCount)
+            {
+                Dispatcher.Invoke((Action)(() => { TxtMsg4ClashN.Clear(); }));
+            }
+
+            compLog.AppendText(msg);
+
+            if (!msg.EndsWith(Environment.NewLine))
+            {
+                compLog.AppendText(Environment.NewLine);
+            }
+
+            if (ViewModel?.ScrollToEnd == true)
+            {
+                compLog.ScrollToEnd();
+            }
         }
-
-        compLog.AppendText(msg);
-
-        if (!msg.EndsWith(Environment.NewLine))
+        
+        if (logType == LogType.Log4Clash)
         {
-            compLog.AppendText(Environment.NewLine);
-        }
+            var metaLogInfos = msg.Split(" ", 3);
+            if (metaLogInfos.Length >= 3)
+            {
+                var metaLog = new MetaLogModel
+                {
+                    Time = metaLogInfos[0],
+                    LogLevel = metaLogInfos[1],
+                    Msg = metaLogInfos[2],
+                };
+                ViewModel?.MetaLogItems.Add(metaLog);
+            }
+            else
+            {
+                TxtMsg4ClashN.AppendText($"Error: Can't split Clash Meta Log: {msg}{Environment.NewLine}");
+            }
 
-        if (ViewModel?.ScrollToEnd == true)
-        {
-            compLog.ScrollToEnd();
+            var count = ViewModel?.MetaLogItems.Count;
+            if (count > ViewModel?.LineCount)
+            {
+                var diff = count - ViewModel?.LineCount;
+                for (var i = 0; i < diff; i++)
+                {
+                    ViewModel?.MetaLogItems.RemoveAt(0);
+                }
+            }
+
+            if (ViewModel?.ScrollToEnd == true)
+            {
+                if (ListMetaLogs.Items.Count > 0)
+                {
+                    ListMetaLogs.ScrollIntoView(ListMetaLogs.Items[ListMetaLogs.Items.Count - 1]);
+                }
+            }
         }
     }
 
     private void ClearMsg()
     {
-        Dispatcher.Invoke((Action)(() => { TxtMsg.Clear(); }));
+        Dispatcher.Invoke((Action)(() => { ViewModel?.MetaLogItems.Clear(); }));
+        Dispatcher.Invoke((Action)(() => { TxtMsg4ClashN.Clear(); }));
     }
 
     private void BtnDelete_Click(object sender, RoutedEventArgs e)
