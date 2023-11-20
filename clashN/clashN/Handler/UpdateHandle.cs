@@ -184,11 +184,11 @@ internal class UpdateHandle
 
             foreach (var item in profileItems)
             {
-                string indexId = item.indexId.TrimEx();
-                string url = item.url.TrimEx();
-                string userAgent = item.userAgent.TrimEx();
-                string groupId = item.groupId.TrimEx();
-                string hashCode = $"{item.remarks}->";
+                var indexId = item.indexId.TrimEx();
+                var url = item.url.TrimEx();
+                var userAgent = item.userAgent.TrimEx();
+                var groupId = item.groupId.TrimEx();
+                var hashCode = $"{item.remarks}->";
                 if (item.enabled == false || string.IsNullOrEmpty(indexId) || string.IsNullOrEmpty(url))
                 {
                     _updateFunc(false, $"{hashCode}{ResUI.MsgSkipSubscriptionUpdate}");
@@ -216,11 +216,11 @@ internal class UpdateHandle
                 {
                     _updateFunc(false, $"{hashCode}{args.GetException().Message}");
                 };
-                var result = (await downloadHandle.DownloadStringAsync(url, blProxy, userAgent)) ??
+                var result = await downloadHandle.DownloadStringAsync(url, blProxy, userAgent) ??
                              throw new Exception();
                 if (blProxy && string.IsNullOrEmpty(result.Item1))
                 {
-                    result = (await downloadHandle.DownloadStringAsync(url, false, userAgent)) ??
+                    result = await downloadHandle.DownloadStringAsync(url, false, userAgent) ??
                              throw new Exception();
                 }
 
@@ -236,7 +236,7 @@ internal class UpdateHandle
                         _updateFunc(false, $"{hashCode}{result}");
                     }
 
-                    int ret = ConfigProc.AddBatchProfiles(ref config, result.Item1, indexId, groupId);
+                    var ret = ConfigProc.AddBatchProfiles(ref config, result.Item1, indexId, groupId);
                     if (ret == 0)
                     {
                         item.updateTime = ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();

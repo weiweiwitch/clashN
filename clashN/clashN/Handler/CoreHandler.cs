@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using ClashN.Tool;
+using ClashN.ViewModels;
 
 namespace ClashN.Handler;
 
@@ -18,9 +19,9 @@ internal class CoreHandler
     private CoreInfo _coreInfo;
     private Process _process;
 
-    private readonly Action<bool, string> _showMsgHandler;
+    private readonly Action<bool, LogType, string> _showMsgHandler;
 
-    public CoreHandler(Action<bool, string> showMsgHandler)
+    public CoreHandler(Action<bool, LogType, string> showMsgHandler)
     {
         _showMsgHandler = showMsgHandler;
     }
@@ -30,8 +31,8 @@ internal class CoreHandler
     /// </summary>
     public void LoadCore(Config config)
     {
-        ShowMsg(false, $"Load Core: {Global.reloadCore}");
-        
+        Utils.SaveLogDebug($"CoreHandler:LoadCore - Start to Load Core: {Global.reloadCore}");
+
         if (!Global.reloadCore)
         {
             return;
@@ -42,35 +43,35 @@ internal class CoreHandler
         {
             CoreStop();
 
-            ShowMsg(false, ResUI.CheckProfileSettings);
+            ShowMsg(false, LogType.Log4ClashN, ResUI.CheckProfileSettings);
             return;
         }
 
         if (config.EnableTun && !Utils.IsAdministrator())
         {
-            ShowMsg(true, ResUI.EnableTunModeFailed);
+            ShowMsg(true, LogType.Log4ClashN, ResUI.EnableTunModeFailed);
             return;
         }
 
         if (config.EnableTun && item.coreType == CoreKind.Clash)
         {
-            ShowMsg(true, ResUI.TunModeCoreTip);
+            ShowMsg(true, LogType.Log4ClashN, ResUI.TunModeCoreTip);
             return;
         }
 
         SetCore(config, item, out var blChanged);
 
         var fileName = Utils.GetConfigPath(CoreConfigRes);
-        ShowMsg(false, $"Load file: {fileName}");
+        Utils.SaveLogDebug($"CoreHandler:LoadCore - Load file: {fileName}");
         if (CoreConfigHandler.GenerateClientConfig(item, fileName, false, out var msg) != 0)
         {
             CoreStop();
 
-            ShowMsg(false, msg);
+            ShowMsg(false, LogType.Log4ClashN, msg);
             return;
         }
 
-        ShowMsg(true, msg);
+        ShowMsg(true, LogType.Log4ClashN, msg);
 
         if (_process != null && !_process.HasExited && !blChanged)
         {
@@ -99,8 +100,9 @@ internal class CoreHandler
     /// </summary>
     public void CoreStop()
     {
-        ShowMsg(false, string.Format(ResUI.StopService, DateTime.Now.ToString(CultureInfo.CurrentCulture)));
-        
+        Utils.SaveLogDebug(
+            $"CoreHandler:CoreStop - Stop the Core: {DateTime.Now.ToString(CultureInfo.CurrentCulture)}");
+
         try
         {
             if (_process != null)
@@ -191,7 +193,7 @@ internal class CoreHandler
         if (string.IsNullOrEmpty(fileName))
         {
             var msg = string.Format(ResUI.NotFoundCore, _coreInfo.coreUrl);
-            ShowMsg(false, msg);
+            ShowMsg(false, LogType.Log4ClashN, msg);
         }
 
         return fileName;
@@ -202,13 +204,21 @@ internal class CoreHandler
     /// </summary>
     private void CoreStart(ProfileItem item)
     {
-        ShowMsg(false, string.Format(ResUI.StartService, DateTime.Now.ToString(CultureInfo.CurrentCulture)));
-        ShowMsg(false, $"{ResUI.TbCoreType} {_coreInfo.coreType.ToString()}");
+        Utils.SaveLogDebug(
+            $"CoreHandler:CoreStart - Start the Core: {DateTime.Now.ToString(CultureInfo.CurrentCulture)}");
+
+        ShowMsg(false, LogType.Log4ClashN,
+            string.Format(ResUI.StartService, DateTime.Now.ToString(CultureInfo.CurrentCulture)));
+        ShowMsg(false, LogType.Log4ClashN, $"{ResUI.TbCoreType} {_coreInfo.coreType.ToString()}");
 
         try
         {
             var fileName = FindCoreExe();
-            if (fileName == "") return;
+            if (fileName == "")
+            {
+                Utils.SaveLogError($"CoreHandler:CoreStart - Can't find any core");
+                return;
+            }
 
             //Portable Mode
             var arguments = _coreInfo.arguments;
@@ -237,13 +247,15 @@ internal class CoreHandler
             //{
             //    p.StartInfo.Verb = "runas";
             //}
-            p.OutputDataReceived += (sender, e) =>
+            p.OutputDataReceived += (_, e) =>
             {
-                if (!string.IsNullOrEmpty(e.Data))
+                if (string.IsNullOrEmpty(e.Data))
                 {
-                    var msg = e.Data + Environment.NewLine;
-                    ShowMsg(false, msg);
+                    return;
                 }
+
+                var msg = e.Data + Environment.NewLine;
+                ShowMsg(false, LogType.Log4Clash, msg);
             };
             p.Start();
             //p.PriorityClass = ProcessPriorityClass.High;
@@ -251,25 +263,29 @@ internal class CoreHandler
             //processId = p.Id;
             _process = p;
 
+            Utils.SaveLogDebug($"CoreHandler:CoreStart - Core started 1. fileName: {fileName}, arguments: {arguments}");
+
             if (p.WaitForExit(1000))
             {
                 throw new Exception(p.StandardError.ReadToEnd());
             }
 
             Global.processJob.AddProcess(p.Handle);
+
+            Utils.SaveLogDebug($"CoreHandler:CoreStart - Core started after AddProcess");
         }
         catch (Exception ex)
         {
             Utils.SaveLog(ex.Message, ex);
 
             var msg = ex.Message;
-            ShowMsg(true, msg);
+            ShowMsg(true, LogType.Log4ClashN, msg);
         }
     }
 
-    private void ShowMsg(bool updateToTrayTooltip, string msg)
+    private void ShowMsg(bool updateToTrayTooltip, LogType logType, string msg)
     {
-        _showMsgHandler(updateToTrayTooltip, msg);
+        _showMsgHandler(updateToTrayTooltip, logType, msg);
     }
 
     private void KillProcess(Process p)

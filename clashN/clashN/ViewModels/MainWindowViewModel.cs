@@ -283,7 +283,7 @@ public class MainWindowViewModel : ReactiveObject
             _statistics = new StatisticsHandler(_config, UpdateStatisticsHandler);
         }
 
-        MainFormHandler.Instance.UpdateTask(_config, UpdateTaskHandler);
+        MainFormHandler.UpdateTask(_config, UpdateTaskHandler);
         MainFormHandler.Instance.RegisterGlobalHotkey(_config, OnHotkeyHandler, UpdateTaskHandler);
 
         OnProgramStarted("shown", true);
@@ -291,14 +291,14 @@ public class MainWindowViewModel : ReactiveObject
         _ = LoadCore();
     }
 
-    private void ShowMsgHandler(bool notify, string msg)
+    private void ShowMsgHandler(bool notify, LogType logType, string msg)
     {
         if (notify)
         {
             _noticeHandler?.Enqueue(msg);
         }
 
-        NoticeHandler.SendMessage(LogType.Log4ClashN, msg);
+        NoticeHandler.SendMessage(logType, msg);
     }
 
     private async void UpdateTaskHandler(bool success, string msg)

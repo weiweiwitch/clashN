@@ -47,10 +47,12 @@ internal class CoreConfigHandler
                 msg = ResUI.FailedGetDefaultConfiguration;
                 return -1;
             }
+
             if (!File.Exists(addressFileName))
             {
                 addressFileName = Path.Combine(Utils.GetConfigPath(), addressFileName);
             }
+
             if (!File.Exists(addressFileName))
             {
                 msg = ResUI.FailedReadConfiguration + "1";
@@ -70,6 +72,7 @@ internal class CoreConfigHandler
                 msg = ResUI.FailedConversionConfiguration;
                 return -1;
             }
+
             //mixed-port
             fileContent["mixed-port"] = config.MixedPort;
             //port
@@ -148,6 +151,7 @@ internal class CoreConfigHandler
             msg = ResUI.FailedGenDefaultConfiguration;
             return -1;
         }
+
         return 0;
     }
 
@@ -172,6 +176,7 @@ internal class CoreConfigHandler
         {
             return;
         }
+
         foreach (var item in mixinContent)
         {
             if (!config.EnableTun && item.Key == "tun")
@@ -190,6 +195,7 @@ internal class CoreConfigHandler
                 fileContent[item.Key] = item.Value;
             }
         }
+
         return;
     }
 
@@ -222,6 +228,7 @@ internal class CoreConfigHandler
             fileContent.Add(key, value);
             return;
         }
+
         var lstOri = (List<object>)fileContent[key];
         var lstValue = (List<object>)value;
 
@@ -231,6 +238,7 @@ internal class CoreConfigHandler
             {
                 lstOri.RemoveAll(t => t.ToString().StartsWith(item.ToString()));
             }
+
             return;
         }
 
