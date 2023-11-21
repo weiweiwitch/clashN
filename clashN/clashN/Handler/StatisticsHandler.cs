@@ -13,7 +13,7 @@ internal class StatisticsHandler
     private ClientWebSocket _webSocket = null;
     private string _url = string.Empty;
 
-    private readonly Action<ulong, ulong> _updateFunc;
+    private readonly Action<ulong, ulong> _cbStatisticUpdateFunc;
 
     private bool Enable
     {
@@ -28,10 +28,10 @@ internal class StatisticsHandler
     //    }
     //}
 
-    public StatisticsHandler(Action<ulong, ulong> update)
+    public StatisticsHandler(Action<ulong, ulong> cbStatisticUpdate)
     {
         Enable = LazyConfig.Instance.Config.EnableStatistics;
-        _updateFunc = update;
+        _cbStatisticUpdateFunc = cbStatisticUpdate;
         _exitFlag = false;
 
         //LoadFromFile();
@@ -111,7 +111,7 @@ internal class StatisticsHandler
                                 serverStatItem.UploadRemote += up;
                                 serverStatItem.DownloadRemote += down;
                             }
-                            _updateFunc(up, down);
+                            _cbStatisticUpdateFunc(up, down);
                         }
                         res = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                     }

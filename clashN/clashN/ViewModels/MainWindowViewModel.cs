@@ -79,13 +79,13 @@ public class MainWindowViewModel : ReactiveObject
     #endregion Rule mode
 
     #region Timer
-    
+
     // For Update Profile
     private DispatcherTimer? _updateTaskDispatcherTimer;
     private DateTime _autoUpdateSubTime = DateTime.Now;
-    
+
     #endregion Timer
-    
+
     #region Other
 
     public ReactiveCommand<Unit, Unit> AddProfileViaScanCmd { get; }
@@ -112,10 +112,9 @@ public class MainWindowViewModel : ReactiveObject
         GetSettingsView = new SettingsView();
         GetHelpView = new HelpView();
         GetPromotionView = new PromotionView();
-        
+
         NoticeHandler.Instance.ConfigMessageQueue(snackbarMessageQueue);
-        
-        
+
 
         //System proxy
         SystemProxyClearCmd = ReactiveCommand.Create(() =>
@@ -175,31 +174,20 @@ public class MainWindowViewModel : ReactiveObject
         NotifyLeftClickCmd = ReactiveCommand.Create(() => { ShowHideWindow(null); });
 
         Global.ShowInTaskbar = true; //Application.Current.MainWindow.ShowInTaskbar;
-        
-        ThreadPool.RegisterWaitForSingleObject(App.ProgramStarted, OnProgramStarted, null, -1, false);
-        
-        // Main Logic
-        // init UI
-        Init();
 
-        // init core
-        InitCore();
-        
+        ThreadPool.RegisterWaitForSingleObject(App.ProgramStarted, OnProgramStarted, null, -1, false);
+
         RestoreUI();
 
-        var config = LazyConfig.Instance.Config;
-        if (config.AutoHideStartup)
-        {
-            Observable.Range(1, 1)
-                .Delay(TimeSpan.FromSeconds(1))
-                .Subscribe(x => { Application.Current.Dispatcher.Invoke((Action)(() => { ShowHideWindow(false); })); });
-        }
+        // Main Logic
+        // init
+        Init();
     }
 
     private void OnProgramStarted(object? state, bool timeout)
     {
         Utils.SaveLog("MainWindowViewModel:OnProgramStarted");
-        
+
         Application.Current.Dispatcher.Invoke((Action)(() =>
         {
             var clipboardData = Utils.GetClipboardData();
@@ -214,7 +202,7 @@ public class MainWindowViewModel : ReactiveObject
             ShowHideWindow(true);
 
             Locator.Current.GetService<ProfilesViewModel>()?.AddProfilesViaClipboard(true);
-            
+
             StartAllTimerTask();
         }));
     }
@@ -236,9 +224,9 @@ public class MainWindowViewModel : ReactiveObject
             }
 
             StorageUI();
-            
+
             ConfigProc.SaveConfig();
-            
+
             _statistics?.Close();
         }
         catch
@@ -281,13 +269,16 @@ public class MainWindowViewModel : ReactiveObject
 
     private void Init()
     {
+        Utils.SaveLog("MainWindowViewModel:Init");
+        
         MainFormHandler.BackupGuiNConfig(true);
+
         MainFormHandler.InitRegister();
 
         var config = LazyConfig.Instance.Config;
         if (config.EnableStatistics)
         {
-            _statistics = new StatisticsHandler(UpdateStatisticsHandler);
+            _statistics = new StatisticsHandler(CbStatisticUpdate);
         }
 
         // Timer 4 Update 
@@ -299,21 +290,18 @@ public class MainWindowViewModel : ReactiveObject
         };
         _updateTaskDispatcherTimer.Tick += (_, _) =>
         {
-            MainFormHandler.Instance.OnTimer4UpdateTask(ref _autoUpdateSubTime, config, UpdateTaskHandler);
+            MainFormHandler.Instance.OnTimer4UpdateTask(ref _autoUpdateSubTime, config, CbUpdateTaskFinish);
         };
 
         // HotKey
-        MainFormHandler.RegisterGlobalHotkey(config, OnHotkeyHandler, UpdateTaskHandler);
+        MainFormHandler.RegisterGlobalHotkey(config, OnHotkeyHandler);
 
         OnProgramStarted("shown", true);
-    }
 
-    private void InitCore()
-    {
         _ = LoadCore();
     }
 
-    private async void UpdateTaskHandler(bool success, string msg)
+    private async void CbUpdateTaskFinish(bool success, string msg)
     {
         NoticeHandler.SendMessage4ClashN(msg);
 
@@ -325,7 +313,7 @@ public class MainWindowViewModel : ReactiveObject
         }
     }
 
-    private void UpdateStatisticsHandler(ulong up, ulong down)
+    private void CbStatisticUpdate(ulong up, ulong down)
     {
         try
         {
@@ -352,7 +340,10 @@ public class MainWindowViewModel : ReactiveObject
 
     public async Task LoadCore()
     {
-        Locator.Current.GetService<ProxiesViewModel>()?.ProxiesClear();
+        Utils.SaveLog("MainWindowViewModel:LoadCore");
+
+        var proxiesViewModel = Locator.Current.GetService<ProxiesViewModel>();
+        proxiesViewModel?.ProxiesClear();
 
         await Task.Run(() => { CoreHandler.Instance.LoadCore(); });
 
@@ -365,8 +356,9 @@ public class MainWindowViewModel : ReactiveObject
 
         SetRuleMode(config.RuleMode);
 
-        Locator.Current.GetService<ProxiesViewModel>()?.ProxiesReload();
-        Locator.Current.GetService<ProxiesViewModel>()?.ProxiesDelayTest();
+        proxiesViewModel?.ProxiesReload();
+        proxiesViewModel?.ProxiesDelayTest();
+        
         Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
     }
 
@@ -457,7 +449,7 @@ public class MainWindowViewModel : ReactiveObject
     public static void ShowHideWindow(bool? blShow)
     {
         Utils.SaveLog($"MainWindowViewModel:ShowHideWindow");
-        
+
         var bl = blShow.HasValue ? blShow.Value : !Global.ShowInTaskbar;
         if (bl)
         {
@@ -480,36 +472,47 @@ public class MainWindowViewModel : ReactiveObject
 
     private void RestoreUI()
     {
-        var config = LazyConfig.Instance.Config;
+        Utils.SaveLog("MainWindowViewModel:RestoreUI");
         
+        var config = LazyConfig.Instance.Config;
+
         ModifyTheme(config.UiItem.ColorModeDark);
 
-        if (!string.IsNullOrEmpty(config.UiItem.ColorPrimaryName))
+        var colorPrimaryName = config.UiItem.ColorPrimaryName;
+        if (!string.IsNullOrEmpty(colorPrimaryName))
         {
-            var swatch =
-                new SwatchesProvider().Swatches.FirstOrDefault(t => t.Name == config.UiItem.ColorPrimaryName);
+            var swatch = new SwatchesProvider().Swatches.FirstOrDefault(t => t.Name == colorPrimaryName);
             if (swatch?.ExemplarHue.Color != null)
             {
                 ChangePrimaryColor(swatch.ExemplarHue.Color);
             }
         }
 
+        var mainWindow = Application.Current.MainWindow;
         if (config.UiItem.MainWidth > 0 && config.UiItem.MainHeight > 0)
         {
-            Application.Current.MainWindow.Width = config.UiItem.MainWidth;
-            Application.Current.MainWindow.Height = config.UiItem.MainHeight;
+            mainWindow.Width = config.UiItem.MainWidth;
+            mainWindow.Height = config.UiItem.MainHeight;
         }
 
-        var hWnd = new WindowInteropHelper(Application.Current.MainWindow).EnsureHandle();
+        var hWnd = new WindowInteropHelper(mainWindow).EnsureHandle();
         var g = Graphics.FromHwnd(hWnd);
-        if (Application.Current.MainWindow.Width > SystemInformation.WorkingArea.Width * 96 / g.DpiX)
+        if (mainWindow.Width > SystemInformation.WorkingArea.Width * 96 / g.DpiX)
         {
-            Application.Current.MainWindow.Width = SystemInformation.WorkingArea.Width * 96 / g.DpiX;
+            mainWindow.Width = SystemInformation.WorkingArea.Width * 96 / g.DpiX;
         }
 
-        if (Application.Current.MainWindow.Height > SystemInformation.WorkingArea.Height * 96 / g.DpiY)
+        if (mainWindow.Height > SystemInformation.WorkingArea.Height * 96 / g.DpiY)
         {
-            Application.Current.MainWindow.Height = SystemInformation.WorkingArea.Height * 96 / g.DpiY;
+            mainWindow.Height = SystemInformation.WorkingArea.Height * 96 / g.DpiY;
+        }
+
+        // Auto Hide
+        if (config.AutoHideStartup)
+        {
+            Observable.Range(1, 1)
+                .Delay(TimeSpan.FromSeconds(1))
+                .Subscribe(x => { Application.Current.Dispatcher.Invoke((Action)(() => { ShowHideWindow(false); })); });
         }
     }
 
@@ -544,7 +547,7 @@ public class MainWindowViewModel : ReactiveObject
     }
 
     #endregion UI
-    
+
     public void StartAllTimerTask()
     {
         _updateTaskDispatcherTimer?.Start();

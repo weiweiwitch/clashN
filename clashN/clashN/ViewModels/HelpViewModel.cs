@@ -45,6 +45,7 @@ public class HelpViewModel : ReactiveObject
         void UpdateUi(bool success, string msg)
         {
             NoticeHandler.SendMessage4ClashN(msg);
+            
             if (success)
             {
                 Locator.Current.GetService<MainWindowViewModel>()?.CloseCore();
@@ -63,6 +64,7 @@ public class HelpViewModel : ReactiveObject
 
                     Global.reloadCore = true;
                     _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
+                    
                     NoticeHandler.Instance.Enqueue(ResUI.MsgUpdateCoreCoreSuccessfully);
                 }
             }

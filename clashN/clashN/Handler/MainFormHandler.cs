@@ -143,8 +143,7 @@ public sealed class MainFormHandler
         });
     }
 
-    public static void RegisterGlobalHotkey(Config config, EventHandler<HotkeyEventArgs> handler,
-        Action<bool, string> update)
+    public static void RegisterGlobalHotkey(Config config, EventHandler<HotkeyEventArgs> handler)
     {
         Utils.SaveLog($"MainFormHandler:RegisterGlobalHotkey");
         
@@ -177,13 +176,13 @@ public sealed class MainFormHandler
                 HotkeyManager.Current.AddOrReplace(((int)item.GlobalHotkey).ToString(), gesture, handler);
                 var msg = string.Format(ResUI.RegisterGlobalHotkeySuccessfully,
                     $"{item.GlobalHotkey.ToString()} = {Utils.ToJson(item)}");
-                update(false, msg);
+                NoticeHandler.SendMessage4ClashN(msg);
             }
             catch (Exception ex)
             {
                 var msg = string.Format(ResUI.RegisterGlobalHotkeyFailed,
                     $"{item.GlobalHotkey.ToString()} = {Utils.ToJson(item)}", ex.Message);
-                update(false, msg);
+                NoticeHandler.SendMessage4ClashN(msg);
                 Utils.SaveLog(msg);
             }
         }
