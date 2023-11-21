@@ -26,7 +26,7 @@ internal class CoreHandler
     /// <summary>
     /// 载入Core
     /// </summary>
-    public void LoadCore(Config config)
+    public void LoadCore()
     {
         Utils.SaveLogDebug($"CoreHandler:LoadCore - Start to Load Core: {Global.reloadCore}");
 
@@ -35,6 +35,7 @@ internal class CoreHandler
             return;
         }
 
+        var config = LazyConfig.Instance.Config;
         var item = ConfigProc.GetDefaultProfile(ref config);
         if (item == null)
         {

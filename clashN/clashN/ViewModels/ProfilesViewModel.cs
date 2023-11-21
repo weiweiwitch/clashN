@@ -282,7 +282,7 @@ public class ProfilesViewModel : ReactiveObject
             return;
         }
 
-        if (ConfigProc.SetDefaultProfile(ref _config, item) == 0)
+        if (ConfigProc.SetDefaultProfile(_config, item) == 0)
         {
             NoticeHandler.SendMessage4ClashN(ResUI.OperationSuccess);
             RefreshProfiles();

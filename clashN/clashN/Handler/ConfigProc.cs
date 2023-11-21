@@ -124,12 +124,12 @@ internal static class ConfigProc
     /// <summary>
     /// 保参数
     /// </summary>
-    /// <param name="config"></param>
     /// <returns></returns>
-    public static int SaveConfig(Config config, bool reload = true)
+    public static int SaveConfig(bool reload = true)
     {
         Global.reloadCore = reload;
 
+        var config = LazyConfig.Instance.Config;
         ToJsonFile(config);
 
         return 0;
@@ -232,7 +232,7 @@ internal static class ConfigProc
     /// <param name="config"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static int SetDefaultProfile(ref Config config, ProfileItem item)
+    public static int SetDefaultProfile(Config config, ProfileItem item)
     {
         if (item == null)
         {
@@ -261,12 +261,12 @@ internal static class ConfigProc
 
         if (lstProfile.Count > 0)
         {
-            return SetDefaultProfile(ref config, lstProfile[0]);
+            return SetDefaultProfile(config, lstProfile[0]);
         }
 
         if (config.ProfileItems.Count > 0)
         {
-            return SetDefaultProfile(ref config, config.ProfileItems[0]);
+            return SetDefaultProfile(config, config.ProfileItems[0]);
         }
 
         return -1;
@@ -282,7 +282,7 @@ internal static class ConfigProc
         var index = config.FindIndexId(config.IndexId);
         if (index < 0)
         {
-            SetDefaultProfile(ref config, config.ProfileItems[0]);
+            SetDefaultProfile(config, config.ProfileItems[0]);
             return config.ProfileItems[0];
         }
 

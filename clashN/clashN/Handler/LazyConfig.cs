@@ -7,21 +7,17 @@ namespace ClashN.Handler;
 public sealed class LazyConfig
 {
     private static readonly Lazy<LazyConfig> _instance = new(() => new LazyConfig());
-    private Config _config;
-    private List<CoreInfo> coreInfos;
-    private Dictionary<string, ProxiesItem> _proxies;
+    public static LazyConfig Instance => _instance.Value;
 
-    public static LazyConfig Instance
-    {
-        get { return _instance.Value; }
-    }
+    private readonly List<CoreInfo> _coreInfos = new();
+    private Dictionary<string, ProxiesItem> _proxies;
 
     public void SetConfig(Config config)
     {
-        _config = config;
+        Config = config;
     }
 
-    public Config Config => _config;
+    public Config Config { get; private set; }
 
     public void SetProxies(Dictionary<string, ProxiesItem> proxies)
     {
@@ -47,19 +43,17 @@ public sealed class LazyConfig
 
     public CoreInfo GetCoreInfo(CoreKind coreType)
     {
-        if (coreInfos == null)
+        if (_coreInfos.Count == 0)
         {
             InitCoreInfo();
         }
 
-        return coreInfos.Where(t => t.CoreType == coreType).FirstOrDefault();
+        return _coreInfos.Where(t => t.CoreType == coreType).FirstOrDefault();
     }
 
     private void InitCoreInfo()
     {
-        coreInfos = new List<CoreInfo>();
-
-        coreInfos.Add(new CoreInfo
+        _coreInfos.Add(new CoreInfo
         {
             CoreType = CoreKind.ClashN,
             CoreUrl = Global.NUrl,
@@ -68,7 +62,7 @@ public sealed class LazyConfig
             CoreDownloadUrl64 = Global.NUrl + "/download/{0}/clashN.zip",
         });
 
-        coreInfos.Add(new CoreInfo
+        _coreInfos.Add(new CoreInfo
         {
             CoreType = CoreKind.Clash,
             CoreExes = new List<string>
@@ -81,16 +75,16 @@ public sealed class LazyConfig
             Match = "Clash"
         });
 
-        coreInfos.Add(new CoreInfo
+        _coreInfos.Add(new CoreInfo
         {
             CoreType = CoreKind.ClashMeta,
             CoreExes = new List<string>
             {
                 $"Clash.Meta-windows-amd64{(Avx2.X64.IsSupported ? "" : "-compatible")}",
                 "Clash.Meta-windows-amd64-compatible",
-                "Clash.Meta-windows-amd64", 
+                "Clash.Meta-windows-amd64",
                 "Clash.Meta-windows-386",
-                "Clash.Meta", 
+                "Clash.Meta",
                 "clash"
             },
             Arguments = "-f config.yaml",
@@ -102,7 +96,7 @@ public sealed class LazyConfig
             Match = "Clash Meta"
         });
 
-        coreInfos.Add(new CoreInfo
+        _coreInfos.Add(new CoreInfo
         {
             CoreType = CoreKind.ClashPremium,
             CoreExes = new List<string>

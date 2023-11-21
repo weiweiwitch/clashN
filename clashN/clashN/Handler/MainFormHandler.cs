@@ -61,7 +61,7 @@ public sealed class MainFormHandler
         }
     }
 
-    public static void BackupGuiNConfig(Config config, bool auto = false)
+    public static void BackupGuiNConfig(bool auto = false)
     {
         var fileName = $"guiNConfig_{DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss_fff")}.json";
         if (auto)
@@ -92,6 +92,7 @@ public sealed class MainFormHandler
             return;
         }
 
+        var config = LazyConfig.Instance.Config;
         var ret = Utils.ToJsonFile(config, fileName);
         if (!auto)
         {

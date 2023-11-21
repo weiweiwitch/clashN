@@ -182,7 +182,7 @@ namespace ClashN.ViewModels
                     {
                         _config.UiItem.ColorModeDark = ColorModeDark;
                         Locator.Current.GetService<MainWindowViewModel>()?.ModifyTheme(ColorModeDark);
-                        ConfigProc.SaveConfig(_config);
+                        ConfigProc.SaveConfig();
                     }
                 });
 
@@ -202,7 +202,7 @@ namespace ClashN.ViewModels
                      {
                          _config.UiItem.ColorPrimaryName = SelectedSwatch?.Name;
                          Locator.Current.GetService<MainWindowViewModel>()?.ChangePrimaryColor(SelectedSwatch.ExemplarHue.Color);
-                         ConfigProc.SaveConfig(_config);
+                         ConfigProc.SaveConfig();
                      }
                  });
 
@@ -227,7 +227,7 @@ namespace ClashN.ViewModels
                  {
                      _config.UiItem.ColorModeDark = ColorModeDark;
                      Locator.Current.GetService<MainWindowViewModel>()?.ModifyTheme(ColorModeDark);
-                     ConfigProc.SaveConfig(_config);
+                     ConfigProc.SaveConfig();
                  }
              });
 
@@ -245,7 +245,7 @@ namespace ClashN.ViewModels
                         Application.Current.Resources["StdFontSize3"] = size + 2;
                         Application.Current.Resources["StdFontSize4"] = size + 3;
 
-                        ConfigProc.SaveConfig(_config);
+                        ConfigProc.SaveConfig();
                     }
                 });
 
@@ -284,7 +284,7 @@ namespace ClashN.ViewModels
             _config.SystemProxyAdvancedProtocol = systemProxyAdvancedProtocol;
             _config.PacPort = PacPort;
 
-            if (ConfigProc.SaveConfig(_config) == 0)
+            if (ConfigProc.SaveConfig() == 0)
             {
                 NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
                 Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();

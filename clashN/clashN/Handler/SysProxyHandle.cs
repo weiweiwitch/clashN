@@ -33,8 +33,9 @@ public static class SysProxyHandle
         }
     }
 
-    public static bool UpdateSysProxy(Config config, bool forceDisable)
+    public static bool UpdateSysProxy(bool forceDisable)
     {
+        var config = LazyConfig.Instance.Config;
         var type = config.SysProxyType;
 
         if (forceDisable && (type == SysProxyType.ForcedChange || type == SysProxyType.Pac))

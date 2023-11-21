@@ -22,8 +22,6 @@ namespace ClashN.ViewModels;
 
 public class MainWindowViewModel : ReactiveObject
 {
-    private readonly Config _config;
-
     private StatisticsHandler? _statistics;
     private readonly PaletteHelper _paletteHelper = new();
 
@@ -105,7 +103,7 @@ public class MainWindowViewModel : ReactiveObject
 
     public MainWindowViewModel(ISnackbarMessageQueue snackbarMessageQueue)
     {
-        //Views
+        // Views
         //GetDashboardView = new();
         GetProxyView = new ProxiesView();
         GetProfilesView = new ProfilesView();
@@ -117,7 +115,7 @@ public class MainWindowViewModel : ReactiveObject
         
         NoticeHandler.Instance.ConfigMessageQueue(snackbarMessageQueue);
         
-        _config = LazyConfig.Instance.Config;
+        var config = LazyConfig.Instance.Config;
 
         ThreadPool.RegisterWaitForSingleObject(App.ProgramStarted, OnProgramStarted, null, -1, false);
 
@@ -129,7 +127,7 @@ public class MainWindowViewModel : ReactiveObject
         
         RestoreUI();
 
-        if (_config.AutoHideStartup)
+        if (config.AutoHideStartup)
         {
             Observable.Range(1, 1)
                 .Delay(TimeSpan.FromSeconds(1))
@@ -232,11 +230,13 @@ public class MainWindowViewModel : ReactiveObject
             }
             else
             {
-                SysProxyHandle.UpdateSysProxy(_config, true);
+                SysProxyHandle.UpdateSysProxy(true);
             }
 
             StorageUI();
-            ConfigProc.SaveConfig(_config);
+            
+            ConfigProc.SaveConfig();
+            
             _statistics?.Close();
         }
         catch
@@ -279,12 +279,13 @@ public class MainWindowViewModel : ReactiveObject
 
     private void Init()
     {
-        MainFormHandler.BackupGuiNConfig(_config, true);
+        MainFormHandler.BackupGuiNConfig(true);
         MainFormHandler.InitRegister();
 
-        if (_config.EnableStatistics)
+        var config = LazyConfig.Instance.Config;
+        if (config.EnableStatistics)
         {
-            _statistics = new StatisticsHandler(_config, UpdateStatisticsHandler);
+            _statistics = new StatisticsHandler(config, UpdateStatisticsHandler);
         }
 
         // Timer 4 Update 
@@ -296,11 +297,11 @@ public class MainWindowViewModel : ReactiveObject
         };
         _updateTaskDispatcherTimer.Tick += (_, _) =>
         {
-            MainFormHandler.Instance.OnTimer4UpdateTask(ref _autoUpdateSubTime, _config, UpdateTaskHandler);
+            MainFormHandler.Instance.OnTimer4UpdateTask(ref _autoUpdateSubTime, config, UpdateTaskHandler);
         };
 
         // HotKey
-        MainFormHandler.RegisterGlobalHotkey(_config, OnHotkeyHandler, UpdateTaskHandler);
+        MainFormHandler.RegisterGlobalHotkey(config, OnHotkeyHandler, UpdateTaskHandler);
 
         OnProgramStarted("shown", true);
     }
@@ -351,15 +352,16 @@ public class MainWindowViewModel : ReactiveObject
     {
         Locator.Current.GetService<ProxiesViewModel>()?.ProxiesClear();
 
-        await Task.Run(() => { CoreHandler.Instance.LoadCore(_config); });
+        await Task.Run(() => { CoreHandler.Instance.LoadCore(); });
 
         Global.reloadCore = false;
 
-        ConfigProc.SaveConfig(_config, false);
+        ConfigProc.SaveConfig(false);
 
-        ChangePACButtonStatus(_config.SysProxyType);
+        var config = LazyConfig.Instance.Config;
+        ChangePACButtonStatus(config.SysProxyType);
 
-        SetRuleMode(_config.RuleMode);
+        SetRuleMode(config.RuleMode);
 
         Locator.Current.GetService<ProxiesViewModel>()?.ProxiesReload();
         Locator.Current.GetService<ProxiesViewModel>()?.ProxiesDelayTest();
@@ -368,7 +370,7 @@ public class MainWindowViewModel : ReactiveObject
 
     public void CloseCore()
     {
-        ConfigProc.SaveConfig(_config, false);
+        ConfigProc.SaveConfig(false);
 
         ChangePACButtonStatus(SysProxyType.ForcedClear);
 
@@ -381,12 +383,13 @@ public class MainWindowViewModel : ReactiveObject
 
     public void SetListenerType(SysProxyType type)
     {
-        if (_config.SysProxyType == type)
+        var config = LazyConfig.Instance.Config;
+        if (config.SysProxyType == type)
         {
             return;
         }
 
-        _config.SysProxyType = type;
+        config.SysProxyType = type;
         ChangePACButtonStatus(type);
 
         Locator.Current.GetService<ProxiesViewModel>()?.ReloadSystemProxySelected();
@@ -394,7 +397,7 @@ public class MainWindowViewModel : ReactiveObject
 
     private void ChangePACButtonStatus(SysProxyType type)
     {
-        SysProxyHandle.UpdateSysProxy(_config, false);
+        SysProxyHandle.UpdateSysProxy(false);
 
         BlSystemProxyClear = type == SysProxyType.ForcedClear;
         BlSystemProxySet = type == SysProxyType.ForcedChange;
@@ -403,14 +406,16 @@ public class MainWindowViewModel : ReactiveObject
 
         NoticeHandler.SendMessage4ClashN($"Change system proxy");
 
-        ConfigProc.SaveConfig(_config, false);
+        ConfigProc.SaveConfig(false);
 
-        NotifyIcon = MainFormHandler.Instance.GetNotifyIcon(_config);
+        var config = LazyConfig.Instance.Config;
+        NotifyIcon = MainFormHandler.Instance.GetNotifyIcon(config);
     }
 
     public void SetRuleModeCheck(ERuleMode mode)
     {
-        if (_config.RuleMode == mode)
+        var config = LazyConfig.Instance.Config;
+        if (config.RuleMode == mode)
         {
             return;
         }
@@ -427,16 +432,17 @@ public class MainWindowViewModel : ReactiveObject
         BlModeDirect = mode == ERuleMode.Direct;
         BlModeNothing = mode == ERuleMode.Unchanged;
 
-        NoticeHandler.SendMessage4ClashN($"Set rule mode {_config.RuleMode.ToString()}->{mode.ToString()}");
+        var config = LazyConfig.Instance.Config;
+        NoticeHandler.SendMessage4ClashN($"Set rule mode {config.RuleMode.ToString()}->{mode.ToString()}");
 
-        _config.RuleMode = mode;
-        ConfigProc.SaveConfig(_config, false);
+        config.RuleMode = mode;
+        ConfigProc.SaveConfig(false);
 
         if (mode != ERuleMode.Unchanged)
         {
             var headers = new Dictionary<string, string>
             {
-                { "mode", _config.RuleMode.ToString().ToLower() }
+                { "mode", config.RuleMode.ToString().ToLower() }
             };
             MainFormHandler.Instance.ClashConfigUpdate(headers);
         }
@@ -472,12 +478,14 @@ public class MainWindowViewModel : ReactiveObject
 
     private void RestoreUI()
     {
-        ModifyTheme(_config.UiItem.ColorModeDark);
+        var config = LazyConfig.Instance.Config;
+        
+        ModifyTheme(config.UiItem.ColorModeDark);
 
-        if (!string.IsNullOrEmpty(_config.UiItem.ColorPrimaryName))
+        if (!string.IsNullOrEmpty(config.UiItem.ColorPrimaryName))
         {
             var swatch =
-                new SwatchesProvider().Swatches.FirstOrDefault(t => t.Name == _config.UiItem.ColorPrimaryName);
+                new SwatchesProvider().Swatches.FirstOrDefault(t => t.Name == config.UiItem.ColorPrimaryName);
             if (swatch?.ExemplarHue.Color != null)
             {
                 ChangePrimaryColor(swatch.ExemplarHue.Color);
@@ -489,10 +497,10 @@ public class MainWindowViewModel : ReactiveObject
         //    this.Location = config.uiItem.mainLocation;
         //}
 
-        if (_config.UiItem.MainWidth > 0 && _config.UiItem.MainHeight > 0)
+        if (config.UiItem.MainWidth > 0 && config.UiItem.MainHeight > 0)
         {
-            Application.Current.MainWindow.Width = _config.UiItem.MainWidth;
-            Application.Current.MainWindow.Height = _config.UiItem.MainHeight;
+            Application.Current.MainWindow.Width = config.UiItem.MainWidth;
+            Application.Current.MainWindow.Height = config.UiItem.MainHeight;
         }
 
         var hWnd = new WindowInteropHelper(Application.Current.MainWindow).EnsureHandle();
@@ -510,8 +518,9 @@ public class MainWindowViewModel : ReactiveObject
 
     private void StorageUI()
     {
-        _config.UiItem.MainWidth = Application.Current.MainWindow.Width;
-        _config.UiItem.MainHeight = Application.Current.MainWindow.Height;
+        var config = LazyConfig.Instance.Config;
+        config.UiItem.MainWidth = Application.Current.MainWindow.Width;
+        config.UiItem.MainHeight = Application.Current.MainWindow.Height;
     }
 
     public void ModifyTheme(bool isDarkTheme)

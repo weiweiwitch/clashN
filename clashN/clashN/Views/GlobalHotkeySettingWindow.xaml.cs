@@ -110,7 +110,7 @@ public partial class GlobalHotkeySettingWindow
         _config.GlobalHotkeys.Clear();
         _config.GlobalHotkeys.AddRange(lstKey);
 
-        if (ConfigProc.SaveConfig(_config, false) == 0)
+        if (ConfigProc.SaveConfig(false) == 0)
         {
             this.Close();
         }
