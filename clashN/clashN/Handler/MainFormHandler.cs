@@ -1,16 +1,15 @@
-﻿using ClashN.Base;
-using ClashN.Mode;
-using ClashN.Resx;
-using NHotkey;
-using NHotkey.Wpf;
-using Splat;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
-using System.Timers;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
+using ClashN.Base;
+using ClashN.Mode;
+using ClashN.Properties;
+using ClashN.Resx;
 using ClashN.Tool;
+using NHotkey;
+using NHotkey.Wpf;
 using static ClashN.Mode.ClashProxies;
 
 namespace ClashN.Handler;
@@ -20,9 +19,10 @@ public sealed class MainFormHandler
     private static Lazy<MainFormHandler> _instance = new(() => new MainFormHandler());
 
     public static MainFormHandler Instance => _instance.Value;
-
-    private DispatcherTimer? _updateTaskDispatcherTimer;
-    private DateTime _autoUpdateSubTime;
+    
+    
+   
+    
     
     public Icon GetNotifyIcon(Config config)
     {
@@ -40,24 +40,24 @@ public sealed class MainFormHandler
             switch (index)
             {
                 case 0:
-                    return Properties.Resources.NotifyIcon1;
+                    return Resources.NotifyIcon1;
 
                 case 1:
-                    return Properties.Resources.NotifyIcon2;
+                    return Resources.NotifyIcon2;
 
                 case 2:
-                    return Properties.Resources.NotifyIcon3;
+                    return Resources.NotifyIcon3;
 
                 case 3:
-                    return Properties.Resources.NotifyIcon2;
+                    return Resources.NotifyIcon2;
             }
 
-            return Properties.Resources.NotifyIcon1;
+            return Resources.NotifyIcon1;
         }
         catch (Exception ex)
         {
             Utils.SaveLog(ex.Message, ex);
-            return Properties.Resources.NotifyIcon1;
+            return Resources.NotifyIcon1;
         }
     }
 
@@ -97,68 +97,49 @@ public sealed class MainFormHandler
         {
             if (ret == 0)
             {
-                Locator.Current.GetService<NoticeHandler>()?.Enqueue(ResUI.OperationSuccess);
+                NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
             }
             else
             {
-                Locator.Current.GetService<NoticeHandler>()?.Enqueue(ResUI.OperationFailed);
+                NoticeHandler.Instance.Enqueue(ResUI.OperationFailed);
             }
         }
     }
 
-    public void StartAllTimerTask()
+    public void OnTimer4UpdateTask(ref DateTime autoUpdateSubTime, Config config, Action<bool, string> update)
     {
-        _updateTaskDispatcherTimer?.Start();
-    }
+        Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Run");
 
-    public void StopAllTimerTask()
-    {
-        _updateTaskDispatcherTimer?.Stop();
-    }
-    
-    public void CreateUpdateTask(Config config, Action<bool, string> update)
-    {
-        Utils.SaveLog($"MainFormHandler:CreateUpdateTask - start to CreateUpdateTask");
-        
-        _autoUpdateSubTime = DateTime.Now;
-        
-        _updateTaskDispatcherTimer = new DispatcherTimer
+        var updateHandle = new UpdateHandle();
+        var dtNow = DateTime.Now;
+
+        if (config.AutoUpdateSubInterval <= 0)
         {
-            Interval = TimeSpan.FromHours(1)
-        };
-        _updateTaskDispatcherTimer.Tick += (_, _) =>
+            return;
+        }
+
+        var diffTime = dtNow - autoUpdateSubTime;
+        if (diffTime.Hours % config.AutoUpdateSubInterval != 0)
         {
-            Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Run");
+            return;
+        }
 
-            var updateHandle = new UpdateHandle();
-            var dtNow = DateTime.Now;
+        // Update
+        autoUpdateSubTime = dtNow;
 
-            if (config.AutoUpdateSubInterval <= 0)
+        // Run time update task
+        Task.Run(() =>
+        {
+            Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Runs In Timer Thread");
+            updateHandle.UpdateSubscriptionProcess(config, true, null, (success, msg) =>
             {
-                return;
-            }
-
-            var diffTime = dtNow - _autoUpdateSubTime;
-            if (diffTime.Hours % config.AutoUpdateSubInterval != 0)
-            {
-                return;
-            }
-            
-            Task.Run(() =>
-            {
-                Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Run In Thread");
-                updateHandle.UpdateSubscriptionProcess(config, true, null, (success, msg) =>
+                update(success, msg);
+                if (success)
                 {
-                    update(success, msg);
-                    if (success)
-                    {
-                        Utils.SaveLog("subscription" + msg);
-                    }
-                });
+                    Utils.SaveLog("subscription" + msg);
+                }
             });
-            
-            _autoUpdateSubTime = dtNow;
-        };
+        });
     }
 
     public static void RegisterGlobalHotkey(Config config, EventHandler<HotkeyEventArgs> handler,

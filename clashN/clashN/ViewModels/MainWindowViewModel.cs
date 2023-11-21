@@ -14,6 +14,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using ClashN.Tool;
 using Application = System.Windows.Application;
 
@@ -21,11 +22,7 @@ namespace ClashN.ViewModels;
 
 public class MainWindowViewModel : ReactiveObject
 {
-    private static Config _config;
-
-    private CoreHandler _coreHandler;
-
-    private readonly NoticeHandler? _noticeHandler;
+    private readonly Config _config;
 
     private StatisticsHandler? _statistics;
     private readonly PaletteHelper _paletteHelper = new();
@@ -83,12 +80,19 @@ public class MainWindowViewModel : ReactiveObject
 
     #endregion Rule mode
 
+    #region Timer
+    
+    // For Update Profile
+    private DispatcherTimer? _updateTaskDispatcherTimer;
+    private DateTime _autoUpdateSubTime;
+    
+    #endregion Timer
+    
     #region Other
 
     public ReactiveCommand<Unit, Unit> AddProfileViaScanCmd { get; }
     public ReactiveCommand<Unit, Unit> SubUpdateCmd { get; }
     public ReactiveCommand<Unit, Unit> SubUpdateViaProxyCmd { get; }
-    public ReactiveCommand<Unit, Unit> ExitCmd { get; }
 
     public ReactiveCommand<Unit, Unit> ReloadCmd { get; }
     public ReactiveCommand<Unit, Unit> NotifyLeftClickCmd { get; }
@@ -101,20 +105,6 @@ public class MainWindowViewModel : ReactiveObject
 
     public MainWindowViewModel(ISnackbarMessageQueue snackbarMessageQueue)
     {
-        _config = LazyConfig.Instance.Config;
-
-        Locator.CurrentMutable.RegisterLazySingleton(() => new NoticeHandler(snackbarMessageQueue),
-            typeof(NoticeHandler));
-        _noticeHandler = Locator.Current.GetService<NoticeHandler>();
-
-        ThreadPool.RegisterWaitForSingleObject(App.ProgramStarted, OnProgramStarted, null, -1, false);
-
-        // init UI
-        Init();
-
-        // init core
-        InitCore();
-
         //Views
         //GetDashboardView = new();
         GetProxyView = new ProxiesView();
@@ -124,7 +114,19 @@ public class MainWindowViewModel : ReactiveObject
         GetSettingsView = new SettingsView();
         GetHelpView = new HelpView();
         GetPromotionView = new PromotionView();
+        
+        NoticeHandler.Instance.ConfigMessageQueue(snackbarMessageQueue);
+        
+        _config = LazyConfig.Instance.Config;
 
+        ThreadPool.RegisterWaitForSingleObject(App.ProgramStarted, OnProgramStarted, null, -1, false);
+
+        // init UI
+        Init();
+
+        // init core
+        InitCore();
+        
         RestoreUI();
 
         if (_config.AutoHideStartup)
@@ -173,7 +175,7 @@ public class MainWindowViewModel : ReactiveObject
         //Other
         AddProfileViaScanCmd = ReactiveCommand.CreateFromTask(() =>
         {
-            return Locator.Current?.GetService<ProfilesViewModel>()?.ScanScreenTaskAsync();
+            return Locator.Current.GetService<ProfilesViewModel>()?.ScanScreenTaskAsync();
         });
         SubUpdateCmd = ReactiveCommand.Create(() =>
         {
@@ -183,10 +185,6 @@ public class MainWindowViewModel : ReactiveObject
         {
             Locator.Current.GetService<ProfilesViewModel>()?.UpdateSubscriptionProcess(true, false);
         });
-        //ExitCmd = ReactiveCommand.Create(() =>
-        //{
-        //    MyAppExit(false);
-        //});
         ReloadCmd = ReactiveCommand.Create(() =>
         {
             Global.reloadCore = true;
@@ -217,7 +215,7 @@ public class MainWindowViewModel : ReactiveObject
 
             Locator.Current.GetService<ProfilesViewModel>()?.AddProfilesViaClipboard(true);
             
-            MainFormHandler.Instance.StartAllTimerTask();
+            StartAllTimerTask();
         }));
     }
 
@@ -225,7 +223,7 @@ public class MainWindowViewModel : ReactiveObject
     {
         try
         {
-            _coreHandler.CoreStop();
+            CoreHandler.Instance.CoreStop();
 
             //HttpProxyHandle.CloseHttpAgent(config);
             if (blWindowsShutDown)
@@ -284,14 +282,24 @@ public class MainWindowViewModel : ReactiveObject
         MainFormHandler.BackupGuiNConfig(_config, true);
         MainFormHandler.InitRegister();
 
-        _coreHandler = new CoreHandler(ShowMsgHandler);
-
         if (_config.EnableStatistics)
         {
             _statistics = new StatisticsHandler(_config, UpdateStatisticsHandler);
         }
 
-        MainFormHandler.Instance.CreateUpdateTask(_config, UpdateTaskHandler);
+        // Timer 4 Update 
+        Utils.SaveLog($"MainWindowViewModel:Init - Create Timer 4 UpdateTask");
+        _autoUpdateSubTime = DateTime.Now;
+        _updateTaskDispatcherTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromHours(1)
+        };
+        _updateTaskDispatcherTimer.Tick += (_, _) =>
+        {
+            MainFormHandler.Instance.OnTimer4UpdateTask(ref _autoUpdateSubTime, _config, UpdateTaskHandler);
+        };
+
+        // HotKey
         MainFormHandler.RegisterGlobalHotkey(_config, OnHotkeyHandler, UpdateTaskHandler);
 
         OnProgramStarted("shown", true);
@@ -300,16 +308,6 @@ public class MainWindowViewModel : ReactiveObject
     private void InitCore()
     {
         _ = LoadCore();
-    }
-
-    private void ShowMsgHandler(bool notify, LogType logType, string msg)
-    {
-        if (notify)
-        {
-            _noticeHandler?.Enqueue(msg);
-        }
-
-        NoticeHandler.SendMessage(logType, msg);
     }
 
     private async void UpdateTaskHandler(bool success, string msg)
@@ -353,7 +351,7 @@ public class MainWindowViewModel : ReactiveObject
     {
         Locator.Current.GetService<ProxiesViewModel>()?.ProxiesClear();
 
-        await Task.Run(() => { _coreHandler.LoadCore(_config); });
+        await Task.Run(() => { CoreHandler.Instance.LoadCore(_config); });
 
         Global.reloadCore = false;
 
@@ -374,7 +372,7 @@ public class MainWindowViewModel : ReactiveObject
 
         ChangePACButtonStatus(SysProxyType.ForcedClear);
 
-        _coreHandler.CoreStop();
+        CoreHandler.Instance.CoreStop();
     }
 
     #endregion Core
@@ -455,7 +453,6 @@ public class MainWindowViewModel : ReactiveObject
         var bl = blShow.HasValue ? blShow.Value : !Global.ShowInTaskbar;
         if (bl)
         {
-            //Application.Current.MainWindow.ShowInTaskbar = true;
             Application.Current.MainWindow.Show();
             if (Application.Current.MainWindow.WindowState == WindowState.Minimized)
             {
@@ -468,7 +465,6 @@ public class MainWindowViewModel : ReactiveObject
         else
         {
             Application.Current.MainWindow.Hide();
-            //Application.Current.MainWindow.ShowInTaskbar = false;
         }
 
         Global.ShowInTaskbar = bl;
@@ -542,4 +538,14 @@ public class MainWindowViewModel : ReactiveObject
     }
 
     #endregion UI
+    
+    public void StartAllTimerTask()
+    {
+        _updateTaskDispatcherTimer?.Start();
+    }
+
+    public void StopAllTimerTask()
+    {
+        _updateTaskDispatcherTimer?.Stop();
+    }
 }

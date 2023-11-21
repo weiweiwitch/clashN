@@ -19,9 +19,7 @@ namespace ClashN.ViewModels;
 public class ProfilesViewModel : ReactiveObject
 {
     private static Config _config;
-
-    private readonly NoticeHandler? _noticeHandler;
-
+    
     private IObservableCollection<ProfileItemModel>
         _profileItems = new ObservableCollectionExtended<ProfileItemModel>();
 
@@ -50,7 +48,6 @@ public class ProfilesViewModel : ReactiveObject
 
     public ProfilesViewModel()
     {
-        _noticeHandler = Locator.Current.GetService<NoticeHandler>();
         _config = LazyConfig.Instance.Config;
 
         SelectedSource = new();
@@ -98,7 +95,7 @@ public class ProfilesViewModel : ReactiveObject
         var address = SelectedSource.Address;
         if (string.IsNullOrEmpty(address))
         {
-            _noticeHandler?.Enqueue(ResUI.FillProfileAddressCustom);
+            NoticeHandler.Instance.Enqueue(ResUI.FillProfileAddressCustom);
             return;
         }
 
@@ -109,7 +106,7 @@ public class ProfilesViewModel : ReactiveObject
         }
         else
         {
-            _noticeHandler?.Enqueue(ResUI.FailedReadConfiguration);
+            NoticeHandler.Instance.Enqueue(ResUI.FailedReadConfiguration);
         }
     }
 
@@ -153,7 +150,7 @@ public class ProfilesViewModel : ReactiveObject
 
         if (string.IsNullOrEmpty(result))
         {
-            _noticeHandler?.Enqueue(ResUI.NoValidQRcodeFound);
+            NoticeHandler.Instance.Enqueue(ResUI.NoValidQRcodeFound);
         }
         else
         {
@@ -161,7 +158,7 @@ public class ProfilesViewModel : ReactiveObject
             if (ret == 0)
             {
                 RefreshProfiles();
-                _noticeHandler?.Enqueue(ResUI.SuccessfullyImportedProfileViaScan);
+                NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedProfileViaScan);
             }
         }
     }
@@ -183,7 +180,7 @@ public class ProfilesViewModel : ReactiveObject
             }
 
             RefreshProfiles();
-            _noticeHandler?.Enqueue(ResUI.SuccessfullyImportedProfileViaClipboard);
+            NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedProfileViaClipboard);
         }
     }
 
@@ -203,7 +200,7 @@ public class ProfilesViewModel : ReactiveObject
 
         Utils.SetClipboardData(content);
 
-        _noticeHandler?.Enqueue(ResUI.BatchExportSuccessfully);
+        NoticeHandler.Instance.Enqueue(ResUI.BatchExportSuccessfully);
     }
 
     public void UpdateSubscriptionProcess(bool blProxy, bool blSelected)
@@ -244,7 +241,7 @@ public class ProfilesViewModel : ReactiveObject
 
         ConfigProc.RemoveProfile(_config, new List<ProfileItem>() { item });
 
-        _noticeHandler?.Enqueue(ResUI.OperationSuccess);
+        NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
 
         RefreshProfiles();
 
@@ -261,7 +258,7 @@ public class ProfilesViewModel : ReactiveObject
 
         if (ConfigProc.CopyProfile(ref _config, new List<ProfileItem>() { item }) == 0)
         {
-            _noticeHandler?.Enqueue(ResUI.OperationSuccess);
+            NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
             RefreshProfiles();
         }
     }
@@ -281,7 +278,7 @@ public class ProfilesViewModel : ReactiveObject
         var item = _config.GetProfileItem(SelectedSource.IndexId);
         if (item is null)
         {
-            _noticeHandler?.Enqueue(ResUI.PleaseSelectProfile);
+            NoticeHandler.Instance.Enqueue(ResUI.PleaseSelectProfile);
             return;
         }
 

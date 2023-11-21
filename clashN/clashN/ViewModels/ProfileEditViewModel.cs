@@ -1,172 +1,170 @@
+using System.IO;
+using System.Reactive;
+using System.Windows.Forms;
 using ClashN.Handler;
 using ClashN.Mode;
 using ClashN.Resx;
+using ClashN.Tool;
 using ClashN.Views;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Helpers;
 using Splat;
-using System.IO;
-using System.Reactive;
-using System.Windows.Forms;
-using ClashN.Tool;
 
-namespace ClashN.ViewModels
+namespace ClashN.ViewModels;
+
+public class ProfileEditViewModel : ReactiveValidationObject
 {
-    public class ProfileEditViewModel : ReactiveValidationObject
+    private static Config _config;
+        
+    private ProfileEditWindow _view;
+
+    [Reactive]
+    public ProfileItem SelectedSource { get; set; }
+
+    [Reactive]
+    public string CoreType { get; set; }
+
+    public ReactiveCommand<Unit, Unit> BrowseProfileCmd { get; }
+    public ReactiveCommand<Unit, Unit> EditProfileCmd { get; }
+    public ReactiveCommand<Unit, Unit> SaveProfileCmd { get; }
+
+    public ProfileEditViewModel(ProfileItem profileItem, ProfileEditWindow view)
     {
-        private static Config _config;
-        private NoticeHandler? _noticeHandler;
-        private ProfileEditWindow _view;
+        _config = LazyConfig.Instance.Config;
 
-        [Reactive]
-        public ProfileItem SelectedSource { get; set; }
-
-        [Reactive]
-        public string CoreType { get; set; }
-
-        public ReactiveCommand<Unit, Unit> BrowseProfileCmd { get; }
-        public ReactiveCommand<Unit, Unit> EditProfileCmd { get; }
-        public ReactiveCommand<Unit, Unit> SaveProfileCmd { get; }
-
-        public ProfileEditViewModel(ProfileItem profileItem, ProfileEditWindow view)
+        if (string.IsNullOrEmpty(profileItem.IndexId))
         {
-            _noticeHandler = Locator.Current.GetService<NoticeHandler>();
-            _config = LazyConfig.Instance.Config;
-
-            if (string.IsNullOrEmpty(profileItem.IndexId))
-            {
-                SelectedSource = profileItem;
-            }
-            else
-            {
-                SelectedSource = Utils.DeepCopy(profileItem);
-            }
-
-            _view = view;
-            CoreType = (SelectedSource.CoreType ?? CoreKind.Clash).ToString();
-
-            BrowseProfileCmd = ReactiveCommand.Create(() =>
-            {
-                BrowseProfile();
-            });
-
-            EditProfileCmd = ReactiveCommand.Create(() =>
-            {
-                EditProfile();
-            });
-
-            SaveProfileCmd = ReactiveCommand.Create(() =>
-            {
-                SaveProfile();
-            });
-
-            Utils.SetDarkBorder(view, _config.UiItem.ColorModeDark);
+            SelectedSource = profileItem;
+        }
+        else
+        {
+            SelectedSource = Utils.DeepCopy(profileItem);
         }
 
-        private void SaveProfile()
+        _view = view;
+        CoreType = (SelectedSource.CoreType ?? CoreKind.Clash).ToString();
+
+        BrowseProfileCmd = ReactiveCommand.Create(() =>
         {
-            string remarks = SelectedSource.Remarks;
-            if (string.IsNullOrEmpty(remarks))
-            {
-                _noticeHandler?.Enqueue(ResUI.PleaseFillRemarks);
-                return;
-            }
+            BrowseProfile();
+        });
 
-            if (string.IsNullOrEmpty(CoreType))
-            {
-                SelectedSource.CoreType = null;
-            }
-            else
-            {
-                SelectedSource.CoreType = (CoreKind)Enum.Parse(typeof(CoreKind), CoreType);
-            }
+        EditProfileCmd = ReactiveCommand.Create(() =>
+        {
+            EditProfile();
+        });
 
-            var item = _config.GetProfileItem(SelectedSource.IndexId);
-            if (item is null)
-            {
-                item = SelectedSource;
-            }
-            else
-            {
-                item.Remarks = SelectedSource.Remarks;
-                item.Url = SelectedSource.Url;
-                item.Address = SelectedSource.Address;
-                item.UserAgent = SelectedSource.UserAgent;
-                item.CoreType = SelectedSource.CoreType;
-                item.Enabled = SelectedSource.Enabled;
-                item.EnableConvert = SelectedSource.EnableConvert;
-            }
+        SaveProfileCmd = ReactiveCommand.Create(() =>
+        {
+            SaveProfile();
+        });
 
-            if (ConfigProc.EditProfile(ref _config, item) == 0)
-            {
-                Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
-                _noticeHandler?.Enqueue(ResUI.OperationSuccess);
-                _view?.Close();
-            }
-            else
-            {
-                _noticeHandler?.Enqueue(ResUI.OperationFailed);
-            }
+        Utils.SetDarkBorder(view, _config.UiItem.ColorModeDark);
+    }
+
+    private void SaveProfile()
+    {
+        string remarks = SelectedSource.Remarks;
+        if (string.IsNullOrEmpty(remarks))
+        {
+            NoticeHandler.Instance.Enqueue(ResUI.PleaseFillRemarks);
+            return;
         }
 
-        private void BrowseProfile()
+        if (string.IsNullOrEmpty(CoreType))
         {
-            OpenFileDialog fileDialog = new OpenFileDialog
-            {
-                Multiselect = false,
-                Filter = "YAML|*.yaml;*.yml|All|*.*"
-            };
-
-            IWin32Window parent = App.Current.MainWindow.WpfWindow2WinFormWin32Window();
-            if (fileDialog.ShowDialog(parent) != DialogResult.OK)
-            {
-                return;
-            }
-            if (UI.ShowYesNo(ResUI.MsgSureContinue) == DialogResult.No)
-            {
-                return;
-            }
-            string fileName = fileDialog.FileName;
-            if (string.IsNullOrEmpty(fileName))
-            {
-                return;
-            }
-            var item = _config.GetProfileItem(SelectedSource.IndexId);
-            if (item is null)
-            {
-                item = SelectedSource;
-            }
-            if (ConfigProc.AddProfileViaPath(ref _config, item, fileName) == 0)
-            {
-                _noticeHandler?.Enqueue(ResUI.SuccessfullyImportedCustomProfile);
-                Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
-                _view?.Close();
-            }
-            else
-            {
-                _noticeHandler?.Enqueue(ResUI.FailedImportedCustomProfile);
-            }
+            SelectedSource.CoreType = null;
+        }
+        else
+        {
+            SelectedSource.CoreType = (CoreKind)Enum.Parse(typeof(CoreKind), CoreType);
         }
 
-        private void EditProfile()
+        var item = _config.GetProfileItem(SelectedSource.IndexId);
+        if (item is null)
         {
-            var address = SelectedSource.Address;
-            if (string.IsNullOrEmpty(address))
-            {
-                _noticeHandler?.Enqueue(ResUI.FillProfileAddressCustom);
-                return;
-            }
+            item = SelectedSource;
+        }
+        else
+        {
+            item.Remarks = SelectedSource.Remarks;
+            item.Url = SelectedSource.Url;
+            item.Address = SelectedSource.Address;
+            item.UserAgent = SelectedSource.UserAgent;
+            item.CoreType = SelectedSource.CoreType;
+            item.Enabled = SelectedSource.Enabled;
+            item.EnableConvert = SelectedSource.EnableConvert;
+        }
 
-            address = Path.Combine(Utils.GetConfigPath(), address);
-            if (File.Exists(address))
-            {
-                Utils.ProcessStart(address);
-            }
-            else
-            {
-                _noticeHandler?.Enqueue(ResUI.FailedReadConfiguration);
-            }
+        if (ConfigProc.EditProfile(ref _config, item) == 0)
+        {
+            Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
+            NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
+            _view?.Close();
+        }
+        else
+        {
+            NoticeHandler.Instance.Enqueue(ResUI.OperationFailed);
+        }
+    }
+
+    private void BrowseProfile()
+    {
+        OpenFileDialog fileDialog = new OpenFileDialog
+        {
+            Multiselect = false,
+            Filter = "YAML|*.yaml;*.yml|All|*.*"
+        };
+
+        IWin32Window parent = App.Current.MainWindow.WpfWindow2WinFormWin32Window();
+        if (fileDialog.ShowDialog(parent) != DialogResult.OK)
+        {
+            return;
+        }
+        if (UI.ShowYesNo(ResUI.MsgSureContinue) == DialogResult.No)
+        {
+            return;
+        }
+        string fileName = fileDialog.FileName;
+        if (string.IsNullOrEmpty(fileName))
+        {
+            return;
+        }
+        var item = _config.GetProfileItem(SelectedSource.IndexId);
+        if (item is null)
+        {
+            item = SelectedSource;
+        }
+        if (ConfigProc.AddProfileViaPath(ref _config, item, fileName) == 0)
+        {
+            NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedCustomProfile);
+            Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
+            _view?.Close();
+        }
+        else
+        {
+            NoticeHandler.Instance.Enqueue(ResUI.FailedImportedCustomProfile);
+        }
+    }
+
+    private void EditProfile()
+    {
+        var address = SelectedSource.Address;
+        if (string.IsNullOrEmpty(address))
+        {
+            NoticeHandler.Instance.Enqueue(ResUI.FillProfileAddressCustom);
+            return;
+        }
+
+        address = Path.Combine(Utils.GetConfigPath(), address);
+        if (File.Exists(address))
+        {
+            Utils.ProcessStart(address);
+        }
+        else
+        {
+            NoticeHandler.Instance.Enqueue(ResUI.FailedReadConfiguration);
         }
     }
 }

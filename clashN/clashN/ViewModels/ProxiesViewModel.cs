@@ -21,7 +21,6 @@ public class ProxiesViewModel : ReactiveObject
 
     private static Config _config;
 
-    private NoticeHandler? _noticeHandler;
     private Dictionary<string, ProxiesItem> _proxies;
     private Dictionary<string, ProvidersItem> _providers;
     
@@ -52,8 +51,6 @@ public class ProxiesViewModel : ReactiveObject
 
     public ProxiesViewModel()
     {
-        _noticeHandler = Locator.Current.GetService<NoticeHandler>();
-        
         _config = LazyConfig.Instance.Config;
 
         SelectedGroup = new ProxyModel();
@@ -421,7 +418,7 @@ public class ProxiesViewModel : ReactiveObject
         var selectedProxy = TryGetProxy(name);
         if (selectedProxy == null || selectedProxy.type != "Selector")
         {
-            _noticeHandler?.Enqueue(ResUI.OperationFailed);
+            NoticeHandler.Instance.Enqueue(ResUI.OperationFailed);
             return;
         }
 
@@ -442,7 +439,7 @@ public class ProxiesViewModel : ReactiveObject
             //_proxyGroups.Insert(index, group);
         }
 
-        _noticeHandler?.Enqueue(ResUI.OperationSuccess);
+        NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
 
         //RefreshProxyDetails(true);
         //GetClashProxies(true);

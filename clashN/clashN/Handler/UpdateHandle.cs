@@ -91,7 +91,7 @@ internal class UpdateHandle
             }
             else
             {
-                Locator.Current.GetService<NoticeHandler>()?.Enqueue(args.Msg);
+                NoticeHandler.Instance.Enqueue(args.Msg);
                 _updateFunc(false, args.Msg);
             }
         };
@@ -143,7 +143,7 @@ internal class UpdateHandle
             }
             else
             {
-                Locator.Current.GetService<NoticeHandler>()?.Enqueue(args.Msg);
+                NoticeHandler.Instance.Enqueue(args.Msg);
                 _updateFunc(false, args.Msg);
             }
         };
@@ -202,7 +202,7 @@ internal class UpdateHandle
                 }
 
                 var downloadHandle = new DownloadHandle();
-                downloadHandle.Error += (sender2, args) =>
+                downloadHandle.Error += (_, args) =>
                 {
                     _updateFunc(false, $"{hashCode}{args.GetException().Message}");
                 };
@@ -494,7 +494,7 @@ internal class UpdateHandle
 
     private int HttpProxyTest()
     {
-        var statistics = new SpeedtestHandler(ref _config);
+        var statistics = new SpeedTestHandler(ref _config);
         return statistics.RunAvailabilityCheck();
     }
 

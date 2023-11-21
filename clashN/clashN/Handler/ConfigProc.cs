@@ -10,9 +10,9 @@ namespace ClashN.Handler;
 /// </summary>
 internal static class ConfigProc
 {
-    private const string ConfigRes = Global.ConfigFileName;
-
     private static readonly object ObjLock = new();
+    
+    private const string ConfigRes = Global.ConfigFileName;
 
     #region ConfigHandler
 

@@ -11,7 +11,6 @@ namespace ClashN.ViewModels;
 public class HelpViewModel : ReactiveObject
 {
     private static Config _config;
-    private NoticeHandler? _noticeHandler;
 
     public ReactiveCommand<Unit, Unit> CheckUpdateCmd { get; }
     public ReactiveCommand<Unit, Unit> CheckUpdateClashCoreCmd { get; }
@@ -20,7 +19,6 @@ public class HelpViewModel : ReactiveObject
     public HelpViewModel()
     {
         _config = LazyConfig.Instance.Config;
-        _noticeHandler = Locator.Current.GetService<NoticeHandler>();
 
         CheckUpdateCmd = ReactiveCommand.Create(() => { CheckUpdateN(); });
         CheckUpdateClashCoreCmd = ReactiveCommand.Create(() => { CheckUpdateCore(CoreKind.Clash); });
@@ -60,15 +58,15 @@ public class HelpViewModel : ReactiveObject
                 {
                     Global.reloadCore = true;
                     _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
-                    _noticeHandler?.Enqueue(ResUI.MsgUpdateCoreCoreFailed);
+                    NoticeHandler.Instance.Enqueue(ResUI.MsgUpdateCoreCoreFailed);
                 }
                 else
                 {
-                    _noticeHandler?.Enqueue(ResUI.MsgUpdateCoreCoreSuccessfullyMore);
+                    NoticeHandler.Instance.Enqueue(ResUI.MsgUpdateCoreCoreSuccessfullyMore);
 
                     Global.reloadCore = true;
                     _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
-                    _noticeHandler?.Enqueue(ResUI.MsgUpdateCoreCoreSuccessfully);
+                    NoticeHandler.Instance.Enqueue(ResUI.MsgUpdateCoreCoreSuccessfully);
                 }
             }
         }

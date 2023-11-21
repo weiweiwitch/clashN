@@ -14,17 +14,14 @@ namespace ClashN.Handler;
 /// </summary>
 internal class CoreHandler
 {
+    private static Lazy<CoreHandler> _instance = new(() => new CoreHandler());
+
+    public static CoreHandler Instance => _instance.Value;
+    
     private const string CoreConfigRes = Global.CoreConfigFileName;
 
     private CoreInfo _coreInfo;
     private Process _process;
-
-    private readonly Action<bool, LogType, string> _showMsgHandler;
-
-    public CoreHandler(Action<bool, LogType, string> showMsgHandler)
-    {
-        _showMsgHandler = showMsgHandler;
-    }
 
     /// <summary>
     /// 载入Core
@@ -285,7 +282,7 @@ internal class CoreHandler
 
     private void ShowMsg(bool updateToTrayTooltip, LogType logType, string msg)
     {
-        _showMsgHandler(updateToTrayTooltip, logType, msg);
+        NoticeHandler.Instance.OnShowMsg(updateToTrayTooltip, logType, msg);
     }
 
     private void KillProcess(Process p)

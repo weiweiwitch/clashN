@@ -286,12 +286,12 @@ namespace ClashN.ViewModels
 
             if (ConfigProc.SaveConfig(_config) == 0)
             {
-                Locator.Current.GetService<NoticeHandler>()?.Enqueue(ResUI.OperationSuccess);
+                NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
                 Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
             }
             else
             {
-                Locator.Current.GetService<NoticeHandler>()?.Enqueue(ResUI.OperationFailed);
+                NoticeHandler.Instance.Enqueue(ResUI.OperationFailed);
             }
         }
 
@@ -313,7 +313,7 @@ namespace ClashN.ViewModels
             }
             else
             {
-                Locator.Current.GetService<NoticeHandler>()?.Enqueue(ResUI.FailedReadConfiguration);
+                NoticeHandler.Instance.Enqueue(ResUI.FailedReadConfiguration);
             }
         }
     }

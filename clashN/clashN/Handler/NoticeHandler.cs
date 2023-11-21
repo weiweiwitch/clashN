@@ -6,11 +6,25 @@ namespace ClashN.Handler;
 
 public class NoticeHandler
 {
-    private readonly ISnackbarMessageQueue _snackbarMessageQueue;
+    private static Lazy<NoticeHandler> _instance = new(() => new NoticeHandler());
 
-    public NoticeHandler(ISnackbarMessageQueue snackbarMessageQueue)
+    public static NoticeHandler Instance => _instance.Value;
+    
+    private ISnackbarMessageQueue _snackbarMessageQueue;
+
+    public void ConfigMessageQueue(ISnackbarMessageQueue snackbarMessageQueue)
     {
         _snackbarMessageQueue = snackbarMessageQueue ?? throw new ArgumentNullException(nameof(snackbarMessageQueue));
+    }
+    
+    public void OnShowMsg(bool notify, LogType logType, string msg)
+    {
+        if (notify)
+        {
+            Enqueue(msg);
+        }
+
+        SendMessage(logType, msg);
     }
 
     public void Enqueue(object content)

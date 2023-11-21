@@ -6,24 +6,21 @@ using ClashN.Tool;
 
 namespace ClashN.Handler;
 
-internal class SpeedtestHandler
+internal class SpeedTestHandler
 {
     private Config _config;
-    private CoreHandler _coreHandler;
     private List<ServerTestItem> _selecteds;
     private Action<string, string> _updateFunc;
 
-    public SpeedtestHandler(ref Config config)
+    public SpeedTestHandler(ref Config config)
     {
         _config = config;
     }
 
-    public SpeedtestHandler(ref Config config, CoreHandler coreHandler, List<ProfileItem> selecteds,
+    public SpeedTestHandler(ref Config config, CoreHandler coreHandler, List<ProfileItem> selecteds,
         ESpeedActionType actionType, Action<string, string> update)
     {
         _config = config;
-        _coreHandler = coreHandler;
-        //_selecteds = Utils.DeepCopy(selecteds);
         _updateFunc = update;
 
         _selecteds = new List<ServerTestItem>();

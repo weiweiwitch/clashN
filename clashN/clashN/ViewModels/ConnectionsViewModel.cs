@@ -21,8 +21,6 @@ namespace ClashN.ViewModels
             _config = LazyConfig.Instance.Config;
         }
 
-        private NoticeHandler? _noticeHandler;
-        
         private IObservableCollection<ConnectionModel> _connectionItems = new ObservableCollectionExtended<ConnectionModel>();
 
         public IObservableCollection<ConnectionModel> ConnectionItems => _connectionItems;
@@ -43,8 +41,6 @@ namespace ClashN.ViewModels
 
         public ConnectionsViewModel()
         {
-            _noticeHandler = Locator.Current.GetService<NoticeHandler>();
-
             AutoRefreshInterval = 10;
             SortingSelected = _config.UiItem.ConnectionsSorting;
             AutoRefresh = _config.UiItem.ConnectionsAutoRefresh;
