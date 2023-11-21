@@ -152,6 +152,8 @@ public class ProxiesViewModel : ReactiveObject
 
     public void ProxiesReload()
     {
+        Utils.SaveLogDebug($"ProxiesViewModel:ProxiesReload - Start");
+        
         GetClashProxies(true);
     }
 
@@ -171,6 +173,8 @@ public class ProxiesViewModel : ReactiveObject
 
     public void ProxiesDelayTest()
     {
+        Utils.SaveLogDebug($"ProxiesViewModel:ProxiesDelayTest - Start");
+        
         ProxiesDelayTest(true);
     }
 

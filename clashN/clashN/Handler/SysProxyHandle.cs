@@ -35,6 +35,8 @@ public static class SysProxyHandle
 
     public static bool UpdateSysProxy(bool forceDisable)
     {
+        Utils.SaveLogDebug($"SysProxyHandle:UpdateSysProxy - Start, forceDisable: {forceDisable}");
+        
         var config = LazyConfig.Instance.Config;
         var type = config.SysProxyType;
 

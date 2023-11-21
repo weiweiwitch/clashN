@@ -360,6 +360,8 @@ public class MainWindowViewModel : ReactiveObject
         proxiesViewModel?.ProxiesDelayTest();
         
         Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
+        
+        Utils.SaveLogDebug($"MainWindowViewModel:LoadCore - Finished: {Global.ReloadCore}");
     }
 
     public void CloseCore()

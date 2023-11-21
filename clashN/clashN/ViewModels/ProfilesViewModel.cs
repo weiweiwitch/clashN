@@ -290,6 +290,8 @@ public class ProfilesViewModel : ReactiveObject
 
     public void RefreshProfiles()
     {
+        Utils.SaveLogDebug($"ProfilesViewModel:RefreshProfiles - Start");
+        
         var config = LazyConfig.Instance.Config;
         ConfigProc.SetDefaultProfile(config, config.ProfileItems);
 
