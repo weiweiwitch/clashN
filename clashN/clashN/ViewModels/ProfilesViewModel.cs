@@ -84,6 +84,8 @@ public class ProfilesViewModel : ReactiveObject
         });
         ProfileReloadCmd = ReactiveCommand.Create(() => { RefreshProfiles(); });
         ProfileQrcodeCmd = ReactiveCommand.Create(() => { ProfileQrcode(); }, canEditRemove);
+        
+        Utils.SaveLogDebug("ProfilesViewModel:ProfilesViewModel - Finished");
     }
 
     private void EditLocalFile()
@@ -290,7 +292,7 @@ public class ProfilesViewModel : ReactiveObject
 
     public void RefreshProfiles()
     {
-        Utils.SaveLogDebug($"ProfilesViewModel:RefreshProfiles - Start");
+        Utils.SaveLog($"ProfilesViewModel:RefreshProfiles - Start");
         
         var config = LazyConfig.Instance.Config;
         ConfigProc.SetDefaultProfile(config, config.ProfileItems);
@@ -308,6 +310,8 @@ public class ProfilesViewModel : ReactiveObject
             _profileItems.Clear();
             _profileItems.AddRange(lstModel);
         }));
+        
+        Utils.SaveLogDebug($"ProfilesViewModel:RefreshProfiles - Finished");
     }
 
     public void MoveProfile(int startIndex, ProfileItemModel targetItem)

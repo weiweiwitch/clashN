@@ -195,6 +195,7 @@ public sealed class MainFormHandler
 
     private async Task GetClashProxiesAsync(Action<ClashProxies, ClashProviders> update)
     {
+        
         for (var i = 0; i < 5; i++)
         {
             var url = $"{GetApiUrl()}/proxies";
@@ -219,6 +220,8 @@ public sealed class MainFormHandler
 
     public void ClashProxiesDelayTest(bool blAll, List<ProxyModel> lstProxy, Action<ProxyModel?, string> update)
     {
+        Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest");
+        
         Task.Run(() =>
         {
             if (blAll)

@@ -148,7 +148,7 @@ public static class SysProxyHandle
         using (var outputWaitHandle = new AutoResetEvent(false))
         using (var errorWaitHandle = new AutoResetEvent(false))
         {
-            using (Process process = new Process())
+            using (var process = new Process())
             {
                 // Configure the process using the StartInfo properties.
                 process.StartInfo.FileName = Utils.GetTempPath("sysproxy.exe");

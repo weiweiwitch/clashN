@@ -93,6 +93,8 @@ public partial class MainWindow
         });
 
         Title = $"{Utils.GetVersion()} - {(Utils.IsAdministrator() ? ResUI.RunAsAdmin : ResUI.NotRunAsAdmin)}";
+        
+        Utils.SaveLogDebug($"MainWindow:MainWindow - Finished {Title}");
     }
 
     private void MainWindow_Closing(object? sender, CancelEventArgs e)

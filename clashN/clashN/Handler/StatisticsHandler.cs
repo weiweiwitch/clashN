@@ -15,10 +15,7 @@ internal class StatisticsHandler
 
     private readonly Action<ulong, ulong> _cbStatisticUpdateFunc;
 
-    private bool Enable
-    {
-        get; set;
-    }
+    private bool Enable { get; set; }
 
     //private List<ProfileStatItem> Statistic
     //{
@@ -34,13 +31,13 @@ internal class StatisticsHandler
         _cbStatisticUpdateFunc = cbStatisticUpdate;
         _exitFlag = false;
 
-        //LoadFromFile();
-
         Task.Run(() => Run());
     }
 
     private async void Init()
     {
+        Utils.SaveLog("StatisticsHandler:Init");
+
         Thread.Sleep(5000);
 
         try
@@ -51,9 +48,13 @@ internal class StatisticsHandler
             {
                 _webSocket = new ClientWebSocket();
                 await _webSocket.ConnectAsync(new Uri(_url), CancellationToken.None);
+
+                Utils.SaveLogDebug("StatisticsHandler:Init - ConnectAsync Finished");
             }
         }
-        catch { }
+        catch
+        {
+        }
     }
 
     public void Close()
@@ -73,7 +74,7 @@ internal class StatisticsHandler
         }
     }
 
-    public async void Run()
+    private async void Run()
     {
         Init();
 
@@ -83,8 +84,7 @@ internal class StatisticsHandler
             {
                 if (Enable)
                 {
-                    if (_webSocket.State == WebSocketState.Aborted
-                        || _webSocket.State == WebSocketState.Closed)
+                    if (_webSocket.State == WebSocketState.Aborted || _webSocket.State == WebSocketState.Closed)
                     {
                         _webSocket.Abort();
                         _webSocket = null;
@@ -111,14 +111,17 @@ internal class StatisticsHandler
                                 serverStatItem.UploadRemote += up;
                                 serverStatItem.DownloadRemote += down;
                             }
+
                             _cbStatisticUpdateFunc(up, down);
                         }
+
                         res = await _webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                     }
                 }
             }
-            catch
+            catch(Exception e)
             {
+                Utils.SaveLog("StatisticsHandler:Run - WebSocket ReceiveAsync Failed", e);
             }
             finally
             {
@@ -227,7 +230,8 @@ internal class StatisticsHandler
 
     private void ParseOutput(string source, out ulong up, out ulong down)
     {
-        up = 0; down = 0;
+        up = 0;
+        down = 0;
         try
         {
             var trafficItem = Utils.FromJson<TrafficItem>(source);

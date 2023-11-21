@@ -186,7 +186,7 @@ public class MainWindowViewModel : ReactiveObject
 
     private void OnProgramStarted(object? state, bool timeout)
     {
-        Utils.SaveLog("MainWindowViewModel:OnProgramStarted");
+        Utils.SaveLog($"MainWindowViewModel:OnProgramStarted {state}");
 
         Application.Current.Dispatcher.Invoke((Action)(() =>
         {
@@ -204,6 +204,8 @@ public class MainWindowViewModel : ReactiveObject
             Locator.Current.GetService<ProfilesViewModel>()?.AddProfilesViaClipboard(true);
 
             StartAllTimerTask();
+            
+            Utils.SaveLogDebug($"MainWindowViewModel:OnProgramStarted - Finished");
         }));
     }
 
