@@ -84,18 +84,6 @@ namespace ClashN.ViewModels
                         GetClashConnections();
                     }
                 });
-
-            //Task.Run(() =>
-            //{
-            //    while (true)
-            //    {
-            //        if (AutoRefresh)
-            //        {
-            //            GetClashConnections();
-            //        }
-            //        Thread.Sleep(1000 * AutoRefreshInterval);
-            //    }
-            //});
         }
 
         private void GetClashConnections()
