@@ -417,6 +417,8 @@ public class MainWindowViewModel : ReactiveObject
         SetRuleMode(mode);
 
         Locator.Current.GetService<ProxiesViewModel>()?.ReloadRuleModeSelected();
+        
+        ConfigProc.SaveConfig(false);
     }
 
     private void SetRuleMode(ERuleMode mode)
@@ -430,7 +432,6 @@ public class MainWindowViewModel : ReactiveObject
         NoticeHandler.SendMessage4ClashN($"Set rule mode {config.RuleMode.ToString()}->{mode.ToString()}");
 
         config.RuleMode = mode;
-        ConfigProc.SaveConfig(false);
 
         if (mode != ERuleMode.Unchanged)
         {

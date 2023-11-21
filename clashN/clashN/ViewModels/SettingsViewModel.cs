@@ -259,6 +259,7 @@ namespace ClashN.ViewModels
             if (ConfigProc.SaveConfig() == 0)
             {
                 NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
+                
                 Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
             }
             else

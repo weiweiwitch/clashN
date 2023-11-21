@@ -72,10 +72,8 @@ internal static class ConfigProc
         {
             Global.reloadCore = true;
 
-            for (var i = 0; i < config.ProfileItems.Count; i++)
+            foreach (var profileItem in config.ProfileItems)
             {
-                var profileItem = config.ProfileItems[i];
-
                 if (string.IsNullOrEmpty(profileItem.IndexId))
                 {
                     profileItem.IndexId = Utils.GetGUID(false);

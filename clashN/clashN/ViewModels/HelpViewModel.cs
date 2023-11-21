@@ -56,6 +56,7 @@ public class HelpViewModel : ReactiveObject
                 {
                     Global.reloadCore = true;
                     _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
+                    
                     NoticeHandler.Instance.Enqueue(ResUI.MsgUpdateCoreCoreFailed);
                 }
                 else
