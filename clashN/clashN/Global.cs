@@ -18,14 +18,16 @@ internal static class Global
 
     public const string SpeedPingTestUrl = @"https://www.google.com/generate_204";
 
-    public static readonly List<string> SubConvertUrls = new List<string> {
+    public static readonly List<string> SubConvertUrls = new()
+    {
         @"https://sub.xeton.dev/sub?target=clash&url={0}",
         @"https://api.dler.io/sub?target=clash&url={0}",
         @"http://127.0.0.1:25500/sub?target=clash&url={0}",
         ""
     };
 
-    public static readonly List<string> SubConvertConfig = new List<string> {
+    public static readonly List<string> SubConvertConfig = new()
+    {
         @"https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online.ini"
     };
 
@@ -124,12 +126,12 @@ internal static class Global
     /// <summary>
     /// 是否需要重启服务
     /// </summary>
-    public static bool reloadCore
+    public static bool ReloadCore
     {
         get; set;
     }
 
-    public static Job processJob
+    public static Job ProcessJob
     {
         get; set;
     }

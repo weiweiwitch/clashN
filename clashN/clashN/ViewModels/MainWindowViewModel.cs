@@ -167,7 +167,7 @@ public class MainWindowViewModel : ReactiveObject
         });
         ReloadCmd = ReactiveCommand.Create(() =>
         {
-            Global.reloadCore = true;
+            Global.ReloadCore = true;
             _ = LoadCore();
         });
 
@@ -307,7 +307,7 @@ public class MainWindowViewModel : ReactiveObject
 
         if (success)
         {
-            Global.reloadCore = true;
+            Global.ReloadCore = true;
 
             await LoadCore();
         }
@@ -347,7 +347,7 @@ public class MainWindowViewModel : ReactiveObject
 
         await Task.Run(() => { CoreHandler.Instance.LoadCore(); });
 
-        Global.reloadCore = false;
+        Global.ReloadCore = false;
 
         ConfigProc.SaveConfig(false);
 

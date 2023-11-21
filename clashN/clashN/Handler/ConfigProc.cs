@@ -66,11 +66,11 @@ internal static class ConfigProc
 
         if (config.ProfileItems.Count <= 0)
         {
-            Global.reloadCore = false;
+            Global.ReloadCore = false;
         }
         else
         {
-            Global.reloadCore = true;
+            Global.ReloadCore = true;
 
             foreach (var profileItem in config.ProfileItems)
             {
@@ -92,7 +92,7 @@ internal static class ConfigProc
     /// <returns></returns>
     public static int SaveConfig(bool reload = true)
     {
-        Global.reloadCore = reload;
+        Global.ReloadCore = reload;
 
         var config = LazyConfig.Instance.Config;
         ToJsonFile(config);
@@ -205,7 +205,7 @@ internal static class ConfigProc
         }
 
         config.IndexId = item.IndexId;
-        Global.reloadCore = true;
+        Global.ReloadCore = true;
 
         ToJsonFile(config);
 
@@ -417,7 +417,7 @@ internal static class ConfigProc
         var config = LazyConfig.Instance.Config;
         if (!string.IsNullOrEmpty(profileItem.IndexId) && config.IndexId == profileItem.IndexId)
         {
-            Global.reloadCore = true;
+            Global.ReloadCore = true;
         }
 
         AddProfileCommon(profileItem);

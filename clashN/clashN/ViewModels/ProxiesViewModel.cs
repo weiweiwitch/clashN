@@ -195,7 +195,7 @@ public class ProxiesViewModel : ReactiveObject
 
     private static void TunModeSwitch()
     {
-        Global.reloadCore = true;
+        Global.ReloadCore = true;
         _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
     }
 

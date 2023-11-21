@@ -54,7 +54,7 @@ public class HelpViewModel : ReactiveObject
                 var toPath = Utils.GetBinPath("", type);
                 if (FileManager.ZipExtractToFile(fileName, toPath, "") == false)
                 {
-                    Global.reloadCore = true;
+                    Global.ReloadCore = true;
                     _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
                     
                     NoticeHandler.Instance.Enqueue(ResUI.MsgUpdateCoreCoreFailed);
@@ -63,7 +63,7 @@ public class HelpViewModel : ReactiveObject
                 {
                     NoticeHandler.Instance.Enqueue(ResUI.MsgUpdateCoreCoreSuccessfullyMore);
 
-                    Global.reloadCore = true;
+                    Global.ReloadCore = true;
                     _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
                     
                     NoticeHandler.Instance.Enqueue(ResUI.MsgUpdateCoreCoreSuccessfully);

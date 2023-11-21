@@ -28,9 +28,9 @@ internal class CoreHandler
     /// </summary>
     public void LoadCore()
     {
-        Utils.SaveLogDebug($"CoreHandler:LoadCore - Start to Load Core: {Global.reloadCore}");
+        Utils.SaveLogDebug($"CoreHandler:LoadCore - Start to Load Core: {Global.ReloadCore}");
 
-        if (!Global.reloadCore)
+        if (!Global.ReloadCore)
         {
             return;
         }
@@ -268,7 +268,7 @@ internal class CoreHandler
                 throw new Exception(p.StandardError.ReadToEnd());
             }
 
-            Global.processJob.AddProcess(p.Handle);
+            Global.ProcessJob.AddProcess(p.Handle);
 
             Utils.SaveLogDebug($"CoreHandler:CoreStart - Core started after AddProcess");
         }

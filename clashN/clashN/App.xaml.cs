@@ -46,7 +46,7 @@ public partial class App
             Utils.SetClipboardData(arg);
         }
 
-        Global.processJob = new Job();
+        Global.ProcessJob = new Job();
 
         // Logging
         Logging.Setup();
