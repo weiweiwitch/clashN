@@ -140,8 +140,8 @@ namespace ClashN.ViewModels
             EnableSecurityProtocolTls13 = _config.EnableSecurityProtocolTls13;
             autoUpdateSubInterval = _config.AutoUpdateSubInterval;
             autoDelayTestInterval = _config.AutoDelayTestInterval;
-            SubConvertUrl = _config.ConstItem.subConvertUrl;
-            currentFontFamily = _config.UiItem.currentFontFamily;
+            SubConvertUrl = _config.ConstItem.SubConvertUrl;
+            currentFontFamily = _config.UiItem.CurrentFontFamily;
             AutoHideStartup = _config.AutoHideStartup;
 
             SetLoopbackCmd = ReactiveCommand.Create(() =>
@@ -164,23 +164,23 @@ namespace ClashN.ViewModels
             PacPort = _config.PacPort;
 
             //UI
-            ColorModeDark = _config.UiItem.colorModeDark;
+            ColorModeDark = _config.UiItem.ColorModeDark;
             _swatches.AddRange(new SwatchesProvider().Swatches);
-            if (!string.IsNullOrEmpty(_config.UiItem.colorPrimaryName))
+            if (!string.IsNullOrEmpty(_config.UiItem.ColorPrimaryName))
             {
-                SelectedSwatch = _swatches.FirstOrDefault(t => t.Name == _config.UiItem.colorPrimaryName);
+                SelectedSwatch = _swatches.FirstOrDefault(t => t.Name == _config.UiItem.ColorPrimaryName);
             }
             CurrentLanguage = Utils.RegReadValue(Global.MyRegPath, Global.MyRegKeyLanguage, Global.Languages[0]);
-            CurrentFontSize = _config.UiItem.currentFontSize;
+            CurrentFontSize = _config.UiItem.CurrentFontSize;
 
             this.WhenAnyValue(
             x => x.ColorModeDark,
             y => y == true)
                 .Subscribe(c =>
                 {
-                    if (_config.UiItem.colorModeDark != ColorModeDark)
+                    if (_config.UiItem.ColorModeDark != ColorModeDark)
                     {
-                        _config.UiItem.colorModeDark = ColorModeDark;
+                        _config.UiItem.ColorModeDark = ColorModeDark;
                         Locator.Current.GetService<MainWindowViewModel>()?.ModifyTheme(ColorModeDark);
                         ConfigProc.SaveConfig(_config);
                     }
@@ -198,9 +198,9 @@ namespace ClashN.ViewModels
                      {
                          return;
                      }
-                     if (_config.UiItem.colorPrimaryName != SelectedSwatch?.Name)
+                     if (_config.UiItem.ColorPrimaryName != SelectedSwatch?.Name)
                      {
-                         _config.UiItem.colorPrimaryName = SelectedSwatch?.Name;
+                         _config.UiItem.ColorPrimaryName = SelectedSwatch?.Name;
                          Locator.Current.GetService<MainWindowViewModel>()?.ChangePrimaryColor(SelectedSwatch.ExemplarHue.Color);
                          ConfigProc.SaveConfig(_config);
                      }
@@ -223,9 +223,9 @@ namespace ClashN.ViewModels
              y => y > 0)
              .Subscribe(c =>
              {
-                 if (_config.UiItem.colorModeDark != ColorModeDark)
+                 if (_config.UiItem.ColorModeDark != ColorModeDark)
                  {
-                     _config.UiItem.colorModeDark = ColorModeDark;
+                     _config.UiItem.ColorModeDark = ColorModeDark;
                      Locator.Current.GetService<MainWindowViewModel>()?.ModifyTheme(ColorModeDark);
                      ConfigProc.SaveConfig(_config);
                  }
@@ -238,7 +238,7 @@ namespace ClashN.ViewModels
                 {
                     if (CurrentFontSize >= Global.MinFontSize)
                     {
-                        _config.UiItem.currentFontSize = CurrentFontSize;
+                        _config.UiItem.CurrentFontSize = CurrentFontSize;
                         double size = (long)CurrentFontSize;
                         Application.Current.Resources["StdFontSize1"] = size;
                         Application.Current.Resources["StdFontSize2"] = size + 1;
@@ -275,8 +275,8 @@ namespace ClashN.ViewModels
             _config.EnableSecurityProtocolTls13 = EnableSecurityProtocolTls13;
             _config.AutoUpdateSubInterval = autoUpdateSubInterval;
             _config.AutoDelayTestInterval = autoDelayTestInterval;
-            _config.ConstItem.subConvertUrl = SubConvertUrl;
-            _config.UiItem.currentFontFamily = currentFontFamily;
+            _config.ConstItem.SubConvertUrl = SubConvertUrl;
+            _config.UiItem.CurrentFontFamily = currentFontFamily;
             _config.AutoHideStartup = AutoHideStartup;
 
             //System proxy

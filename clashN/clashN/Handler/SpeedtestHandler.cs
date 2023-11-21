@@ -31,8 +31,8 @@ internal class SpeedtestHandler
         {
             _selecteds.Add(new ServerTestItem()
             {
-                IndexId = it.indexId,
-                Address = it.address
+                IndexId = it.IndexId,
+                Address = it.Address
             });
         }
 
@@ -102,7 +102,7 @@ internal class SpeedtestHandler
                 {
                     var webProxy = new WebProxy(Global.Loopback, httpPort);
                     var responseTime = -1;
-                    var status = GetRealPingTime(LazyConfig.Instance.Config.ConstItem.speedPingTestUrl, webProxy,
+                    var status = GetRealPingTime(LazyConfig.Instance.Config.ConstItem.SpeedPingTestUrl, webProxy,
                         out responseTime);
                     var noError = string.IsNullOrEmpty(status);
                     return noError ? responseTime : -1;

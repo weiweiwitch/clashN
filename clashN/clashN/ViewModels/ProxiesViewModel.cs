@@ -36,8 +36,8 @@ public class ProxiesViewModel : ReactiveObject
     public ProxyModel SelectedDetail { get; set; }
 
     public ReactiveCommand<Unit, Unit> ProxiesReloadCmd { get; }
-    public ReactiveCommand<Unit, Unit> ProxiesDelaytestCmd { get; }
-    public ReactiveCommand<Unit, Unit> ProxiesDelaytestPartCmd { get; }
+    public ReactiveCommand<Unit, Unit> ProxiesDelayTestCmd { get; }
+    public ReactiveCommand<Unit, Unit> ProxiesDelayTestPartCmd { get; }
     public ReactiveCommand<Unit, Unit> ProxiesSelectActivityCmd { get; }
 
     [Reactive]
@@ -60,11 +60,11 @@ public class ProxiesViewModel : ReactiveObject
         _noticeHandler = Locator.Current.GetService<NoticeHandler>();
         _config = LazyConfig.Instance.Config;
 
-        SelectedGroup = new();
-        SelectedDetail = new();
-        AutoRefresh = _config.UiItem.proxiesAutoRefresh;
+        SelectedGroup = new ProxyModel();
+        SelectedDetail = new ProxyModel();
+        AutoRefresh = _config.UiItem.ProxiesAutoRefresh;
         EnableTun = _config.EnableTun;
-        SortingSelected = _config.UiItem.proxiesSorting;
+        SortingSelected = _config.UiItem.ProxiesSorting;
 
         //GetClashProxies(true);
         this.WhenAnyValue(
@@ -80,7 +80,7 @@ public class ProxiesViewModel : ReactiveObject
         this.WhenAnyValue(
                 x => x.RuleModeSelected,
                 y => y >= 0)
-            .Subscribe(c => DoRulemodeSelected(c));
+            .Subscribe(c => DoRuleModeSelected(c));
 
         this.WhenAnyValue(
                 x => x.SortingSelected,
@@ -95,18 +95,18 @@ public class ProxiesViewModel : ReactiveObject
         this.WhenAnyValue(
                 x => x.AutoRefresh,
                 y => y == true)
-            .Subscribe(c => { _config.UiItem.proxiesAutoRefresh = AutoRefresh; });
+            .Subscribe(c => { _config.UiItem.ProxiesAutoRefresh = AutoRefresh; });
 
         ProxiesReloadCmd = ReactiveCommand.Create(() =>
         {
             ProxiesReload();
         });
-        ProxiesDelaytestCmd = ReactiveCommand.Create(() =>
+        ProxiesDelayTestCmd = ReactiveCommand.Create(() =>
         {
             ProxiesDelayTest(true);
         });
 
-        ProxiesDelaytestPartCmd = ReactiveCommand.Create(() =>
+        ProxiesDelayTestPartCmd = ReactiveCommand.Create(() =>
         {
             ProxiesDelayTest(false);
         });
@@ -134,7 +134,7 @@ public class ProxiesViewModel : ReactiveObject
         Locator.Current.GetService<MainWindowViewModel>()?.SetListenerType((SysProxyType)SystemProxySelected);
     }
 
-    private void DoRulemodeSelected(bool c)
+    private void DoRuleModeSelected(bool c)
     {
         if (!c)
         {
@@ -153,9 +153,9 @@ public class ProxiesViewModel : ReactiveObject
         {
             return;
         }
-        if (SortingSelected != _config.UiItem.proxiesSorting)
+        if (SortingSelected != _config.UiItem.ProxiesSorting)
         {
-            _config.UiItem.proxiesSorting = SortingSelected;
+            _config.UiItem.ProxiesSorting = SortingSelected;
         }
 
         RefreshProxyDetails(c);
@@ -219,7 +219,7 @@ public class ProxiesViewModel : ReactiveObject
 
     private void GetClashProxies(bool refreshUI)
     {
-        MainFormHandler.Instance.GetClashProxies(_config, (it, it2) =>
+        MainFormHandler.Instance.GetClashProxies((it, it2) =>
         {
             UpdateHandler("Refresh Clash Proxies");
                 

@@ -167,16 +167,6 @@ internal class UpdateHandle
 
         Task.Run(async () =>
         {
-            //Turn off system proxy
-            //bool bSysProxyType = false;
-            //if (!blProxy && config.SysProxyType == SysProxyType.ForcedChange)
-            //{
-            //    bSysProxyType = true;
-            //    config.SysProxyType = SysProxyType.ForcedClear;
-            //    SysProxyHandle.UpdateSysProxy(config, false);
-            //    Thread.Sleep(3000);
-            //}
-
             if (profileItems == null)
             {
                 profileItems = config.ProfileItems;
@@ -184,12 +174,12 @@ internal class UpdateHandle
 
             foreach (var item in profileItems)
             {
-                var indexId = item.indexId.TrimEx();
-                var url = item.url.TrimEx();
-                var userAgent = item.userAgent.TrimEx();
-                var groupId = item.groupId.TrimEx();
-                var hashCode = $"{item.remarks}->";
-                if (item.enabled == false || string.IsNullOrEmpty(indexId) || string.IsNullOrEmpty(url))
+                var indexId = item.IndexId.TrimEx();
+                var url = item.Url.TrimEx();
+                var userAgent = item.UserAgent.TrimEx();
+                var groupId = item.GroupId.TrimEx();
+                var hashCode = $"{item.Remarks}->";
+                if (item.Enabled == false || string.IsNullOrEmpty(indexId) || string.IsNullOrEmpty(url))
                 {
                     _updateFunc(false, $"{hashCode}{ResUI.MsgSkipSubscriptionUpdate}");
                     continue;
@@ -197,14 +187,14 @@ internal class UpdateHandle
 
                 _updateFunc(false, $"{hashCode}{ResUI.MsgStartGettingSubscriptions}");
 
-                if (item.enableConvert)
+                if (item.EnableConvert)
                 {
-                    if (string.IsNullOrEmpty(config.ConstItem.subConvertUrl))
+                    if (string.IsNullOrEmpty(config.ConstItem.SubConvertUrl))
                     {
-                        config.ConstItem.subConvertUrl = Global.SubConvertUrls[0];
+                        config.ConstItem.SubConvertUrl = Global.SubConvertUrls[0];
                     }
 
-                    url = string.Format(config.ConstItem.subConvertUrl, Utils.UrlEncode(url));
+                    url = string.Format(config.ConstItem.SubConvertUrl, Utils.UrlEncode(url));
                     if (!url.Contains("config="))
                     {
                         url += $"&config={Global.SubConvertConfig[0]}";
@@ -239,7 +229,7 @@ internal class UpdateHandle
                     var ret = ConfigProc.AddBatchProfiles(ref config, result.Item1, indexId, groupId);
                     if (ret == 0)
                     {
-                        item.updateTime = ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();
+                        item.UpdateTime = ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();
 
                         //get remote info
                         try
@@ -252,16 +242,16 @@ internal class UpdateHandle
                                     .FirstOrDefault()?
                                     .FirstOrDefault();
 
-                                Dictionary<string, string>? dicInfo = userinfo?.Split(';')
+                                var dicInfo = userinfo?.Split(';')
                                     .Select(value => value.Split('='))
                                     .ToDictionary(pair => pair[0].Trim(), pair => pair[1].Trim());
 
                                 if (dicInfo != null)
                                 {
-                                    item.uploadRemote = ParseRemoteInfo(dicInfo, "upload");
-                                    item.downloadRemote = ParseRemoteInfo(dicInfo, "download");
-                                    item.totalRemote = ParseRemoteInfo(dicInfo, "total");
-                                    item.expireRemote = dicInfo.ContainsKey("expire")
+                                    item.UploadRemote = ParseRemoteInfo(dicInfo, "upload");
+                                    item.DownloadRemote = ParseRemoteInfo(dicInfo, "download");
+                                    item.TotalRemote = ParseRemoteInfo(dicInfo, "total");
+                                    item.ExpireRemote = dicInfo.ContainsKey("expire")
                                         ? Convert.ToInt64(dicInfo?["expire"])
                                         : 0;
                                 }
@@ -282,13 +272,7 @@ internal class UpdateHandle
 
                 _updateFunc(false, $"-------------------------------------------------------");
             }
-
-            //restore system proxy
-            //if (bSysProxyType)
-            //{
-            //    config.SysProxyType = SysProxyType.ForcedChange;
-            //    SysProxyHandle.UpdateSysProxy(config, false);
-            //}
+            
             _updateFunc(true, $"{ResUI.MsgUpdateSubscriptionEnd}");
         });
     }

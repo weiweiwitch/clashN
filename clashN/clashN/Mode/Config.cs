@@ -72,7 +72,7 @@ public class Config
         {
             return -1;
         }
-        return ProfileItems.FindIndex(it => it.indexId == id);
+        return ProfileItems.FindIndex(it => it.IndexId == id);
     }
 
     public ProfileItem? GetProfileItem(string id)
@@ -80,12 +80,12 @@ public class Config
         if (string.IsNullOrEmpty(id))
             return null;
 
-        return ProfileItems.FirstOrDefault(it => it.indexId == id);
+        return ProfileItems.FirstOrDefault(it => it.IndexId == id);
     }
 
     public bool IsActiveNode(ProfileItem item)
     {
-        if (!string.IsNullOrEmpty(item.indexId) && item.indexId == IndexId)
+        if (!string.IsNullOrEmpty(item.IndexId) && item.IndexId == IndexId)
         {
             return true;
         }

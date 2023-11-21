@@ -98,7 +98,7 @@ public partial class MainWindow
     private void MainWindow_Closing(object? sender, CancelEventArgs e)
     {
         e.Cancel = true;
-        ViewModel?.ShowHideWindow(false);
+        MainWindowViewModel.ShowHideWindow(false);
     }
 
     private void MenuExit_Click(object sender, RoutedEventArgs e)

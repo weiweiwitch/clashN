@@ -6,51 +6,51 @@ public class ProfileItem
 {
     public ProfileItem()
     {
-        indexId = string.Empty;
-        sort = 0;
-        url = string.Empty;
-        enabled = true;
-        address = string.Empty;
-        remarks = string.Empty;
-        testResult = string.Empty;
-        groupId = string.Empty;
-        enableConvert = false;
+        IndexId = string.Empty;
+        Sort = 0;
+        Url = string.Empty;
+        Enabled = true;
+        Address = string.Empty;
+        Remarks = string.Empty;
+        TestResult = string.Empty;
+        GroupId = string.Empty;
+        EnableConvert = false;
     }
 
     #region function
 
     public string GetSummary()
     {
-        var summary = string.Format("{0}", remarks);
+        var summary = $"{Remarks}";
         return summary;
     }
 
     #endregion function
 
-    public string indexId { get; set; }
+    public string IndexId { get; set; }
 
-    public int sort { get; set; }
+    public int Sort { get; set; }
 
-    public string address { get; set; }
+    public string Address { get; set; }
 
-    public string remarks { get; set; }
+    public string Remarks { get; set; }
 
-    public string testResult { get; set; }
+    public string TestResult { get; set; }
 
-    public string groupId { get; set; } = string.Empty;
-    public CoreKind? coreType { get; set; }
+    public string GroupId { get; set; } = string.Empty;
+    public CoreKind? CoreType { get; set; }
 
-    public string url { get; set; }
+    public string Url { get; set; }
 
-    public bool enabled { get; set; } = true;
+    public bool Enabled { get; set; } = true;
 
-    public string userAgent { get; set; } = string.Empty;
+    public string UserAgent { get; set; } = string.Empty;
 
-    public bool enableConvert { get; set; }
+    public bool EnableConvert { get; set; }
 
-    public long updateTime { get; set; }
-    public ulong uploadRemote { get; set; }
-    public ulong downloadRemote { get; set; }
-    public ulong totalRemote { get; set; }
-    public long expireRemote { get; set; }
+    public long UpdateTime { get; set; }
+    public ulong UploadRemote { get; set; }
+    public ulong DownloadRemote { get; set; }
+    public ulong TotalRemote { get; set; }
+    public long ExpireRemote { get; set; }
 }

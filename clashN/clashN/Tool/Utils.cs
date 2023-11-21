@@ -586,8 +586,8 @@ internal static class Utils
     {
         try
         {
-            string value = RegReadValue(autoRunRegPath, autoRunName, "");
-            string exePath = GetExePath();
+            var value = RegReadValue(autoRunRegPath, autoRunName, "");
+            var exePath = GetExePath();
             if (value?.Equals(exePath) == true || value?.Equals($"\"{exePath}\"") == true)
             {
                 return true;
@@ -607,7 +607,7 @@ internal static class Utils
     /// <returns></returns>
     public static string GetPath(string fileName)
     {
-        string startupPath = StartupPath();
+        var startupPath = StartupPath();
         if (IsNullOrEmpty(fileName))
         {
             return startupPath;
@@ -636,7 +636,7 @@ internal static class Utils
         try
         {
             regKey = Registry.CurrentUser.OpenSubKey(path, false);
-            string value = regKey?.GetValue(name) as string;
+            var value = regKey?.GetValue(name) as string;
             if (IsNullOrEmpty(value))
             {
                 return def;

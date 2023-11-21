@@ -110,8 +110,8 @@ internal class StatisticsHandler
                             ParseOutput(result, out ulong up, out ulong down);
                             if (up + down > 0)
                             {
-                                serverStatItem.uploadRemote += up;
-                                serverStatItem.downloadRemote += down;
+                                serverStatItem.UploadRemote += up;
+                                serverStatItem.DownloadRemote += down;
                             }
                             _updateFunc(up, down);
                         }

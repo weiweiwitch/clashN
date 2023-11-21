@@ -53,7 +53,7 @@ public static class SysProxyHandle
 
             if (type == SysProxyType.ForcedChange)
             {
-                var strExceptions = $"{config.ConstItem.defIEProxyExceptions};{config.SystemProxyExceptions}";
+                var strExceptions = $"{config.ConstItem.DefIeProxyExceptions};{config.SystemProxyExceptions}";
 
                 var strProxy = string.Empty;
                 if (string.IsNullOrEmpty(config.SystemProxyAdvancedProtocol))

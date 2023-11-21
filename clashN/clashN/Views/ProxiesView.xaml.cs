@@ -27,9 +27,9 @@ namespace ClashN.Views
                 this.Bind(ViewModel, vm => vm.SelectedDetail, v => v.LstProxyDetails.SelectedItem).DisposeWith(disposables);
 
                 this.BindCommand(ViewModel, vm => vm.ProxiesReloadCmd, v => v.MenuProxiesReload).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.ProxiesDelaytestCmd, v => v.MenuProxiesDelayTest).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ProxiesDelayTestCmd, v => v.MenuProxiesDelayTest).DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.ProxiesDelaytestPartCmd, v => v.MenuProxiesDelayTestPart).DisposeWith(disposables);
+                this.BindCommand(ViewModel, vm => vm.ProxiesDelayTestPartCmd, v => v.MenuProxiesDelayTestPart).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.ProxiesSelectActivityCmd, v => v.MenuProxiesSelectActivity).DisposeWith(disposables);
 
                 this.Bind(ViewModel, vm => vm.SystemProxySelected, v => v.CmbSystemProxy.SelectedIndex).DisposeWith(disposables);

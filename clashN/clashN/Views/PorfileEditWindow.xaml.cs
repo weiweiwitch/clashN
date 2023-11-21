@@ -21,14 +21,14 @@ namespace ClashN.Views
             });
             this.WhenActivated(disposables =>
             {
-                this.Bind(ViewModel, vm => vm.SelectedSource.remarks, v => v.TxtRemarks.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedSource.url, v => v.TxtUrl.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedSource.address, v => v.TxtAddress.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedSource.userAgent, v => v.TxtUserAgent.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.Remarks, v => v.TxtRemarks.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.Url, v => v.TxtUrl.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.Address, v => v.TxtAddress.Text).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.UserAgent, v => v.TxtUserAgent.Text).DisposeWith(disposables);
 
                 this.Bind(ViewModel, vm => vm.CoreType, v => v.CmbCoreType.Text).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedSource.enabled, v => v.TogEnabled.IsChecked).DisposeWith(disposables);
-                this.Bind(ViewModel, vm => vm.SelectedSource.enableConvert, v => v.TogEnableConvert.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.Enabled, v => v.TogEnabled.IsChecked).DisposeWith(disposables);
+                this.Bind(ViewModel, vm => vm.SelectedSource.EnableConvert, v => v.TogEnableConvert.IsChecked).DisposeWith(disposables);
 
                 this.BindCommand(ViewModel, vm => vm.BrowseProfileCmd, v => v.BtnBrowse).DisposeWith(disposables);
                 this.BindCommand(ViewModel, vm => vm.EditProfileCmd, v => v.BtnEdit).DisposeWith(disposables);

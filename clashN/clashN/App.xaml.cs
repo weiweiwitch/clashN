@@ -9,20 +9,22 @@ namespace ClashN;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application
+public partial class App
 {
-    public static EventWaitHandle? ProgramStarted;
+    public static readonly EventWaitHandle? ProgramStarted;
+    
     private Config? _config;
 
     static App()
     {
-        ProgramStarted = new EventWaitHandle(false, EventResetMode.AutoReset, "ProgramStartedEvent", out bool bCreatedNew);
+        ProgramStarted = new EventWaitHandle(false, EventResetMode.AutoReset, "ProgramStartedEvent", out var bCreatedNew);
         if (!bCreatedNew)
         {
             ProgramStarted.Set();
-            App.Current.Shutdown();
+            
+            Current.Shutdown();
+            
             Environment.Exit(-1);
-            return;
         }
     }
 
@@ -30,7 +32,7 @@ public partial class App : Application
     {
         // Locator.CurrentMutable.RegisterViewsForViewModels(Assembly.GetCallingAssembly());
 
-        this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+        DispatcherUnhandledException += App_DispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
     }

@@ -46,8 +46,8 @@ namespace ClashN.ViewModels
             _noticeHandler = Locator.Current.GetService<NoticeHandler>();
 
             AutoRefreshInterval = 10;
-            SortingSelected = _config.UiItem.connectionsSorting;
-            AutoRefresh = _config.UiItem.connectionsAutoRefresh;
+            SortingSelected = _config.UiItem.ConnectionsSorting;
+            AutoRefresh = _config.UiItem.ConnectionsAutoRefresh;
 
             var canEditRemove = this.WhenAnyValue(
              x => x.SelectedSource,
@@ -61,7 +61,7 @@ namespace ClashN.ViewModels
             this.WhenAnyValue(
                x => x.AutoRefresh,
                y => y == true)
-                   .Subscribe(c => { _config.UiItem.connectionsAutoRefresh = AutoRefresh; });
+                   .Subscribe(c => { _config.UiItem.ConnectionsAutoRefresh = AutoRefresh; });
 
             ConnectionCloseCmd = ReactiveCommand.Create(() =>
             {
@@ -82,9 +82,9 @@ namespace ClashN.ViewModels
             {
                 return;
             }
-            if (SortingSelected != _config.UiItem.connectionsSorting)
+            if (SortingSelected != _config.UiItem.ConnectionsSorting)
             {
-                _config.UiItem.connectionsSorting = SortingSelected;
+                _config.UiItem.ConnectionsSorting = SortingSelected;
             }
 
             GetClashConnections();

@@ -37,9 +37,9 @@ public sealed class LazyConfig
 
     public static CoreKind GetCoreType(ProfileItem profileItem)
     {
-        if (profileItem != null && profileItem.coreType != null)
+        if (profileItem != null && profileItem.CoreType != null)
         {
-            return (CoreKind)profileItem.coreType;
+            return (CoreKind)profileItem.CoreType;
         }
 
         return CoreKind.Clash;

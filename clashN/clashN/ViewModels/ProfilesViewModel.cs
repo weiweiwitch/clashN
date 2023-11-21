@@ -59,7 +59,7 @@ public class ProfilesViewModel : ReactiveObject
 
         var canEditRemove = this.WhenAnyValue(
             x => x.SelectedSource,
-            selectedSource => selectedSource != null && !string.IsNullOrEmpty(selectedSource.indexId));
+            selectedSource => selectedSource != null && !string.IsNullOrEmpty(selectedSource.IndexId));
 
         //Profile
         EditLocalFileCmd = ReactiveCommand.Create(() => { EditLocalFile(); }, canEditRemove);
@@ -95,7 +95,7 @@ public class ProfilesViewModel : ReactiveObject
 
     private void EditLocalFile()
     {
-        var address = SelectedSource.address;
+        var address = SelectedSource.Address;
         if (string.IsNullOrEmpty(address))
         {
             _noticeHandler?.Enqueue(ResUI.FillProfileAddressCustom);
@@ -120,12 +120,12 @@ public class ProfilesViewModel : ReactiveObject
         {
             item = new()
             {
-                coreType = CoreKind.ClashMeta
+                CoreType = CoreKind.ClashMeta
             };
         }
         else
         {
-            item = _config.GetProfileItem(SelectedSource.indexId);
+            item = _config.GetProfileItem(SelectedSource.IndexId);
             if (item is null)
             {
                 return;
@@ -145,11 +145,11 @@ public class ProfilesViewModel : ReactiveObject
 
     public async Task ScanScreenTaskAsync()
     {
-        Locator.Current.GetService<MainWindowViewModel>()?.ShowHideWindow(false);
+        MainWindowViewModel.ShowHideWindow(false);
 
-        string result = await Task.Run(() => { return Utils.ScanScreen(); });
+        var result = await Task.Run(() => { return Utils.ScanScreen(); });
 
-        Locator.Current.GetService<MainWindowViewModel>()?.ShowHideWindow(true);
+        MainWindowViewModel.ShowHideWindow(true);
 
         if (string.IsNullOrEmpty(result))
         {
@@ -168,13 +168,13 @@ public class ProfilesViewModel : ReactiveObject
 
     public void AddProfilesViaClipboard(bool bClear)
     {
-        string? clipboardData = Utils.GetClipboardData();
+        var clipboardData = Utils.GetClipboardData();
         if (string.IsNullOrEmpty(clipboardData))
         {
             return;
         }
 
-        int ret = ConfigProc.AddBatchProfiles(ref _config, clipboardData, "", "");
+        var ret = ConfigProc.AddBatchProfiles(ref _config, clipboardData, "", "");
         if (ret == 0)
         {
             if (bClear)
@@ -189,7 +189,7 @@ public class ProfilesViewModel : ReactiveObject
 
     public void ExportProfile2Clipboard()
     {
-        var item = _config.GetProfileItem(SelectedSource.indexId);
+        var item = _config.GetProfileItem(SelectedSource.IndexId);
         if (item is null)
         {
             return;
@@ -198,7 +198,7 @@ public class ProfilesViewModel : ReactiveObject
         var content = ConfigProc.GetProfileContent(item);
         if (string.IsNullOrEmpty(content))
         {
-            content = item.url;
+            content = item.Url;
         }
 
         Utils.SetClipboardData(content);
@@ -211,7 +211,7 @@ public class ProfilesViewModel : ReactiveObject
         List<ProfileItem> profileItems = null;
         if (blSelected)
         {
-            var item = _config.GetProfileItem(SelectedSource.indexId);
+            var item = _config.GetProfileItem(SelectedSource.IndexId);
             profileItems = new List<ProfileItem>() { item };
         }
 
@@ -231,7 +231,7 @@ public class ProfilesViewModel : ReactiveObject
 
     public void RemoveProfile()
     {
-        var item = _config.GetProfileItem(SelectedSource.indexId);
+        var item = _config.GetProfileItem(SelectedSource.IndexId);
         if (item is null)
         {
             return;
@@ -253,7 +253,7 @@ public class ProfilesViewModel : ReactiveObject
 
     private void CloneProfile()
     {
-        var item = _config.GetProfileItem(SelectedSource.indexId);
+        var item = _config.GetProfileItem(SelectedSource.IndexId);
         if (item is null)
         {
             return;
@@ -268,17 +268,17 @@ public class ProfilesViewModel : ReactiveObject
 
     public void SetDefaultProfile()
     {
-        if (string.IsNullOrEmpty(SelectedSource?.indexId))
+        if (string.IsNullOrEmpty(SelectedSource?.IndexId))
         {
             return;
         }
 
-        if (SelectedSource?.indexId == _config.IndexId)
+        if (SelectedSource?.IndexId == _config.IndexId)
         {
             return;
         }
 
-        var item = _config.GetProfileItem(SelectedSource.indexId);
+        var item = _config.GetProfileItem(SelectedSource.IndexId);
         if (item is null)
         {
             _noticeHandler?.Enqueue(ResUI.PleaseSelectProfile);
@@ -299,7 +299,7 @@ public class ProfilesViewModel : ReactiveObject
         ConfigProc.SetDefaultProfile(_config, _config.ProfileItems);
 
         var lstModel = new List<ProfileItemModel>();
-        foreach (var item in _config.ProfileItems.OrderBy(it => it.sort))
+        foreach (var item in _config.ProfileItems.OrderBy(it => it.Sort))
         {
             var model = Utils.FromJson<ProfileItemModel>(Utils.ToJson(item));
             model.IsActive = _config.IsActiveNode(item);
@@ -327,22 +327,22 @@ public class ProfilesViewModel : ReactiveObject
 
     public async void ProfileQrcode()
     {
-        var item = _config.GetProfileItem(SelectedSource.indexId);
+        var item = _config.GetProfileItem(SelectedSource.IndexId);
         if (item is null)
         {
             return;
         }
 
-        if (string.IsNullOrEmpty(item.url))
+        if (string.IsNullOrEmpty(item.Url))
         {
             return;
         }
 
-        var img = QRCodeHelper.GetQRCode(item.url);
+        var img = QRCodeHelper.GetQRCode(item.Url);
         var dialog = new ProfileQrcodeView()
         {
             ImgQrcode = { Source = img },
-            TxtContent = { Text = item.url },
+            TxtContent = { Text = item.Url },
         };
 
         await DialogHost.Show(dialog, "RootDialog");

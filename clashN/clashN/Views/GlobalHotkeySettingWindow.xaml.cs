@@ -49,7 +49,7 @@ namespace ClashN.Views
 
             BindingData(-1);
 
-            Utils.SetDarkBorder(this, _config.UiItem.colorModeDark);
+            Utils.SetDarkBorder(this, _config.UiItem.ColorModeDark);
         }
 
         private void TxtGlobalHotkey_KeyDown(object sender, KeyEventArgs e)

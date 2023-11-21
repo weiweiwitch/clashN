@@ -6,8 +6,10 @@ using NHotkey.Wpf;
 using Splat;
 using System.Drawing;
 using System.IO;
+using System.Timers;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Threading;
 using ClashN.Tool;
 using static ClashN.Mode.ClashProxies;
 
@@ -15,13 +17,13 @@ namespace ClashN.Handler;
 
 public sealed class MainFormHandler
 {
-    private static readonly Lazy<MainFormHandler> instance = new Lazy<MainFormHandler>(() => new MainFormHandler());
+    private static Lazy<MainFormHandler> _instance = new(() => new MainFormHandler());
 
-    public static MainFormHandler Instance
-    {
-        get { return instance.Value; }
-    }
+    public static MainFormHandler Instance => _instance.Value;
 
+    private DispatcherTimer? _updateTaskDispatcherTimer;
+    private DateTime _autoUpdateSubTime;
+    
     public Icon GetNotifyIcon(Config config)
     {
         try
@@ -104,77 +106,66 @@ public sealed class MainFormHandler
         }
     }
 
-    public static void UpdateTask(Config config, Action<bool, string> update)
+    public void StartAllTimerTask()
     {
-        Task.Run(() => UpdateTaskRun(config, update));
+        _updateTaskDispatcherTimer?.Start();
     }
 
-    private static void UpdateTaskRun(Config config, Action<bool, string> update)
+    public void StopAllTimerTask()
     {
-        Utils.SaveLogDebug($"MainFormHandler:UpdateTaskRun - UpdateTaskRun");
-
-        var autoUpdateSubTime = DateTime.Now;
-        //var autoUpdateGeoTime = DateTime.Now;
-
-        const int delayTime = 60000;
-        Thread.Sleep(delayTime);
-        Utils.SaveLog($"MainFormHandler:UpdateTaskRun - start to UpdateTaskRun after {delayTime / 1000}s");
-
-        var updateHandle = new UpdateHandle();
-        while (true)
+        _updateTaskDispatcherTimer?.Stop();
+    }
+    
+    public void CreateUpdateTask(Config config, Action<bool, string> update)
+    {
+        Utils.SaveLog($"MainFormHandler:CreateUpdateTask - start to CreateUpdateTask");
+        
+        _autoUpdateSubTime = DateTime.Now;
+        
+        _updateTaskDispatcherTimer = new DispatcherTimer
         {
+            Interval = TimeSpan.FromHours(1)
+        };
+        _updateTaskDispatcherTimer.Tick += (_, _) =>
+        {
+            Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Run");
+
+            var updateHandle = new UpdateHandle();
             var dtNow = DateTime.Now;
 
-            if (config.AutoUpdateSubInterval > 0)
+            if (config.AutoUpdateSubInterval <= 0)
             {
-                if ((dtNow - autoUpdateSubTime).Hours % config.AutoUpdateSubInterval == 0)
-                {
-                    updateHandle.UpdateSubscriptionProcess(config, true, null, (success, msg) =>
-                    {
-                        update(success, msg);
-                        if (success)
-                        {
-                            Utils.SaveLog("subscription" + msg);
-                        }
-                    });
-                    autoUpdateSubTime = dtNow;
-                }
-
-                Thread.Sleep(delayTime);
+                return;
             }
 
-            //if (config.autoUpdateInterval > 0)
-            //{
-            //    if ((dtNow - autoUpdateGeoTime).Hours % config.autoUpdateInterval == 0)
-            //    {
-            //        updateHandle.UpdateGeoFile("geosite", config, (bool success, string msg) =>
-            //        {
-            //            update(false, msg);
-            //            if (success)
-            //                Utils.SaveLog("geosite" + msg);
-            //        });
-
-            //        updateHandle.UpdateGeoFile("geoip", config, (bool success, string msg) =>
-            //        {
-            //            update(false, msg);
-            //            if (success)
-            //                Utils.SaveLog("geoip" + msg);
-            //        });
-            //        autoUpdateGeoTime = dtNow;
-            //    }
-            //}
-
-            Thread.Sleep(1000 * 3600);
-        }
+            var diffTime = dtNow - _autoUpdateSubTime;
+            if (diffTime.Hours % config.AutoUpdateSubInterval != 0)
+            {
+                return;
+            }
+            
+            Task.Run(() =>
+            {
+                Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Run In Thread");
+                updateHandle.UpdateSubscriptionProcess(config, true, null, (success, msg) =>
+                {
+                    update(success, msg);
+                    if (success)
+                    {
+                        Utils.SaveLog("subscription" + msg);
+                    }
+                });
+            });
+            
+            _autoUpdateSubTime = dtNow;
+        };
     }
 
-    public void RegisterGlobalHotkey(Config config, EventHandler<HotkeyEventArgs> handler, Action<bool, string> update)
+    public static void RegisterGlobalHotkey(Config config, EventHandler<HotkeyEventArgs> handler,
+        Action<bool, string> update)
     {
-        if (config.GlobalHotkeys == null)
-        {
-            return;
-        }
-
+        Utils.SaveLog($"MainFormHandler:RegisterGlobalHotkey");
+        
         foreach (var item in config.GlobalHotkeys)
         {
             if (item.KeyCode == null)
@@ -216,12 +207,12 @@ public sealed class MainFormHandler
         }
     }
 
-    public void GetClashProxies(Config config, Action<ClashProxies, ClashProviders> update)
+    public void GetClashProxies(Action<ClashProxies, ClashProviders> update)
     {
-        Task.Run(() => GetClashProxiesAsync(config, update));
+        Task.Run(() => GetClashProxiesAsync(update));
     }
 
-    private async Task GetClashProxiesAsync(Config config, Action<ClashProxies, ClashProviders> update)
+    private async Task GetClashProxiesAsync(Action<ClashProxies, ClashProviders> update)
     {
         for (var i = 0; i < 5; i++)
         {
@@ -289,7 +280,7 @@ public sealed class MainFormHandler
             }
 
             var urlBase = $"{GetApiUrl()}/proxies";
-            urlBase += @"/{0}/delay?timeout=10000&url=" + LazyConfig.Instance.Config.ConstItem.speedPingTestUrl;
+            urlBase += @"/{0}/delay?timeout=10000&url=" + LazyConfig.Instance.Config.ConstItem.SpeedPingTestUrl;
 
             var tasks = new List<Task>();
             foreach (var it in lstProxy)
@@ -351,7 +342,7 @@ public sealed class MainFormHandler
         try
         {
             var url = $"{GetApiUrl()}/proxies/{name}";
-            Dictionary<string, string> headers = new Dictionary<string, string>();
+            var headers = new Dictionary<string, string>();
             headers.Add("name", nameNode);
             await HttpClientHelper.GetInstance().PutAsync(url, headers);
         }

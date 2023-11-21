@@ -53,7 +53,7 @@ internal class CoreHandler
             return;
         }
 
-        if (config.EnableTun && item.coreType == CoreKind.Clash)
+        if (config.EnableTun && item.CoreType == CoreKind.Clash)
         {
             ShowMsg(true, LogType.Log4ClashN, ResUI.TunModeCoreTip);
             return;

@@ -34,7 +34,7 @@ namespace ClashN.ViewModels
             _noticeHandler = Locator.Current.GetService<NoticeHandler>();
             _config = LazyConfig.Instance.Config;
 
-            if (string.IsNullOrEmpty(profileItem.indexId))
+            if (string.IsNullOrEmpty(profileItem.IndexId))
             {
                 SelectedSource = profileItem;
             }
@@ -44,7 +44,7 @@ namespace ClashN.ViewModels
             }
 
             _view = view;
-            CoreType = (SelectedSource.coreType ?? CoreKind.Clash).ToString();
+            CoreType = (SelectedSource.CoreType ?? CoreKind.Clash).ToString();
 
             BrowseProfileCmd = ReactiveCommand.Create(() =>
             {
@@ -61,12 +61,12 @@ namespace ClashN.ViewModels
                 SaveProfile();
             });
 
-            Utils.SetDarkBorder(view, _config.UiItem.colorModeDark);
+            Utils.SetDarkBorder(view, _config.UiItem.ColorModeDark);
         }
 
         private void SaveProfile()
         {
-            string remarks = SelectedSource.remarks;
+            string remarks = SelectedSource.Remarks;
             if (string.IsNullOrEmpty(remarks))
             {
                 _noticeHandler?.Enqueue(ResUI.PleaseFillRemarks);
@@ -75,27 +75,27 @@ namespace ClashN.ViewModels
 
             if (string.IsNullOrEmpty(CoreType))
             {
-                SelectedSource.coreType = null;
+                SelectedSource.CoreType = null;
             }
             else
             {
-                SelectedSource.coreType = (CoreKind)Enum.Parse(typeof(CoreKind), CoreType);
+                SelectedSource.CoreType = (CoreKind)Enum.Parse(typeof(CoreKind), CoreType);
             }
 
-            var item = _config.GetProfileItem(SelectedSource.indexId);
+            var item = _config.GetProfileItem(SelectedSource.IndexId);
             if (item is null)
             {
                 item = SelectedSource;
             }
             else
             {
-                item.remarks = SelectedSource.remarks;
-                item.url = SelectedSource.url;
-                item.address = SelectedSource.address;
-                item.userAgent = SelectedSource.userAgent;
-                item.coreType = SelectedSource.coreType;
-                item.enabled = SelectedSource.enabled;
-                item.enableConvert = SelectedSource.enableConvert;
+                item.Remarks = SelectedSource.Remarks;
+                item.Url = SelectedSource.Url;
+                item.Address = SelectedSource.Address;
+                item.UserAgent = SelectedSource.UserAgent;
+                item.CoreType = SelectedSource.CoreType;
+                item.Enabled = SelectedSource.Enabled;
+                item.EnableConvert = SelectedSource.EnableConvert;
             }
 
             if (ConfigProc.EditProfile(ref _config, item) == 0)
@@ -132,7 +132,7 @@ namespace ClashN.ViewModels
             {
                 return;
             }
-            var item = _config.GetProfileItem(SelectedSource.indexId);
+            var item = _config.GetProfileItem(SelectedSource.IndexId);
             if (item is null)
             {
                 item = SelectedSource;
@@ -151,7 +151,7 @@ namespace ClashN.ViewModels
 
         private void EditProfile()
         {
-            var address = SelectedSource.address;
+            var address = SelectedSource.Address;
             if (string.IsNullOrEmpty(address))
             {
                 _noticeHandler?.Enqueue(ResUI.FillProfileAddressCustom);

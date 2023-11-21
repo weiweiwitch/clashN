@@ -198,8 +198,10 @@ public class MainWindowViewModel : ReactiveObject
         Global.ShowInTaskbar = true; //Application.Current.MainWindow.ShowInTaskbar;
     }
 
-    private void OnProgramStarted(object state, bool timeout)
+    private void OnProgramStarted(object? state, bool timeout)
     {
+        Utils.SaveLog("MainWindowViewModel:OnProgramStarted");
+        
         Application.Current.Dispatcher.Invoke((Action)(() =>
         {
             var clipboardData = Utils.GetClipboardData();
@@ -214,6 +216,8 @@ public class MainWindowViewModel : ReactiveObject
             ShowHideWindow(true);
 
             Locator.Current.GetService<ProfilesViewModel>()?.AddProfilesViaClipboard(true);
+            
+            MainFormHandler.Instance.StartAllTimerTask();
         }));
     }
 
@@ -235,7 +239,6 @@ public class MainWindowViewModel : ReactiveObject
 
             StorageUI();
             ConfigProc.SaveConfig(_config);
-            //statistics?.SaveToFile();
             _statistics?.Close();
         }
         catch
@@ -248,7 +251,7 @@ public class MainWindowViewModel : ReactiveObject
         }
     }
 
-    private void OnHotkeyHandler(object sender, HotkeyEventArgs e)
+    private void OnHotkeyHandler(object? sender, HotkeyEventArgs e)
     {
         switch (Utils.ToInt(e.Name))
         {
@@ -288,8 +291,8 @@ public class MainWindowViewModel : ReactiveObject
             _statistics = new StatisticsHandler(_config, UpdateStatisticsHandler);
         }
 
-        MainFormHandler.UpdateTask(_config, UpdateTaskHandler);
-        MainFormHandler.Instance.RegisterGlobalHotkey(_config, OnHotkeyHandler, UpdateTaskHandler);
+        MainFormHandler.Instance.CreateUpdateTask(_config, UpdateTaskHandler);
+        MainFormHandler.RegisterGlobalHotkey(_config, OnHotkeyHandler, UpdateTaskHandler);
 
         OnProgramStarted("shown", true);
     }
@@ -355,9 +358,9 @@ public class MainWindowViewModel : ReactiveObject
         Global.reloadCore = false;
 
         ConfigProc.SaveConfig(_config, false);
-        //statistics?.SaveToFile();
 
         ChangePACButtonStatus(_config.SysProxyType);
+
         SetRuleMode(_config.RuleMode);
 
         Locator.Current.GetService<ProxiesViewModel>()?.ProxiesReload();
@@ -368,7 +371,6 @@ public class MainWindowViewModel : ReactiveObject
     public void CloseCore()
     {
         ConfigProc.SaveConfig(_config, false);
-        //statistics?.SaveToFile();
 
         ChangePACButtonStatus(SysProxyType.ForcedClear);
 
@@ -396,16 +398,14 @@ public class MainWindowViewModel : ReactiveObject
     {
         SysProxyHandle.UpdateSysProxy(_config, false);
 
-        BlSystemProxyClear = (type == SysProxyType.ForcedClear);
-        BlSystemProxySet = (type == SysProxyType.ForcedChange);
-        BlSystemProxyNothing = (type == SysProxyType.Unchanged);
-        BlSystemProxyPac = (type == SysProxyType.Pac);
+        BlSystemProxyClear = type == SysProxyType.ForcedClear;
+        BlSystemProxySet = type == SysProxyType.ForcedChange;
+        BlSystemProxyNothing = type == SysProxyType.Unchanged;
+        BlSystemProxyPac = type == SysProxyType.Pac;
 
         NoticeHandler.SendMessage4ClashN($"Change system proxy");
 
         ConfigProc.SaveConfig(_config, false);
-
-        //mainMsgControl.DisplayToolStatus(config);
 
         NotifyIcon = MainFormHandler.Instance.GetNotifyIcon(_config);
     }
@@ -448,8 +448,10 @@ public class MainWindowViewModel : ReactiveObject
 
     #region UI
 
-    public void ShowHideWindow(bool? blShow)
+    public static void ShowHideWindow(bool? blShow)
     {
+        Utils.SaveLog($"MainWindowViewModel:ShowHideWindow");
+        
         var bl = blShow.HasValue ? blShow.Value : !Global.ShowInTaskbar;
         if (bl)
         {
@@ -469,18 +471,17 @@ public class MainWindowViewModel : ReactiveObject
             //Application.Current.MainWindow.ShowInTaskbar = false;
         }
 
-        ;
         Global.ShowInTaskbar = bl;
     }
 
     private void RestoreUI()
     {
-        ModifyTheme(_config.UiItem.colorModeDark);
+        ModifyTheme(_config.UiItem.ColorModeDark);
 
-        if (!string.IsNullOrEmpty(_config.UiItem.colorPrimaryName))
+        if (!string.IsNullOrEmpty(_config.UiItem.ColorPrimaryName))
         {
             var swatch =
-                new SwatchesProvider().Swatches.FirstOrDefault(t => t.Name == _config.UiItem.colorPrimaryName);
+                new SwatchesProvider().Swatches.FirstOrDefault(t => t.Name == _config.UiItem.ColorPrimaryName);
             if (swatch?.ExemplarHue.Color != null)
             {
                 ChangePrimaryColor(swatch.ExemplarHue.Color);
@@ -492,10 +493,10 @@ public class MainWindowViewModel : ReactiveObject
         //    this.Location = config.uiItem.mainLocation;
         //}
 
-        if (_config.UiItem.mainWidth > 0 && _config.UiItem.mainHeight > 0)
+        if (_config.UiItem.MainWidth > 0 && _config.UiItem.MainHeight > 0)
         {
-            Application.Current.MainWindow.Width = _config.UiItem.mainWidth;
-            Application.Current.MainWindow.Height = _config.UiItem.mainHeight;
+            Application.Current.MainWindow.Width = _config.UiItem.MainWidth;
+            Application.Current.MainWindow.Height = _config.UiItem.MainHeight;
         }
 
         var hWnd = new WindowInteropHelper(Application.Current.MainWindow).EnsureHandle();
@@ -513,8 +514,8 @@ public class MainWindowViewModel : ReactiveObject
 
     private void StorageUI()
     {
-        _config.UiItem.mainWidth = Application.Current.MainWindow.Width;
-        _config.UiItem.mainHeight = Application.Current.MainWindow.Height;
+        _config.UiItem.MainWidth = Application.Current.MainWindow.Width;
+        _config.UiItem.MainHeight = Application.Current.MainWindow.Height;
     }
 
     public void ModifyTheme(bool isDarkTheme)

@@ -41,7 +41,7 @@ internal static class CoreConfigHandler
                 File.Delete(fileName);
             }
 
-            string addressFileName = node.address;
+            string addressFileName = node.Address;
             if (string.IsNullOrEmpty(addressFileName))
             {
                 msg = ResUI.FailedGetDefaultConfiguration;
