@@ -19,6 +19,8 @@ internal static class CoreConfigHandler
     /// <returns></returns>
     public static int GenerateClientConfig(ProfileItem node, string fileName, bool blExport, out string msg)
     {
+        Utils.SaveLog("CoreConfigHandler:GenerateClientConfig - Start");
+        
         if (node == null)
         {
             msg = ResUI.CheckProfileSettings;
@@ -41,7 +43,7 @@ internal static class CoreConfigHandler
                 File.Delete(fileName);
             }
 
-            string addressFileName = node.Address;
+            var addressFileName = node.Address;
             if (string.IsNullOrEmpty(addressFileName))
             {
                 msg = ResUI.FailedGetDefaultConfiguration;
@@ -59,9 +61,9 @@ internal static class CoreConfigHandler
                 return -1;
             }
 
-            string tagYamlStr1 = "!<str>";
-            string tagYamlStr2 = "__strn__";
-            string tagYamlStr3 = "!!str";
+            var tagYamlStr1 = "!<str>";
+            var tagYamlStr2 = "__strn__";
+            var tagYamlStr3 = "!!str";
             var config = LazyConfig.Instance.Config;
             var txtFile = File.ReadAllText(addressFileName);
             txtFile = txtFile.Replace(tagYamlStr1, tagYamlStr2);
@@ -144,6 +146,8 @@ internal static class CoreConfigHandler
             LazyConfig.Instance.ProfileContent = fileContent;
 
             msg = string.Format(ResUI.SuccessfulConfiguration, $"{node.GetSummary()}");
+            
+            Utils.SaveLogDebug("CoreConfigHandler:GenerateClientConfig - Finished");
         }
         catch (Exception ex)
         {
@@ -195,8 +199,6 @@ internal static class CoreConfigHandler
                 fileContent[item.Key] = item.Value;
             }
         }
-
-        return;
     }
 
     private static void ModifyContentMerge(Dictionary<string, object> fileContent, string key, object value)

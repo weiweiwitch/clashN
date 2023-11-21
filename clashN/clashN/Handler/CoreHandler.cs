@@ -63,6 +63,8 @@ internal class CoreHandler
         Utils.SaveLogDebug($"CoreHandler:LoadCore - Load file: {fileName}");
         if (CoreConfigHandler.GenerateClientConfig(item, fileName, false, out var msg) != 0)
         {
+            Utils.SaveLogDebug("CoreHandler:LoadCore - GenerateClientConfig Failed");
+            
             CoreStop();
 
             ShowMsg(false, LogType.Log4ClashN, msg);
