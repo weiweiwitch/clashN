@@ -11,8 +11,6 @@ public class NoticeHandler
     public NoticeHandler(ISnackbarMessageQueue snackbarMessageQueue)
     {
         _snackbarMessageQueue = snackbarMessageQueue ?? throw new ArgumentNullException(nameof(snackbarMessageQueue));
-
-        //_snackbarMessageQueue = snackbarMessageQueue;
     }
 
     public void Enqueue(object content)

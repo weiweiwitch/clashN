@@ -15,12 +15,10 @@ namespace ClashN.Views;
 /// </summary>
 public partial class SettingsView
 {
-    private static Config _config;
-
     public SettingsView()
     {
         InitializeComponent();
-        _config = LazyConfig.Instance.Config;
+        
         ViewModel = new SettingsViewModel();
 
         Global.SubConvertUrls.ForEach(it => { CmbSubConvertUrl.Items.Add(it); });

@@ -1,18 +1,17 @@
 using ReactiveUI;
 
-namespace ClashN.Views
+namespace ClashN.Views;
+
+/// <summary>
+/// Interaction logic for DashboardView.xaml
+/// </summary>
+public partial class DashboardView
 {
-    /// <summary>
-    /// Interaction logic for DashboardView.xaml
-    /// </summary>
-    public partial class DashboardView
+    public DashboardView()
     {
-        public DashboardView()
+        InitializeComponent();
+        this.WhenActivated(disposables =>
         {
-            InitializeComponent();
-            this.WhenActivated(disposables =>
-            {
-            });
-        }
+        });
     }
 }

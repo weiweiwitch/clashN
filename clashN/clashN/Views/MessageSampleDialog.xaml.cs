@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace ClashN.Views
+namespace ClashN.Views;
+
+/// <summary>
+/// Interaction logic for MessageSampleDialog.xaml
+/// </summary>
+public partial class MessageSampleDialog : UserControl
 {
-    /// <summary>
-    /// Interaction logic for MessageSampleDialog.xaml
-    /// </summary>
-    public partial class MessageSampleDialog : UserControl
+    public MessageSampleDialog()
     {
-        public MessageSampleDialog()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

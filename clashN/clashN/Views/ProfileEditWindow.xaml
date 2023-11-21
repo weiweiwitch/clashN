@@ -1,5 +1,5 @@
 ﻿<reactiveui:ReactiveWindow
-    x:Class="ClashN.Views.PorfileEditWindow"
+    x:Class="ClashN.Views.ProfileEditWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Views="clr-namespace:ClashN.Views"

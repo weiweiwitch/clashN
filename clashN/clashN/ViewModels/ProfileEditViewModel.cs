@@ -17,7 +17,7 @@ namespace ClashN.ViewModels
     {
         private static Config _config;
         private NoticeHandler? _noticeHandler;
-        private PorfileEditWindow _view;
+        private ProfileEditWindow _view;
 
         [Reactive]
         public ProfileItem SelectedSource { get; set; }
@@ -29,7 +29,7 @@ namespace ClashN.ViewModels
         public ReactiveCommand<Unit, Unit> EditProfileCmd { get; }
         public ReactiveCommand<Unit, Unit> SaveProfileCmd { get; }
 
-        public ProfileEditViewModel(ProfileItem profileItem, PorfileEditWindow view)
+        public ProfileEditViewModel(ProfileItem profileItem, ProfileEditWindow view)
         {
             _noticeHandler = Locator.Current.GetService<NoticeHandler>();
             _config = LazyConfig.Instance.Config;

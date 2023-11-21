@@ -17,47 +17,43 @@ namespace ClashN.ViewModels;
 
 public class ProxiesViewModel : ReactiveObject
 {
-    private static Config _config;
-    private NoticeHandler? _noticeHandler;
-    private Dictionary<string, ProxiesItem> proxies;
-    private Dictionary<string, ProvidersItem> providers;
-    private int delayTimeout = 99999999;
+    private const int DelayTimeout = 99999999;
 
+    private static Config _config;
+
+    private NoticeHandler? _noticeHandler;
+    private Dictionary<string, ProxiesItem> _proxies;
+    private Dictionary<string, ProvidersItem> _providers;
+    
     private IObservableCollection<ProxyModel> _proxyGroups = new ObservableCollectionExtended<ProxyModel>();
     private IObservableCollection<ProxyModel> _proxyDetails = new ObservableCollectionExtended<ProxyModel>();
 
     public IObservableCollection<ProxyModel> ProxyGroups => _proxyGroups;
     public IObservableCollection<ProxyModel> ProxyDetails => _proxyDetails;
 
-    [Reactive]
-    public ProxyModel SelectedGroup { get; set; }
+    [Reactive] public ProxyModel SelectedGroup { get; set; }
 
-    [Reactive]
-    public ProxyModel SelectedDetail { get; set; }
+    [Reactive] public ProxyModel SelectedDetail { get; set; }
 
     public ReactiveCommand<Unit, Unit> ProxiesReloadCmd { get; }
     public ReactiveCommand<Unit, Unit> ProxiesDelayTestCmd { get; }
     public ReactiveCommand<Unit, Unit> ProxiesDelayTestPartCmd { get; }
     public ReactiveCommand<Unit, Unit> ProxiesSelectActivityCmd { get; }
 
-    [Reactive]
-    public int SystemProxySelected { get; set; }
+    [Reactive] public int SystemProxySelected { get; set; }
 
-    [Reactive]
-    public int RuleModeSelected { get; set; }
+    [Reactive] public int RuleModeSelected { get; set; }
 
-    [Reactive]
-    public int SortingSelected { get; set; }
+    [Reactive] public int SortingSelected { get; set; }
 
-    [Reactive]
-    public bool AutoRefresh { get; set; }
+    [Reactive] public bool AutoRefresh { get; set; }
 
-    [Reactive]
-    public bool EnableTun { get; set; }
+    [Reactive] public bool EnableTun { get; set; }
 
     public ProxiesViewModel()
     {
         _noticeHandler = Locator.Current.GetService<NoticeHandler>();
+        
         _config = LazyConfig.Instance.Config;
 
         SelectedGroup = new ProxyModel();
@@ -97,23 +93,11 @@ public class ProxiesViewModel : ReactiveObject
                 y => y == true)
             .Subscribe(c => { _config.UiItem.ProxiesAutoRefresh = AutoRefresh; });
 
-        ProxiesReloadCmd = ReactiveCommand.Create(() =>
-        {
-            ProxiesReload();
-        });
-        ProxiesDelayTestCmd = ReactiveCommand.Create(() =>
-        {
-            ProxiesDelayTest(true);
-        });
+        ProxiesReloadCmd = ReactiveCommand.Create(() => { ProxiesReload(); });
+        ProxiesDelayTestCmd = ReactiveCommand.Create(() => { ProxiesDelayTest(true); });
 
-        ProxiesDelayTestPartCmd = ReactiveCommand.Create(() =>
-        {
-            ProxiesDelayTest(false);
-        });
-        ProxiesSelectActivityCmd = ReactiveCommand.Create(() =>
-        {
-            SetActiveProxy();
-        });
+        ProxiesDelayTestPartCmd = ReactiveCommand.Create(() => { ProxiesDelayTest(false); });
+        ProxiesSelectActivityCmd = ReactiveCommand.Create(() => { SetActiveProxy(); });
 
         ReloadSystemProxySelected();
         ReloadRuleModeSelected();
@@ -127,10 +111,12 @@ public class ProxiesViewModel : ReactiveObject
         {
             return;
         }
+
         if (_config.SysProxyType == (SysProxyType)SystemProxySelected)
         {
             return;
         }
+
         Locator.Current.GetService<MainWindowViewModel>()?.SetListenerType((SysProxyType)SystemProxySelected);
     }
 
@@ -140,10 +126,12 @@ public class ProxiesViewModel : ReactiveObject
         {
             return;
         }
+
         if (_config.RuleMode == (ERuleMode)RuleModeSelected)
         {
             return;
         }
+
         Locator.Current.GetService<MainWindowViewModel>()?.SetRuleModeCheck((ERuleMode)RuleModeSelected);
     }
 
@@ -153,6 +141,7 @@ public class ProxiesViewModel : ReactiveObject
         {
             return;
         }
+
         if (SortingSelected != _config.UiItem.ProxiesSorting)
         {
             _config.UiItem.ProxiesSorting = SortingSelected;
@@ -173,10 +162,10 @@ public class ProxiesViewModel : ReactiveObject
 
     public void ProxiesClear()
     {
-        proxies = null;
-        providers = null;
+        _proxies = null;
+        _providers = null;
 
-        LazyConfig.Instance.SetProxies(proxies);
+        LazyConfig.Instance.SetProxies(_proxies);
 
         Application.Current.Dispatcher.Invoke((Action)(() =>
         {
@@ -222,21 +211,19 @@ public class ProxiesViewModel : ReactiveObject
         MainFormHandler.Instance.GetClashProxies((it, it2) =>
         {
             UpdateHandler("Refresh Clash Proxies");
-                
-            proxies = it?.proxies;
-            providers = it2?.providers;
 
-            LazyConfig.Instance.SetProxies(proxies);
-            if (proxies == null)
+            _proxies = it?.proxies;
+            _providers = it2?.providers;
+
+            LazyConfig.Instance.SetProxies(_proxies);
+            if (_proxies == null)
             {
                 return;
             }
+
             if (refreshUI)
             {
-                Application.Current.Dispatcher.Invoke((Action)(() =>
-                {
-                    RefreshProxyGroups();
-                }));
+                Application.Current.Dispatcher.Invoke((Action)(() => { RefreshProxyGroups(); }));
             }
         });
     }
@@ -251,15 +238,17 @@ public class ProxiesViewModel : ReactiveObject
         {
             foreach (var it in proxyGroups)
             {
-                if (string.IsNullOrEmpty(it.name) || !proxies.ContainsKey(it.name))
+                if (string.IsNullOrEmpty(it.name) || !_proxies.ContainsKey(it.name))
                 {
                     continue;
                 }
-                var item = proxies[it.name];
+
+                var item = _proxies[it.name];
                 if (!Global.AllowSelectType.Contains(item.type.ToLower()))
                 {
                     continue;
                 }
+
                 _proxyGroups.Add(new ProxyModel()
                 {
                     now = item.now,
@@ -270,17 +259,19 @@ public class ProxiesViewModel : ReactiveObject
         }
 
         //from api
-        foreach (KeyValuePair<string, ProxiesItem> kv in proxies)
+        foreach (KeyValuePair<string, ProxiesItem> kv in _proxies)
         {
             if (!Global.AllowSelectType.Contains(kv.Value.type.ToLower()))
             {
                 continue;
             }
+
             var item = _proxyGroups.Where(t => t.name == kv.Key).FirstOrDefault();
             if (item != null && !string.IsNullOrEmpty(item.name))
             {
                 continue;
             }
+
             _proxyGroups.Add(new ProxyModel()
             {
                 now = kv.Value.now,
@@ -313,21 +304,24 @@ public class ProxiesViewModel : ReactiveObject
         {
             return;
         }
+
         var name = SelectedGroup?.name;
         if (string.IsNullOrEmpty(name))
         {
             return;
         }
-        if (proxies == null)
+
+        if (_proxies == null)
         {
             return;
         }
 
-        proxies.TryGetValue(name, out ProxiesItem proxy);
+        _proxies.TryGetValue(name, out ProxiesItem proxy);
         if (proxy == null || proxy.all == null)
         {
             return;
         }
+
         var lstDetails = new List<ProxyModel>();
         foreach (var item in proxy.all)
         {
@@ -338,6 +332,7 @@ public class ProxiesViewModel : ReactiveObject
             {
                 continue;
             }
+
             int delay = -1;
             if (proxy2.history.Count > 0)
             {
@@ -349,10 +344,11 @@ public class ProxiesViewModel : ReactiveObject
                 isActive = isActive,
                 name = item,
                 type = proxy2.type,
-                delay = delay <= 0 ? delayTimeout : delay,
+                delay = delay <= 0 ? DelayTimeout : delay,
                 delayName = delay <= 0 ? string.Empty : $"{delay}ms",
             });
         }
+
         //sort
         switch (SortingSelected)
         {
@@ -367,20 +363,22 @@ public class ProxiesViewModel : ReactiveObject
             default:
                 break;
         }
+
         _proxyDetails.AddRange(lstDetails);
     }
 
     private ProxiesItem TryGetProxy(string name)
     {
-        proxies.TryGetValue(name, out ProxiesItem proxy2);
+        _proxies.TryGetValue(name, out ProxiesItem proxy2);
         if (proxy2 != null)
         {
             return proxy2;
         }
+
         //from providers
-        if (providers != null)
+        if (_providers != null)
         {
-            foreach (KeyValuePair<string, ProvidersItem> kv in providers)
+            foreach (KeyValuePair<string, ProvidersItem> kv in _providers)
             {
                 if (Global.ProxyVehicleType.Contains(kv.Value.vehicleType.ToLower()))
                 {
@@ -392,6 +390,7 @@ public class ProxiesViewModel : ReactiveObject
                 }
             }
         }
+
         return null;
     }
 
@@ -401,20 +400,24 @@ public class ProxiesViewModel : ReactiveObject
         {
             return;
         }
+
         if (SelectedDetail == null || string.IsNullOrEmpty(SelectedDetail.name))
         {
             return;
         }
+
         var name = SelectedGroup.name;
         if (string.IsNullOrEmpty(name))
         {
             return;
         }
+
         var nameNode = SelectedDetail.name;
         if (string.IsNullOrEmpty(nameNode))
         {
             return;
         }
+
         var selectedProxy = TryGetProxy(name);
         if (selectedProxy == null || selectedProxy.type != "Selector")
         {
@@ -438,6 +441,7 @@ public class ProxiesViewModel : ReactiveObject
             //_proxyGroups.Remove(group);
             //_proxyGroups.Insert(index, group);
         }
+
         _noticeHandler?.Enqueue(ResUI.OperationSuccess);
 
         //RefreshProxyDetails(true);
@@ -455,10 +459,12 @@ public class ProxiesViewModel : ReactiveObject
                 GetClashProxies(true);
                 return;
             }
+
             if (string.IsNullOrEmpty(result))
             {
                 return;
             }
+
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 //UpdateHandler(false, $"{item.name}={result}");
@@ -473,14 +479,15 @@ public class ProxiesViewModel : ReactiveObject
                     }
                     else if (dicResult != null && dicResult.ContainsKey("message"))
                     {
-                        detail.delay = delayTimeout;
+                        detail.delay = DelayTimeout;
                         detail.delayName = $"{dicResult["message"]}";
                     }
                     else
                     {
-                        detail.delay = delayTimeout;
+                        detail.delay = DelayTimeout;
                         detail.delayName = String.Empty;
                     }
+
                     _proxyDetails.Replace(detail, Utils.DeepCopy(detail));
                 }
             }));
@@ -502,6 +509,7 @@ public class ProxiesViewModel : ReactiveObject
                 {
                     return;
                 }
+
                 var dtNow = DateTime.Now;
 
                 if (_config.AutoDelayTestInterval > 0)
@@ -511,6 +519,7 @@ public class ProxiesViewModel : ReactiveObject
                         ProxiesDelayTest();
                         autoDelayTestTime = dtNow;
                     }
+
                     Thread.Sleep(1000);
                 }
             });

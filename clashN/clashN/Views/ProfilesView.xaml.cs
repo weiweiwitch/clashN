@@ -20,7 +20,6 @@ public partial class ProfilesView
         InitializeComponent();
 
         ViewModel = new ProfilesViewModel();
-
         Locator.CurrentMutable.RegisterLazySingleton(() => ViewModel, typeof(ProfilesViewModel));
 
         LstProfiles.PreviewMouseDoubleClick += lstProfiles_PreviewMouseDoubleClick;

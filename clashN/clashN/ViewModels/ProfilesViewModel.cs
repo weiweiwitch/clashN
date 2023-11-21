@@ -132,7 +132,7 @@ public class ProfilesViewModel : ReactiveObject
             }
         }
 
-        PorfileEditWindow dialog = new PorfileEditWindow(item)
+        ProfileEditWindow dialog = new ProfileEditWindow(item)
         {
             Owner = App.Current.MainWindow,
         };

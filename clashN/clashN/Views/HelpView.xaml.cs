@@ -3,29 +3,29 @@ using ReactiveUI;
 using System.Reactive.Disposables;
 using ClashN.Tool;
 
-namespace ClashN.Views
+namespace ClashN.Views;
+
+/// <summary>
+/// Interaction logic for HelpView.xaml
+/// </summary>
+public partial class HelpView
 {
-    /// <summary>
-    /// Interaction logic for HelpView.xaml
-    /// </summary>
-    public partial class HelpView
+    public HelpView()
     {
-        public HelpView()
-        {
-            InitializeComponent();
-            ViewModel = new HelpViewModel();
+        InitializeComponent();
+            
+        ViewModel = new HelpViewModel();
 
-            this.WhenActivated(disposables =>
-            {
-                this.BindCommand(ViewModel, vm => vm.CheckUpdateCmd, v => v.BtnCheckUpdateN).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.CheckUpdateClashCoreCmd, v => v.BtnCheckUpdateClashCore).DisposeWith(disposables);
-                this.BindCommand(ViewModel, vm => vm.CheckUpdateClashMetaCoreCmd, v => v.BtnCheckUpdateClashMetaCore).DisposeWith(disposables);
-            });
-        }
-
-        private void BtnAbout_Click(object sender, System.Windows.RoutedEventArgs e)
+        this.WhenActivated(disposables =>
         {
-            Utils.ProcessStart(Global.AboutUrl);
-        }
+            this.BindCommand(ViewModel, vm => vm.CheckUpdateCmd, v => v.BtnCheckUpdateN).DisposeWith(disposables);
+            this.BindCommand(ViewModel, vm => vm.CheckUpdateClashCoreCmd, v => v.BtnCheckUpdateClashCore).DisposeWith(disposables);
+            this.BindCommand(ViewModel, vm => vm.CheckUpdateClashMetaCoreCmd, v => v.BtnCheckUpdateClashMetaCore).DisposeWith(disposables);
+        });
+    }
+
+    private void BtnAbout_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        Utils.ProcessStart(Global.AboutUrl);
     }
 }

@@ -2,57 +2,56 @@ using ReactiveUI;
 using System.Reactive.Linq;
 using System.Windows.Threading;
 
-namespace ClashN.Views
+namespace ClashN.Views;
+
+/// <summary>
+/// Interaction logic for MsgView.xaml
+/// </summary>
+public partial class MsgView
 {
-    /// <summary>
-    /// Interaction logic for MsgView.xaml
-    /// </summary>
-    public partial class MsgView
+    public MsgView()
     {
-        public MsgView()
-        {
-            InitializeComponent();
-            MessageBus.Current.Listen<string>("MsgView").Subscribe(x => DelegateAppendText(x));
-        }
+        InitializeComponent();
+        MessageBus.Current.Listen<string>("MsgView").Subscribe(x => DelegateAppendText(x));
+    }
 
-        private void DelegateAppendText(string msg)
-        {
-            Dispatcher.BeginInvoke(new Action<string>(AppendText), DispatcherPriority.Send, msg);
-        }
+    private void DelegateAppendText(string msg)
+    {
+        Dispatcher.BeginInvoke(new Action<string>(AppendText), DispatcherPriority.Send, msg);
+    }
 
-        public void AppendText(string msg)
-        {
-            //if (!string.IsNullOrEmpty(MsgFilter))
-            //{
-            //    if (!Regex.IsMatch(text, MsgFilter))
-            //    {
-            //        return;
-            //    }
-            //}
+    public void AppendText(string msg)
+    {
+        //if (!string.IsNullOrEmpty(MsgFilter))
+        //{
+        //    if (!Regex.IsMatch(text, MsgFilter))
+        //    {
+        //        return;
+        //    }
+        //}
 
-            ShowMsg(msg);
-        }
+        ShowMsg(msg);
+    }
 
-        private void ShowMsg(string msg)
+    private void ShowMsg(string msg)
+    {
+        if (TxtMsg.LineCount > 999)
         {
-            if (TxtMsg.LineCount > 999)
-            {
-                ClearMsg();
-            }
-            this.TxtMsg.AppendText(msg);
-            if (!msg.EndsWith(Environment.NewLine))
-            {
-                this.TxtMsg.AppendText(Environment.NewLine);
-            }
-            TxtMsg.ScrollToEnd();
+            ClearMsg();
         }
+        this.TxtMsg.AppendText(msg);
+        if (!msg.EndsWith(Environment.NewLine))
+        {
+            this.TxtMsg.AppendText(Environment.NewLine);
+        }
+        TxtMsg.ScrollToEnd();
+    }
 
-        public void ClearMsg()
+    public void ClearMsg()
+    {
+        Dispatcher.Invoke((Action)(() =>
         {
-            Dispatcher.Invoke((Action)(() =>
-            {
-                TxtMsg.Clear();
-            }));
-        }
+            TxtMsg.Clear();
+        }));
     }
 }
