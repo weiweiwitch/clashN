@@ -26,7 +26,7 @@ public class Config
 
     public SysProxyType SysProxyType { get; set; }
 
-    public ERuleMode ruleMode { get; set; }
+    public ERuleMode RuleMode { get; set; }
 
     public bool AllowLANConn { get; set; }
 
@@ -54,13 +54,13 @@ public class Config
 
     #region other entities
 
-    public List<ProfileItem> ProfileItems { get; } = new List<ProfileItem>();
+    public List<ProfileItem> ProfileItems { get; } = new();
 
     public UIItem? UiItem { get; set; }
 
     public ConstItem? ConstItem { get; set; }
 
-    public List<KeyShortcut> globalHotkeys { get; } = new List<KeyShortcut>();
+    public List<KeyShortcut> GlobalHotkeys { get; } = new();
 
     #endregion other entities
 
@@ -96,85 +96,4 @@ public class Config
     #endregion function
 }
 
-[Serializable]
-public class ProfileItem
-{
-    public ProfileItem()
-    {
-        indexId = string.Empty;
-        sort = 0;
-        url = string.Empty;
-        enabled = true;
-        address = string.Empty;
-        remarks = string.Empty;
-        testResult = string.Empty;
-        groupId = string.Empty;
-        enableConvert = false;
-    }
 
-    #region function
-
-    public string GetSummary()
-    {
-        string summary = string.Format("{0}", remarks);
-        return summary;
-    }
-
-    #endregion function
-
-    public string indexId { get; set; }
-
-    public int sort { get; set; }
-
-    public string address { get; set; }
-
-    public string remarks { get; set; }
-
-    public string testResult { get; set; }
-
-    public string groupId { get; set; } = string.Empty;
-    public CoreKind? coreType { get; set; }
-
-    public string url { get; set; }
-
-    public bool enabled { get; set; } = true;
-
-    public string userAgent { get; set; } = string.Empty;
-
-    public bool enableConvert { get; set; }
-
-    public long updateTime { get; set; }
-    public ulong uploadRemote { get; set; }
-    public ulong downloadRemote { get; set; }
-    public ulong totalRemote { get; set; }
-    public long expireRemote { get; set; }
-}
-
-[Serializable]
-public class UIItem
-{
-    public Point mainLocation { get; set; }
-
-    public double mainWidth { get; set; }
-    public double mainHeight { get; set; }
-
-    public bool colorModeDark { get; set; }
-    public string? colorPrimaryName { get; set; }
-    public string currentFontFamily { get; set; } = string.Empty;
-    public int currentFontSize { get; set; }
-
-    public int proxiesSorting { get; set; }
-    public bool proxiesAutoRefresh { get; set; }
-
-    public int connectionsSorting { get; set; }
-    public bool connectionsAutoRefresh { get; set; }
-}
-
-[Serializable]
-public class ConstItem
-{
-    public string subConvertUrl { get; set; } = string.Empty;
-    public string speedTestUrl { get; set; } = string.Empty;
-    public string speedPingTestUrl { get; set; } = string.Empty;
-    public string defIEProxyExceptions { get; set; } = string.Empty;
-}

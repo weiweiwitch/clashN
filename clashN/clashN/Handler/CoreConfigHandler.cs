@@ -8,7 +8,7 @@ namespace ClashN.Handler;
 /// <summary>
 /// Core配置文件处理类
 /// </summary>
-internal class CoreConfigHandler
+internal static class CoreConfigHandler
 {
     /// <summary>
     /// 生成配置文件
@@ -104,9 +104,9 @@ internal class CoreConfigHandler
             }
             else
             {
-                if (config.ruleMode != ERuleMode.Unchanged)
+                if (config.RuleMode != ERuleMode.Unchanged)
                 {
-                    fileContent["mode"] = config.ruleMode.ToString().ToLower();
+                    fileContent["mode"] = config.RuleMode.ToString().ToLower();
                 }
             }
 
@@ -201,8 +201,8 @@ internal class CoreConfigHandler
 
     private static void ModifyContentMerge(Dictionary<string, object> fileContent, string key, object value)
     {
-        bool blPrepend = false;
-        bool blRemoved = false;
+        var blPrepend = false;
+        var blRemoved = false;
         if (key.StartsWith("prepend-"))
         {
             blPrepend = true;

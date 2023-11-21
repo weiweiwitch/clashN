@@ -19,10 +19,11 @@ namespace ClashN.ViewModels;
 public class ProfilesViewModel : ReactiveObject
 {
     private static Config _config;
-    
+
     private readonly NoticeHandler? _noticeHandler;
 
-    private IObservableCollection<ProfileItemModel> _profileItems = new ObservableCollectionExtended<ProfileItemModel>();
+    private IObservableCollection<ProfileItemModel>
+        _profileItems = new ObservableCollectionExtended<ProfileItemModel>();
 
     public IObservableCollection<ProfileItemModel> ProfileItems => _profileItems;
 
@@ -45,8 +46,7 @@ public class ProfilesViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> ProfileReloadCmd { get; }
     public ReactiveCommand<Unit, Unit> ProfileQrcodeCmd { get; }
 
-    [Reactive]
-    public ProfileItemModel SelectedSource { get; set; }
+    [Reactive] public ProfileItemModel SelectedSource { get; set; }
 
     public ProfilesViewModel()
     {
@@ -62,79 +62,35 @@ public class ProfilesViewModel : ReactiveObject
             selectedSource => selectedSource != null && !string.IsNullOrEmpty(selectedSource.indexId));
 
         //Profile
-        EditLocalFileCmd = ReactiveCommand.Create(() =>
-        {
-            EditLocalFile();
-        }, canEditRemove);
+        EditLocalFileCmd = ReactiveCommand.Create(() => { EditLocalFile(); }, canEditRemove);
 
-        EditProfileCmd = ReactiveCommand.Create(() =>
-        {
-            EditProfile(false);
-        }, canEditRemove);
+        EditProfileCmd = ReactiveCommand.Create(() => { EditProfile(false); }, canEditRemove);
 
-        AddProfileCmd = ReactiveCommand.Create(() =>
-        {
-            EditProfile(true);
-        });
-        AddProfileViaScanCmd = ReactiveCommand.CreateFromTask(() =>
-        {
-            return ScanScreenTaskAsync();
-        });
-        AddProfileViaClipboardCmd = ReactiveCommand.Create(() =>
-        {
-            AddProfilesViaClipboard(false);
-        });
+        AddProfileCmd = ReactiveCommand.Create(() => { EditProfile(true); });
+        AddProfileViaScanCmd = ReactiveCommand.CreateFromTask(() => { return ScanScreenTaskAsync(); });
+        AddProfileViaClipboardCmd = ReactiveCommand.Create(() => { AddProfilesViaClipboard(false); });
 
-        ExportProfileCmd = ReactiveCommand.Create(() =>
-        {
-            ExportProfile2Clipboard();
-        }, canEditRemove);
+        ExportProfileCmd = ReactiveCommand.Create(() => { ExportProfile2Clipboard(); }, canEditRemove);
 
         //Subscription
-        SubUpdateCmd = ReactiveCommand.Create(() =>
-        {
-            UpdateSubscriptionProcess(false, false);
-        });
-        SubUpdateSelectedCmd = ReactiveCommand.Create(() =>
-        {
-            UpdateSubscriptionProcess(false, true);
-        }, canEditRemove);
-        SubUpdateViaProxyCmd = ReactiveCommand.Create(() =>
-        {
-            UpdateSubscriptionProcess(true, false);
-        });
-        SubUpdateSelectedViaProxyCmd = ReactiveCommand.Create(() =>
-        {
-            UpdateSubscriptionProcess(true, true);
-        }, canEditRemove);
+        SubUpdateCmd = ReactiveCommand.Create(() => { UpdateSubscriptionProcess(false, false); });
+        SubUpdateSelectedCmd = ReactiveCommand.Create(() => { UpdateSubscriptionProcess(false, true); }, canEditRemove);
+        SubUpdateViaProxyCmd = ReactiveCommand.Create(() => { UpdateSubscriptionProcess(true, false); });
+        SubUpdateSelectedViaProxyCmd =
+            ReactiveCommand.Create(() => { UpdateSubscriptionProcess(true, true); }, canEditRemove);
 
         //Profile other
-        RemoveProfileCmd = ReactiveCommand.Create(() =>
-        {
-            RemoveProfile();
-        }, canEditRemove);
-        CloneProfileCmd = ReactiveCommand.Create(() =>
-        {
-            CloneProfile();
-        }, canEditRemove);
-        SetDefaultProfileCmd = ReactiveCommand.Create(() =>
-        {
-            SetDefaultProfile();
-        }, canEditRemove);
+        RemoveProfileCmd = ReactiveCommand.Create(() => { RemoveProfile(); }, canEditRemove);
+        CloneProfileCmd = ReactiveCommand.Create(() => { CloneProfile(); }, canEditRemove);
+        SetDefaultProfileCmd = ReactiveCommand.Create(() => { SetDefaultProfile(); }, canEditRemove);
 
         ClearStatisticCmd = ReactiveCommand.Create(() =>
         {
             ConfigProc.ClearAllServerStatistics(ref _config);
             RefreshProfiles();
         });
-        ProfileReloadCmd = ReactiveCommand.Create(() =>
-        {
-            RefreshProfiles();
-        });
-        ProfileQrcodeCmd = ReactiveCommand.Create(() =>
-        {
-            ProfileQrcode();
-        }, canEditRemove);
+        ProfileReloadCmd = ReactiveCommand.Create(() => { RefreshProfiles(); });
+        ProfileQrcodeCmd = ReactiveCommand.Create(() => { ProfileQrcode(); }, canEditRemove);
     }
 
     private void EditLocalFile()
@@ -191,10 +147,7 @@ public class ProfilesViewModel : ReactiveObject
     {
         Locator.Current.GetService<MainWindowViewModel>()?.ShowHideWindow(false);
 
-        string result = await Task.Run(() =>
-        {
-            return Utils.ScanScreen();
-        });
+        string result = await Task.Run(() => { return Utils.ScanScreen(); });
 
         Locator.Current.GetService<MainWindowViewModel>()?.ShowHideWindow(true);
 
@@ -220,6 +173,7 @@ public class ProfilesViewModel : ReactiveObject
         {
             return;
         }
+
         int ret = ConfigProc.AddBatchProfiles(ref _config, clipboardData, "", "");
         if (ret == 0)
         {
@@ -227,6 +181,7 @@ public class ProfilesViewModel : ReactiveObject
             {
                 Utils.SetClipboardData(String.Empty);
             }
+
             RefreshProfiles();
             _noticeHandler?.Enqueue(ResUI.SuccessfullyImportedProfileViaClipboard);
         }
@@ -239,11 +194,13 @@ public class ProfilesViewModel : ReactiveObject
         {
             return;
         }
+
         var content = ConfigProc.GetProfileContent(item);
         if (string.IsNullOrEmpty(content))
         {
             content = item.url;
         }
+
         Utils.SetClipboardData(content);
 
         _noticeHandler?.Enqueue(ResUI.BatchExportSuccessfully);
@@ -263,7 +220,7 @@ public class ProfilesViewModel : ReactiveObject
 
         void UpdateUi(bool success, string msg)
         {
-            NoticeHandler.SendMessage(LogType.Log4ClashN, msg);
+            NoticeHandler.SendMessage4ClashN(msg);
 
             if (success)
             {
@@ -279,6 +236,7 @@ public class ProfilesViewModel : ReactiveObject
         {
             return;
         }
+
         if (UI.ShowYesNo(ResUI.RemoveProfile) == DialogResult.No)
         {
             return;
@@ -300,6 +258,7 @@ public class ProfilesViewModel : ReactiveObject
         {
             return;
         }
+
         if (ConfigProc.CopyProfile(ref _config, new List<ProfileItem>() { item }) == 0)
         {
             _noticeHandler?.Enqueue(ResUI.OperationSuccess);
@@ -313,10 +272,12 @@ public class ProfilesViewModel : ReactiveObject
         {
             return;
         }
+
         if (SelectedSource?.indexId == _config.IndexId)
         {
             return;
         }
+
         var item = _config.GetProfileItem(SelectedSource.indexId);
         if (item is null)
         {
@@ -326,7 +287,7 @@ public class ProfilesViewModel : ReactiveObject
 
         if (ConfigProc.SetDefaultProfile(ref _config, item) == 0)
         {
-            NoticeHandler.SendMessage(LogType.Log4ClashN, ResUI.OperationSuccess);
+            NoticeHandler.SendMessage4ClashN(ResUI.OperationSuccess);
             RefreshProfiles();
 
             Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
@@ -371,10 +332,12 @@ public class ProfilesViewModel : ReactiveObject
         {
             return;
         }
+
         if (string.IsNullOrEmpty(item.url))
         {
             return;
         }
+
         var img = QRCodeHelper.GetQRCode(item.url);
         var dialog = new ProfileQrcodeView()
         {

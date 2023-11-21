@@ -4,195 +4,200 @@ using System.Net;
 using System.Net.Sockets;
 using ClashN.Tool;
 
-namespace ClashN.Handler
+namespace ClashN.Handler;
+
+internal class SpeedtestHandler
 {
-    internal class SpeedtestHandler
+    private Config _config;
+    private CoreHandler _coreHandler;
+    private List<ServerTestItem> _selecteds;
+    private Action<string, string> _updateFunc;
+
+    public SpeedtestHandler(ref Config config)
     {
-        private Config _config;
-        private CoreHandler _coreHandler;
-        private List<ServerTestItem> _selecteds;
-        private Action<string, string> _updateFunc;
+        _config = config;
+    }
 
-        public SpeedtestHandler(ref Config config)
+    public SpeedtestHandler(ref Config config, CoreHandler coreHandler, List<ProfileItem> selecteds,
+        ESpeedActionType actionType, Action<string, string> update)
+    {
+        _config = config;
+        _coreHandler = coreHandler;
+        //_selecteds = Utils.DeepCopy(selecteds);
+        _updateFunc = update;
+
+        _selecteds = new List<ServerTestItem>();
+        foreach (var it in selecteds)
         {
-            _config = config;
-        }
-
-        public SpeedtestHandler(ref Config config, CoreHandler coreHandler, List<ProfileItem> selecteds, ESpeedActionType actionType, Action<string, string> update)
-        {
-            _config = config;
-            _coreHandler = coreHandler;
-            //_selecteds = Utils.DeepCopy(selecteds);
-            _updateFunc = update;
-
-            _selecteds = new List<ServerTestItem>();
-            foreach (var it in selecteds)
+            _selecteds.Add(new ServerTestItem()
             {
-                _selecteds.Add(new ServerTestItem()
-                {
-                    IndexId = it.indexId,
-                    Address = it.address
-                });
-            }
-
-            if (actionType == ESpeedActionType.Ping)
-            {
-                Task.Run(() => RunPing());
-            }
-            else if (actionType == ESpeedActionType.Tcping)
-            {
-                Task.Run(() => RunTcping());
-            }
-        }
-
-        private void RunPingSub(Action<ServerTestItem> updateFun)
-        {
-            try
-            {
-                foreach (var it in _selecteds)
-                {
-                    try
-                    {
-                        updateFun(it);
-                    }
-                    catch (Exception ex)
-                    {
-                        Utils.SaveLog(ex.Message, ex);
-                    }
-                }
-
-                Thread.Sleep(10);
-            }
-            catch (Exception ex)
-            {
-                Utils.SaveLog(ex.Message, ex);
-            }
-        }
-
-        private void RunPing()
-        {
-            RunPingSub((ServerTestItem it) =>
-            {
-                long time = Utils.Ping(it.Address);
-
-                _updateFunc(it.IndexId, FormatOut(time, "ms"));
+                IndexId = it.indexId,
+                Address = it.address
             });
         }
 
-        private void RunTcping()
+        if (actionType == ESpeedActionType.Ping)
         {
-            RunPingSub((ServerTestItem it) =>
-            {
-                int time = GetTcpingTime(it.Address, it.Port);
+            Task.Run(() => RunPing());
+        }
+        else if (actionType == ESpeedActionType.Tcping)
+        {
+            Task.Run(() => RunTcping());
+        }
+    }
 
-                _updateFunc(it.IndexId, FormatOut(time, "ms"));
+    private void RunPingSub(Action<ServerTestItem> updateFun)
+    {
+        try
+        {
+            foreach (var it in _selecteds)
+            {
+                try
+                {
+                    updateFun(it);
+                }
+                catch (Exception ex)
+                {
+                    Utils.SaveLog(ex.Message, ex);
+                }
+            }
+
+            Thread.Sleep(10);
+        }
+        catch (Exception ex)
+        {
+            Utils.SaveLog(ex.Message, ex);
+        }
+    }
+
+    private void RunPing()
+    {
+        RunPingSub((ServerTestItem it) =>
+        {
+            long time = Utils.Ping(it.Address);
+
+            _updateFunc(it.IndexId, FormatOut(time, "ms"));
+        });
+    }
+
+    private void RunTcping()
+    {
+        RunPingSub((ServerTestItem it) =>
+        {
+            int time = GetTcpingTime(it.Address, it.Port);
+
+            _updateFunc(it.IndexId, FormatOut(time, "ms"));
+        });
+    }
+
+    public int RunAvailabilityCheck() // alias: isLive
+    {
+        try
+        {
+            var httpPort = _config.HttpPort;
+
+            var t = Task.Run(() =>
+            {
+                try
+                {
+                    var webProxy = new WebProxy(Global.Loopback, httpPort);
+                    var responseTime = -1;
+                    var status = GetRealPingTime(LazyConfig.Instance.Config.ConstItem.speedPingTestUrl, webProxy,
+                        out responseTime);
+                    var noError = string.IsNullOrEmpty(status);
+                    return noError ? responseTime : -1;
+                }
+                catch (Exception ex)
+                {
+                    Utils.SaveLog(ex.Message, ex);
+                    return -1;
+                }
             });
+            return t.Result;
         }
-
-        public int RunAvailabilityCheck() // alias: isLive
+        catch (Exception ex)
         {
-            try
-            {
-                int httpPort = _config.HttpPort;
-
-                Task<int> t = Task.Run(() =>
-                {
-                    try
-                    {
-                        WebProxy webProxy = new WebProxy(Global.Loopback, httpPort);
-                        int responseTime = -1;
-                        string status = GetRealPingTime(LazyConfig.Instance.Config.ConstItem.speedPingTestUrl, webProxy, out responseTime);
-                        bool noError = string.IsNullOrEmpty(status);
-                        return noError ? responseTime : -1;
-                    }
-                    catch (Exception ex)
-                    {
-                        Utils.SaveLog(ex.Message, ex);
-                        return -1;
-                    }
-                });
-                return t.Result;
-            }
-            catch (Exception ex)
-            {
-                Utils.SaveLog(ex.Message, ex);
-                return -1;
-            }
+            Utils.SaveLog(ex.Message, ex);
+            return -1;
         }
+    }
 
-        private int GetTcpingTime(string url, int port)
+    private int GetTcpingTime(string url, int port)
+    {
+        var responseTime = -1;
+
+        try
         {
-            int responseTime = -1;
-
-            try
+            if (!IPAddress.TryParse(url, out IPAddress ipAddress))
             {
-                if (!IPAddress.TryParse(url, out IPAddress ipAddress))
-                {
-                    IPHostEntry ipHostInfo = System.Net.Dns.GetHostEntry(url);
-                    ipAddress = ipHostInfo.AddressList[0];
-                }
-
-                Stopwatch timer = new Stopwatch();
-                timer.Start();
-
-                IPEndPoint endPoint = new IPEndPoint(ipAddress, port);
-                Socket clientSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
-                IAsyncResult result = clientSocket.BeginConnect(endPoint, null, null);
-                if (!result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(5)))
-                    throw new TimeoutException("connect timeout (5s): " + url);
-                clientSocket.EndConnect(result);
-
-                timer.Stop();
-                responseTime = timer.Elapsed.Milliseconds;
-                clientSocket.Close();
+                IPHostEntry ipHostInfo = System.Net.Dns.GetHostEntry(url);
+                ipAddress = ipHostInfo.AddressList[0];
             }
-            catch (Exception ex)
-            {
-                Utils.SaveLog(ex.Message, ex);
-            }
-            return responseTime;
+
+            var timer = new Stopwatch();
+            timer.Start();
+
+            var endPoint = new IPEndPoint(ipAddress, port);
+            var clientSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+            var result = clientSocket.BeginConnect(endPoint, null, null);
+            if (!result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(5)))
+                throw new TimeoutException("connect timeout (5s): " + url);
+            clientSocket.EndConnect(result);
+
+            timer.Stop();
+            responseTime = timer.Elapsed.Milliseconds;
+            clientSocket.Close();
         }
-
-        private string GetRealPingTime(string url, WebProxy webProxy, out int responseTime)
+        catch (Exception ex)
         {
-            string msg = string.Empty;
-            responseTime = -1;
-            try
-            {
-                HttpWebRequest myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-                myHttpWebRequest.Timeout = 5000;
-                myHttpWebRequest.Proxy = webProxy;//new WebProxy(Global.Loopback, Global.httpPort);
-
-                Stopwatch timer = new Stopwatch();
-                timer.Start();
-
-                HttpWebResponse myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-                if (myHttpWebResponse.StatusCode != HttpStatusCode.OK
-                    && myHttpWebResponse.StatusCode != HttpStatusCode.NoContent)
-                {
-                    msg = myHttpWebResponse.StatusDescription;
-                }
-                timer.Stop();
-                responseTime = timer.Elapsed.Milliseconds;
-
-                myHttpWebResponse.Close();
-            }
-            catch (Exception ex)
-            {
-                Utils.SaveLog(ex.Message, ex);
-                msg = ex.Message;
-            }
-            return msg;
+            Utils.SaveLog(ex.Message, ex);
         }
 
-        private string FormatOut(object time, string unit)
+        return responseTime;
+    }
+
+    private string GetRealPingTime(string url, WebProxy webProxy, out int responseTime)
+    {
+        var msg = string.Empty;
+        responseTime = -1;
+        try
         {
-            if (time.ToString().Equals("-1"))
+            var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+            myHttpWebRequest.Timeout = 5000;
+            myHttpWebRequest.Proxy = webProxy; //new WebProxy(Global.Loopback, Global.httpPort);
+
+            var timer = new Stopwatch();
+            timer.Start();
+
+            var myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
+            if (myHttpWebResponse.StatusCode != HttpStatusCode.OK
+                && myHttpWebResponse.StatusCode != HttpStatusCode.NoContent)
             {
-                return "Timeout";
+                msg = myHttpWebResponse.StatusDescription;
             }
-            return string.Format("{0}{1}", time, unit).PadLeft(8, ' ');
+
+            timer.Stop();
+            responseTime = timer.Elapsed.Milliseconds;
+
+            myHttpWebResponse.Close();
         }
+        catch (Exception ex)
+        {
+            Utils.SaveLog(ex.Message, ex);
+            msg = ex.Message;
+        }
+
+        return msg;
+    }
+
+    private string FormatOut(object time, string unit)
+    {
+        if (time.ToString().Equals("-1"))
+        {
+            return "Timeout";
+        }
+
+        return string.Format("{0}{1}", time, unit).PadLeft(8, ' ');
     }
 }

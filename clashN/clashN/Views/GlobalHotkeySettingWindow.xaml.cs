@@ -24,12 +24,12 @@ namespace ClashN.Views
 
             foreach (GlobalHotkeyAction it in Enum.GetValues(typeof(GlobalHotkeyAction)))
             {
-                if (_config.globalHotkeys.FindIndex(t => t.GlobalHotkey == it) >= 0)
+                if (_config.GlobalHotkeys.FindIndex(t => t.GlobalHotkey == it) >= 0)
                 {
                     continue;
                 }
 
-                _config.globalHotkeys.Add(new KeyShortcut()
+                _config.GlobalHotkeys.Add(new KeyShortcut()
                 {
                     GlobalHotkey = it,
                     Alt = false,
@@ -39,7 +39,7 @@ namespace ClashN.Views
                 });
             }
 
-            lstKey = Utils.DeepCopy(_config.globalHotkeys);
+            lstKey = Utils.DeepCopy(_config.GlobalHotkeys);
 
             TxtGlobalHotkey0.KeyDown += TxtGlobalHotkey_KeyDown;
             TxtGlobalHotkey1.KeyDown += TxtGlobalHotkey_KeyDown;
@@ -106,8 +106,8 @@ namespace ClashN.Views
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            _config.globalHotkeys.Clear();
-            _config.globalHotkeys.AddRange(lstKey);
+            _config.GlobalHotkeys.Clear();
+            _config.GlobalHotkeys.AddRange(lstKey);
 
             if (ConfigProc.SaveConfig(_config, false) == 0)
             {

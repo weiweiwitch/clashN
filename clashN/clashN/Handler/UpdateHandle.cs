@@ -1,14 +1,14 @@
-﻿using ClashN.Base;
-using ClashN.Mode;
-using ClashN.Resx;
-using Splat;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using ClashN.Base;
+using ClashN.Mode;
+using ClashN.Resx;
 using ClashN.Tool;
+using Splat;
 
 namespace ClashN.Handler;
 
@@ -353,12 +353,12 @@ internal class UpdateHandle
         try
         {
             var coreInfo = LazyConfig.Instance.GetCoreInfo(type);
-            string url = coreInfo.coreLatestUrl;
+            string url = coreInfo.CoreLatestUrl;
 
             var result = await (new DownloadHandle()).UrlRedirectAsync(url, true);
             if (!string.IsNullOrEmpty(result))
             {
-                responseHandler(type, result);
+                ResponseHandler(type, result);
             }
             else
             {
@@ -380,16 +380,16 @@ internal class UpdateHandle
     /// <summary>
     /// 获取Core版本
     /// </summary>
-    private string getCoreVersion(CoreKind type)
+    private string GetCoreVersion(CoreKind type)
     {
         try
         {
             var coreInfo = LazyConfig.Instance.GetCoreInfo(type);
-            string filePath = string.Empty;
-            foreach (string name in coreInfo.coreExes)
+            var filePath = string.Empty;
+            foreach (var name in coreInfo.CoreExes)
             {
-                string vName = string.Format("{0}.exe", name);
-                vName = Utils.GetBinPath(vName, coreInfo.coreType);
+                var vName = $"{name}.exe";
+                vName = Utils.GetBinPath(vName, coreInfo.CoreType);
                 if (File.Exists(vName))
                 {
                     filePath = vName;
@@ -399,11 +399,11 @@ internal class UpdateHandle
 
             if (string.IsNullOrEmpty(filePath))
             {
-                string msg = string.Format(ResUI.NotFoundCore, @"");
+                var msg = string.Format(ResUI.NotFoundCore, @"");
                 return "";
             }
 
-            Process p = new Process();
+            var p = new Process();
             p.StartInfo.FileName = filePath;
             p.StartInfo.Arguments = "-v";
             p.StartInfo.WorkingDirectory = Utils.StartupPath();
@@ -413,8 +413,8 @@ internal class UpdateHandle
             p.StartInfo.StandardOutputEncoding = Encoding.UTF8;
             p.Start();
             p.WaitForExit(5000);
-            string echo = p.StandardOutput.ReadToEnd();
-            string version = Regex.Match(echo, $"v[0-9.]+").Groups[0].Value;
+            var echo = p.StandardOutput.ReadToEnd();
+            var version = Regex.Match(echo, $"v[0-9.]+").Groups[0].Value;
             return version;
         }
         catch (Exception ex)
@@ -425,11 +425,11 @@ internal class UpdateHandle
         }
     }
 
-    private void responseHandler(CoreKind type, string redirectUrl)
+    private void ResponseHandler(CoreKind type, string redirectUrl)
     {
         try
         {
-            string version = redirectUrl.Substring(redirectUrl.LastIndexOf("/", StringComparison.Ordinal) + 1);
+            var version = redirectUrl.Substring(redirectUrl.LastIndexOf("/", StringComparison.Ordinal) + 1);
             var coreInfo = LazyConfig.Instance.GetCoreInfo(type);
 
             string curVersion;
@@ -437,35 +437,35 @@ internal class UpdateHandle
             string url;
             if (type == CoreKind.Clash)
             {
-                curVersion = getCoreVersion(type);
+                curVersion = GetCoreVersion(type);
                 message = string.Format(ResUI.IsLatestCore, curVersion);
                 if (Environment.Is64BitProcess)
                 {
-                    url = string.Format(coreInfo.coreDownloadUrl64, version);
+                    url = string.Format(coreInfo.CoreDownloadUrl64, version);
                 }
                 else
                 {
-                    url = string.Format(coreInfo.coreDownloadUrl32, version);
+                    url = string.Format(coreInfo.CoreDownloadUrl32, version);
                 }
             }
             else if (type == CoreKind.ClashMeta)
             {
-                curVersion = getCoreVersion(type);
+                curVersion = GetCoreVersion(type);
                 message = string.Format(ResUI.IsLatestCore, curVersion);
                 if (Environment.Is64BitProcess)
                 {
-                    url = string.Format(coreInfo.coreDownloadUrl64, version);
+                    url = string.Format(coreInfo.CoreDownloadUrl64, version);
                 }
                 else
                 {
-                    url = string.Format(coreInfo.coreDownloadUrl32, version);
+                    url = string.Format(coreInfo.CoreDownloadUrl32, version);
                 }
             }
             else if (type == CoreKind.ClashN)
             {
                 curVersion = FileVersionInfo.GetVersionInfo(Utils.GetExePath()).FileVersion.ToString();
                 message = string.Format(ResUI.IsLatestN, curVersion);
-                url = string.Format(coreInfo.coreDownloadUrl64, version);
+                url = string.Format(coreInfo.CoreDownloadUrl64, version);
             }
             else
             {
@@ -489,7 +489,7 @@ internal class UpdateHandle
 
     private void AskToDownload(DownloadHandle downloadHandle, string url, bool blAsk)
     {
-        bool blDownload = false;
+        var blDownload = false;
         if (blAsk)
         {
             if (UI.ShowYesNo(string.Format(ResUI.DownloadYesNo, url)) == DialogResult.Yes)
@@ -508,7 +508,7 @@ internal class UpdateHandle
         }
     }
 
-    private int httpProxyTest()
+    private int HttpProxyTest()
     {
         var statistics = new SpeedtestHandler(ref _config);
         return statistics.RunAvailabilityCheck();

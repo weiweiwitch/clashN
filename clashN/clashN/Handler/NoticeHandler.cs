@@ -27,11 +27,6 @@ public class NoticeHandler
 
     public static void SendMessage4ClashN(string msg)
     {
-        MessageBus.Current.SendMessage(msg, LogType.Log4ClashN.ToString());
-    }
-
-    public static void SendMessage4ClashNWithTime(string msg)
-    {
         msg = $"{DateTime.Now} {msg}";
         MessageBus.Current.SendMessage(msg, LogType.Log4ClashN.ToString());
     }

@@ -1,18 +1,18 @@
-﻿using ClashN.Mode;
-using ClashN.Tool;
-using System.Collections.Specialized;
-using System.IO;
+﻿using System.IO;
 using System.Web;
+using ClashN.Mode;
+using ClashN.Tool;
 
 namespace ClashN.Handler;
 
 /// <summary>
 /// 本软件配置文件处理类
 /// </summary>
-internal class ConfigProc
+internal static class ConfigProc
 {
-    private static string configRes = Global.ConfigFileName;
-    private static readonly object objLock = new object();
+    private const string ConfigRes = Global.ConfigFileName;
+
+    private static readonly object ObjLock = new();
 
     #region ConfigHandler
 
@@ -24,7 +24,7 @@ internal class ConfigProc
     public static int LoadConfig(ref Config? config)
     {
         //载入配置文件
-        var result = Utils.LoadResource(Utils.GetConfigPath(configRes));
+        var result = Utils.LoadResource(Utils.GetConfigPath(ConfigRes));
         if (!string.IsNullOrEmpty(result))
         {
             //转成Json
@@ -32,7 +32,7 @@ internal class ConfigProc
         }
         else
         {
-            if (File.Exists(Utils.GetConfigPath(configRes)))
+            if (File.Exists(Utils.GetConfigPath(ConfigRes)))
             {
                 Utils.SaveLog("LoadConfig Exception");
                 return -1;
@@ -141,12 +141,12 @@ internal class ConfigProc
     /// <param name="config"></param>
     private static void ToJsonFile(Config config)
     {
-        lock (objLock)
+        lock (ObjLock)
         {
             try
             {
                 //save temp file
-                var resPath = Utils.GetConfigPath(configRes);
+                var resPath = Utils.GetConfigPath(ConfigRes);
                 var tempPath = $"{resPath}_temp";
                 if (Utils.ToJsonFile(config, tempPath) != 0)
                 {
@@ -579,7 +579,7 @@ internal class ConfigProc
         if (string.IsNullOrEmpty(indexId) && (clipboardData.StartsWith(Global.HttpsProtocol) ||
                                               clipboardData.StartsWith(Global.HttpProtocol)))
         {
-            ProfileItem item = new ProfileItem()
+            var item = new ProfileItem()
             {
                 groupId = groupId,
                 url = clipboardData,
@@ -598,12 +598,11 @@ internal class ConfigProc
             var url = new Uri(clipboardData);
             if (url.Host == "install-config")
             {
-                NameValueCollection query =
-                    HttpUtility.ParseQueryString(url.Query);
+                var query = HttpUtility.ParseQueryString(url.Query);
 
                 if (!string.IsNullOrEmpty(query["url"] ?? ""))
                 {
-                    ProfileItem item = new ProfileItem()
+                    var item = new ProfileItem
                     {
                         groupId = groupId,
                         url = query["url"] ?? string.Empty,
@@ -621,7 +620,7 @@ internal class ConfigProc
         //maybe file
         if (File.Exists(clipboardData))
         {
-            var item = new ProfileItem()
+            var item = new ProfileItem
             {
                 groupId = groupId,
                 url = "",

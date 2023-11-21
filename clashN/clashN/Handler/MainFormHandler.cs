@@ -59,7 +59,7 @@ public sealed class MainFormHandler
         }
     }
 
-    public void BackupGuiNConfig(Config config, bool auto = false)
+    public static void BackupGuiNConfig(Config config, bool auto = false)
     {
         var fileName = $"guiNConfig_{DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss_fff")}.json";
         if (auto)
@@ -170,12 +170,12 @@ public sealed class MainFormHandler
 
     public void RegisterGlobalHotkey(Config config, EventHandler<HotkeyEventArgs> handler, Action<bool, string> update)
     {
-        if (config.globalHotkeys == null)
+        if (config.GlobalHotkeys == null)
         {
             return;
         }
 
-        foreach (var item in config.globalHotkeys)
+        foreach (var item in config.GlobalHotkeys)
         {
             if (item.KeyCode == null)
             {
@@ -251,7 +251,7 @@ public sealed class MainFormHandler
         {
             if (blAll)
             {
-                for (int i = 0; i < 5; i++)
+                for (var i = 0; i < 5; i++)
                 {
                     if (LazyConfig.Instance.GetProxies() != null)
                     {
@@ -291,7 +291,7 @@ public sealed class MainFormHandler
             var urlBase = $"{GetApiUrl()}/proxies";
             urlBase += @"/{0}/delay?timeout=10000&url=" + LazyConfig.Instance.Config.ConstItem.speedPingTestUrl;
 
-            List<Task> tasks = new List<Task>();
+            var tasks = new List<Task>();
             foreach (var it in lstProxy)
             {
                 if (Global.NotAllowTestType.Contains(it.type.ToLower()))
@@ -315,7 +315,7 @@ public sealed class MainFormHandler
         });
     }
 
-    public void InitRegister(Config config)
+    public static void InitRegister()
     {
         Task.Run(() =>
         {
@@ -327,7 +327,7 @@ public sealed class MainFormHandler
         });
     }
 
-    public List<ProxiesItem> GetClashProxyGroups()
+    public static List<ProxiesItem> GetClashProxyGroups()
     {
         try
         {
@@ -380,7 +380,7 @@ public sealed class MainFormHandler
     public async void ClashConfigReload(string filePath)
     {
         ClashConnectionClose("");
-        
+
         try
         {
             var url = $"{GetApiUrl()}/configs?force=true";

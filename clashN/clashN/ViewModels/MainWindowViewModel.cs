@@ -109,7 +109,11 @@ public class MainWindowViewModel : ReactiveObject
 
         ThreadPool.RegisterWaitForSingleObject(App.ProgramStarted, OnProgramStarted, null, -1, false);
 
+        // init UI
         Init();
+
+        // init core
+        InitCore();
 
         //Views
         //GetDashboardView = new();
@@ -188,6 +192,7 @@ public class MainWindowViewModel : ReactiveObject
             Global.reloadCore = true;
             _ = LoadCore();
         });
+
         NotifyLeftClickCmd = ReactiveCommand.Create(() => { ShowHideWindow(null); });
 
         Global.ShowInTaskbar = true; //Application.Current.MainWindow.ShowInTaskbar;
@@ -197,7 +202,7 @@ public class MainWindowViewModel : ReactiveObject
     {
         Application.Current.Dispatcher.Invoke((Action)(() =>
         {
-            string? clipboardData = Utils.GetClipboardData();
+            var clipboardData = Utils.GetClipboardData();
             if (state != null && clipboardData != null)
             {
                 if (string.IsNullOrEmpty(clipboardData) || !clipboardData.StartsWith(Global.ClashProtocol))
@@ -273,8 +278,8 @@ public class MainWindowViewModel : ReactiveObject
 
     private void Init()
     {
-        MainFormHandler.Instance.BackupGuiNConfig(_config, true);
-        MainFormHandler.Instance.InitRegister(_config);
+        MainFormHandler.BackupGuiNConfig(_config, true);
+        MainFormHandler.InitRegister();
 
         _coreHandler = new CoreHandler(ShowMsgHandler);
 
@@ -287,7 +292,10 @@ public class MainWindowViewModel : ReactiveObject
         MainFormHandler.Instance.RegisterGlobalHotkey(_config, OnHotkeyHandler, UpdateTaskHandler);
 
         OnProgramStarted("shown", true);
+    }
 
+    private void InitCore()
+    {
         _ = LoadCore();
     }
 
@@ -303,7 +311,7 @@ public class MainWindowViewModel : ReactiveObject
 
     private async void UpdateTaskHandler(bool success, string msg)
     {
-        NoticeHandler.SendMessage(LogType.Log4ClashN, msg);
+        NoticeHandler.SendMessage4ClashN(msg);
 
         if (success)
         {
@@ -342,10 +350,6 @@ public class MainWindowViewModel : ReactiveObject
     {
         Locator.Current.GetService<ProxiesViewModel>()?.ProxiesClear();
 
-        //if (Global.reloadCore)
-        //{
-        //    mainMsgControl.ClearMsg();
-        //}
         await Task.Run(() => { _coreHandler.LoadCore(_config); });
 
         Global.reloadCore = false;
@@ -354,7 +358,7 @@ public class MainWindowViewModel : ReactiveObject
         //statistics?.SaveToFile();
 
         ChangePACButtonStatus(_config.SysProxyType);
-        SetRuleMode(_config.ruleMode);
+        SetRuleMode(_config.RuleMode);
 
         Locator.Current.GetService<ProxiesViewModel>()?.ProxiesReload();
         Locator.Current.GetService<ProxiesViewModel>()?.ProxiesDelayTest();
@@ -397,7 +401,7 @@ public class MainWindowViewModel : ReactiveObject
         BlSystemProxyNothing = (type == SysProxyType.Unchanged);
         BlSystemProxyPac = (type == SysProxyType.Pac);
 
-        NoticeHandler.SendMessage4ClashNWithTime($"Change system proxy");
+        NoticeHandler.SendMessage4ClashN($"Change system proxy");
 
         ConfigProc.SaveConfig(_config, false);
 
@@ -408,14 +412,14 @@ public class MainWindowViewModel : ReactiveObject
 
     public void SetRuleModeCheck(ERuleMode mode)
     {
-        if (_config.ruleMode == mode)
+        if (_config.RuleMode == mode)
         {
             return;
         }
 
         SetRuleMode(mode);
 
-        Locator.Current.GetService<ProxiesViewModel>()?.ReloadRulemodeSelected();
+        Locator.Current.GetService<ProxiesViewModel>()?.ReloadRuleModeSelected();
     }
 
     private void SetRuleMode(ERuleMode mode)
@@ -425,18 +429,17 @@ public class MainWindowViewModel : ReactiveObject
         BlModeDirect = mode == ERuleMode.Direct;
         BlModeNothing = mode == ERuleMode.Unchanged;
 
-        //mainMsgControl.SetToolSslInfo("routing", mode.ToString());
+        NoticeHandler.SendMessage4ClashN($"Set rule mode {_config.RuleMode.ToString()}->{mode.ToString()}");
 
-        NoticeHandler.SendMessage4ClashNWithTime(
-            $"Set rule mode {_config.ruleMode.ToString()}->{mode.ToString()}");
-
-        _config.ruleMode = mode;
+        _config.RuleMode = mode;
         ConfigProc.SaveConfig(_config, false);
 
         if (mode != ERuleMode.Unchanged)
         {
-            Dictionary<string, string> headers = new Dictionary<string, string>();
-            headers.Add("mode", _config.ruleMode.ToString().ToLower());
+            var headers = new Dictionary<string, string>
+            {
+                { "mode", _config.RuleMode.ToString().ToLower() }
+            };
             MainFormHandler.Instance.ClashConfigUpdate(headers);
         }
     }
@@ -478,9 +481,7 @@ public class MainWindowViewModel : ReactiveObject
         {
             var swatch =
                 new SwatchesProvider().Swatches.FirstOrDefault(t => t.Name == _config.UiItem.colorPrimaryName);
-            if (swatch != null
-                && swatch.ExemplarHue != null
-                && swatch.ExemplarHue?.Color != null)
+            if (swatch?.ExemplarHue.Color != null)
             {
                 ChangePrimaryColor(swatch.ExemplarHue.Color);
             }
@@ -497,8 +498,8 @@ public class MainWindowViewModel : ReactiveObject
             Application.Current.MainWindow.Height = _config.UiItem.mainHeight;
         }
 
-        IntPtr hWnd = new WindowInteropHelper(Application.Current.MainWindow).EnsureHandle();
-        Graphics g = Graphics.FromHwnd(hWnd);
+        var hWnd = new WindowInteropHelper(Application.Current.MainWindow).EnsureHandle();
+        var g = Graphics.FromHwnd(hWnd);
         if (Application.Current.MainWindow.Width > SystemInformation.WorkingArea.Width * 96 / g.DpiX)
         {
             Application.Current.MainWindow.Width = SystemInformation.WorkingArea.Width * 96 / g.DpiX;

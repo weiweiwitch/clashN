@@ -3,19 +3,19 @@
 [Serializable]
 public class CoreInfo
 {
-    public CoreKind coreType { get; set; }
+    public CoreKind CoreType { get; set; }
 
-    public List<string> coreExes { get; set; }
+    public List<string> CoreExes { get; set; }
 
-    public string arguments { get; set; }
+    public string Arguments { get; set; }
 
-    public string coreUrl { get; set; }
+    public string CoreUrl { get; set; }
 
-    public string coreLatestUrl { get; set; }
+    public string CoreLatestUrl { get; set; }
 
-    public string coreDownloadUrl32 { get; set; }
+    public string CoreDownloadUrl32 { get; set; }
 
-    public string coreDownloadUrl64 { get; set; }
+    public string CoreDownloadUrl64 { get; set; }
 
-    public string match { get; set; }
+    public string Match { get; set; }
 }

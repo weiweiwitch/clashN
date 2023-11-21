@@ -116,7 +116,7 @@ public class ProxiesViewModel : ReactiveObject
         });
 
         ReloadSystemProxySelected();
-        ReloadRulemodeSelected();
+        ReloadRuleModeSelected();
 
         DelayTestTask();
     }
@@ -140,7 +140,7 @@ public class ProxiesViewModel : ReactiveObject
         {
             return;
         }
-        if (_config.ruleMode == (ERuleMode)RuleModeSelected)
+        if (_config.RuleMode == (ERuleMode)RuleModeSelected)
         {
             return;
         }
@@ -161,9 +161,9 @@ public class ProxiesViewModel : ReactiveObject
         RefreshProxyDetails(c);
     }
 
-    private void UpdateHandler(bool notify, string msg)
+    private static void UpdateHandler(string msg)
     {
-        NoticeHandler.SendMessage4ClashNWithTime(msg);
+        NoticeHandler.SendMessage4ClashN(msg);
     }
 
     public void ProxiesReload()
@@ -195,9 +195,9 @@ public class ProxiesViewModel : ReactiveObject
         SystemProxySelected = (int)_config.SysProxyType;
     }
 
-    public void ReloadRulemodeSelected()
+    public void ReloadRuleModeSelected()
     {
-        RuleModeSelected = (int)_config.ruleMode;
+        RuleModeSelected = (int)_config.RuleMode;
     }
 
     private void DoEnableTun(bool c)
@@ -209,7 +209,7 @@ public class ProxiesViewModel : ReactiveObject
         }
     }
 
-    private void TunModeSwitch()
+    private static void TunModeSwitch()
     {
         Global.reloadCore = true;
         _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
@@ -221,7 +221,7 @@ public class ProxiesViewModel : ReactiveObject
     {
         MainFormHandler.Instance.GetClashProxies(_config, (it, it2) =>
         {
-            UpdateHandler(false, "Refresh Clash Proxies");
+            UpdateHandler("Refresh Clash Proxies");
                 
             proxies = it?.proxies;
             providers = it2?.providers;
@@ -246,7 +246,7 @@ public class ProxiesViewModel : ReactiveObject
         var selectedName = SelectedGroup?.name;
         _proxyGroups.Clear();
 
-        var proxyGroups = MainFormHandler.Instance.GetClashProxyGroups();
+        var proxyGroups = MainFormHandler.GetClashProxyGroups();
         if (proxyGroups != null && proxyGroups.Count > 0)
         {
             foreach (var it in proxyGroups)
@@ -446,7 +446,7 @@ public class ProxiesViewModel : ReactiveObject
 
     private void ProxiesDelayTest(bool blAll)
     {
-        UpdateHandler(false, "Clash Proxies Latency Test");
+        UpdateHandler("Clash Proxies Latency Test");
 
         MainFormHandler.Instance.ClashProxiesDelayTest(blAll, _proxyDetails.ToList(), (item, result) =>
         {

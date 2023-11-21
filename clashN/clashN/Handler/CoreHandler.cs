@@ -113,18 +113,18 @@ internal class CoreHandler
             }
             else
             {
-                if (_coreInfo == null || _coreInfo.coreExes == null)
+                if (_coreInfo == null || _coreInfo.CoreExes == null)
                 {
                     return;
                 }
 
-                foreach (var vName in _coreInfo.coreExes)
+                foreach (var vName in _coreInfo.CoreExes)
                 {
                     var existing = Process.GetProcessesByName(vName);
                     foreach (var p in existing)
                     {
                         var path = p.MainModule.FileName;
-                        if (path == $"{Utils.GetBinPath(vName, _coreInfo.coreType)}.exe")
+                        if (path == $"{Utils.GetBinPath(vName, _coreInfo.CoreType)}.exe")
                         {
                             KillProcess(p);
                         }
@@ -179,10 +179,10 @@ internal class CoreHandler
     private string FindCoreExe()
     {
         var fileName = string.Empty;
-        foreach (var name in _coreInfo.coreExes)
+        foreach (var name in _coreInfo.CoreExes)
         {
             var vName = $"{name}.exe";
-            vName = Utils.GetBinPath(vName, _coreInfo.coreType);
+            vName = Utils.GetBinPath(vName, _coreInfo.CoreType);
             if (File.Exists(vName))
             {
                 fileName = vName;
@@ -192,7 +192,7 @@ internal class CoreHandler
 
         if (string.IsNullOrEmpty(fileName))
         {
-            var msg = string.Format(ResUI.NotFoundCore, _coreInfo.coreUrl);
+            var msg = string.Format(ResUI.NotFoundCore, _coreInfo.CoreUrl);
             ShowMsg(false, LogType.Log4ClashN, msg);
         }
 
@@ -209,7 +209,7 @@ internal class CoreHandler
 
         ShowMsg(false, LogType.Log4ClashN,
             string.Format(ResUI.StartService, DateTime.Now.ToString(CultureInfo.CurrentCulture)));
-        ShowMsg(false, LogType.Log4ClashN, $"{ResUI.TbCoreType} {_coreInfo.coreType.ToString()}");
+        ShowMsg(false, LogType.Log4ClashN, $"{ResUI.TbCoreType} {_coreInfo.CoreType.ToString()}");
 
         try
         {
@@ -221,7 +221,7 @@ internal class CoreHandler
             }
 
             //Portable Mode
-            var arguments = _coreInfo.arguments;
+            var arguments = _coreInfo.Arguments;
             var data = Utils.GetPath("data");
             if (Directory.Exists(data))
             {
@@ -306,27 +306,16 @@ internal class CoreHandler
         }
     }
 
-    private int SetCore(Config config, ProfileItem item, out bool blChanged)
+    private void SetCore(Config config, ProfileItem item, out bool blChanged)
     {
         blChanged = true;
-        if (item == null)
-        {
-            return -1;
-        }
-
-        var coreType = LazyConfig.Instance.GetCoreType(item);
+        var coreType = LazyConfig.GetCoreType(item);
         var tempInfo = LazyConfig.Instance.GetCoreInfo(coreType);
-        if (tempInfo != null && _coreInfo != null && tempInfo.coreType == _coreInfo.coreType)
+        if (tempInfo != null && _coreInfo != null && tempInfo.CoreType == _coreInfo.CoreType)
         {
             blChanged = false;
         }
 
         _coreInfo = tempInfo;
-        if (_coreInfo == null)
-        {
-            return -1;
-        }
-
-        return 0;
     }
 }

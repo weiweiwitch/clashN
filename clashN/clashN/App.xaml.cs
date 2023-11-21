@@ -48,6 +48,7 @@ public partial class App : Application
 
         Global.processJob = new Job();
 
+        // Logging
         Logging.Setup();
         Utils.SaveLog($"ClashN start up | {Utils.GetVersion()} | {Utils.GetExePath()}");
         Logging.ClearLogs();
