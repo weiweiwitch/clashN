@@ -14,23 +14,22 @@ namespace ClashN.Views;
 /// </summary>
 public partial class GlobalHotkeySettingWindow
 {
-    private static Config _config;
-    
     private List<KeyShortcut> lstKey;
 
     public GlobalHotkeySettingWindow()
     {
         InitializeComponent();
-        _config = LazyConfig.Instance.Config;
+
+        var config = LazyConfig.Instance.Config;
 
         foreach (GlobalHotkeyAction it in Enum.GetValues(typeof(GlobalHotkeyAction)))
         {
-            if (_config.GlobalHotkeys.FindIndex(t => t.GlobalHotkey == it) >= 0)
+            if (config.GlobalHotkeys.FindIndex(t => t.GlobalHotkey == it) >= 0)
             {
                 continue;
             }
 
-            _config.GlobalHotkeys.Add(new KeyShortcut()
+            config.GlobalHotkeys.Add(new KeyShortcut()
             {
                 GlobalHotkey = it,
                 Alt = false,
@@ -40,7 +39,7 @@ public partial class GlobalHotkeySettingWindow
             });
         }
 
-        lstKey = Utils.DeepCopy(_config.GlobalHotkeys);
+        lstKey = Utils.DeepCopy(config.GlobalHotkeys);
 
         TxtGlobalHotkey0.KeyDown += TxtGlobalHotkey_KeyDown;
         TxtGlobalHotkey1.KeyDown += TxtGlobalHotkey_KeyDown;
@@ -50,7 +49,7 @@ public partial class GlobalHotkeySettingWindow
 
         BindingData(-1);
 
-        Utils.SetDarkBorder(this, _config.UiItem.ColorModeDark);
+        Utils.SetDarkBorder(this, config.UiItem.ColorModeDark);
     }
 
     private void TxtGlobalHotkey_KeyDown(object sender, KeyEventArgs e)
@@ -81,6 +80,7 @@ public partial class GlobalHotkeySettingWindow
             {
                 continue;
             }
+
             var item = lstKey[k];
             var keys = string.Empty;
 
@@ -88,14 +88,17 @@ public partial class GlobalHotkeySettingWindow
             {
                 keys += $"{Forms.Keys.Control.ToString()} + ";
             }
+
             if (item.Alt)
             {
                 keys += $"{Forms.Keys.Alt.ToString()} + ";
             }
+
             if (item.Shift)
             {
                 keys += $"{Forms.Keys.Shift.ToString()} + ";
             }
+
             if (item.KeyCode != null)
             {
                 keys += $"{item.KeyCode.ToString()}";
@@ -107,12 +110,13 @@ public partial class GlobalHotkeySettingWindow
 
     private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
-        _config.GlobalHotkeys.Clear();
-        _config.GlobalHotkeys.AddRange(lstKey);
+        var config = LazyConfig.Instance.Config;
+        config.GlobalHotkeys.Clear();
+        config.GlobalHotkeys.AddRange(lstKey);
 
         if (ConfigProc.SaveConfig(false) == 0)
         {
-            this.Close();
+            Close();
         }
         else
         {
@@ -122,7 +126,7 @@ public partial class GlobalHotkeySettingWindow
 
     private void BtnCancel_Click(object sender, RoutedEventArgs e)
     {
-        this.Close();
+        Close();
     }
 
     private void BtnReset_Click(object sender, RoutedEventArgs e)
@@ -144,6 +148,7 @@ public partial class GlobalHotkeySettingWindow
                 KeyCode = null
             });
         }
+
         BindingData(-1);
     }
 

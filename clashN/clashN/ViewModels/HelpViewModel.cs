@@ -10,7 +10,6 @@ namespace ClashN.ViewModels;
 
 public class HelpViewModel : ReactiveObject
 {
-    private static Config _config;
 
     public ReactiveCommand<Unit, Unit> CheckUpdateCmd { get; }
     public ReactiveCommand<Unit, Unit> CheckUpdateClashCoreCmd { get; }
@@ -18,8 +17,6 @@ public class HelpViewModel : ReactiveObject
 
     public HelpViewModel()
     {
-        _config = LazyConfig.Instance.Config;
-
         CheckUpdateCmd = ReactiveCommand.Create(() => { CheckUpdateN(); });
         CheckUpdateClashCoreCmd = ReactiveCommand.Create(() => { CheckUpdateCore(CoreKind.Clash); });
         CheckUpdateClashMetaCoreCmd = ReactiveCommand.Create(() => { CheckUpdateCore(CoreKind.ClashMeta); });
@@ -27,7 +24,7 @@ public class HelpViewModel : ReactiveObject
 
     private void CheckUpdateN()
     {
-        new UpdateHandle().CheckUpdateGuiN(_config, UpdateUi);
+        new UpdateHandle().CheckUpdateGuiN(UpdateUi);
         return;
 
         void UpdateUi(bool success, string msg)
@@ -42,7 +39,7 @@ public class HelpViewModel : ReactiveObject
 
     private void CheckUpdateCore(CoreKind type)
     {
-        new UpdateHandle().CheckUpdateCore(type, _config, UpdateUi);
+        new UpdateHandle().CheckUpdateCore(type, UpdateUi);
         return;
 
         void UpdateUi(bool success, string msg)

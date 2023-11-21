@@ -56,9 +56,9 @@ public class Config
 
     public List<ProfileItem> ProfileItems { get; } = new();
 
-    public UIItem? UiItem { get; set; }
+    public UIItem UiItem { get; set; } = new();
 
-    public ConstItem? ConstItem { get; set; }
+    public ConstItem ConstItem { get; set; } = new();
 
     public List<KeyShortcut> GlobalHotkeys { get; } = new();
 

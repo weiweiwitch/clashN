@@ -11,7 +11,7 @@ namespace ClashN.Handler;
 internal static class ConfigProc
 {
     private static readonly object ObjLock = new();
-    
+
     private const string ConfigRes = Global.ConfigFileName;
 
     #region ConfigHandler
@@ -19,69 +19,36 @@ internal static class ConfigProc
     /// <summary>
     /// 载入配置文件
     /// </summary>
-    /// <param name="config"></param>
     /// <returns></returns>
-    public static int LoadConfig(ref Config? config)
+    public static int LoadConfig()
     {
         //载入配置文件
+        Config config;
         var result = Utils.LoadResource(Utils.GetConfigPath(ConfigRes));
-        if (!string.IsNullOrEmpty(result))
-        {
-            //转成Json
-            config = Utils.FromJson<Config>(result);
-        }
-        else
+        if (string.IsNullOrEmpty(result))
         {
             if (File.Exists(Utils.GetConfigPath(ConfigRes)))
             {
                 Utils.SaveLog("LoadConfig Exception");
                 return -1;
             }
-        }
 
-        if (config == null)
-        {
+            // File is not exist
             config = new Config
             {
                 LogLevel = "warning",
                 EnableStatistics = true,
+                MixedPort = 7890,
+                ApiPort = 9090,
+                PacPort = 7990
             };
         }
-
-        //本地监听
-        if (config.MixedPort == 0)
-            config.MixedPort = 7888;
-
-        if (config.HttpPort == 0)
-            config.HttpPort = 7890;
-
-        if (config.SocksPort == 0)
-            config.SocksPort = 7891;
-
-        if (config.ApiPort == 0)
-            config.ApiPort = 9090;
-
-        if (config.PacPort == 0)
+        else
         {
-            config.PacPort = 7990;
+            // 转成Json
+            config = Utils.FromJson<Config>(result);
         }
-
-        if (config.UiItem == null)
-        {
-            config.UiItem = new UIItem()
-            {
-            };
-        }
-
-        if (config.ConstItem == null)
-        {
-            config.ConstItem = new ConstItem();
-        }
-
-        //if (string.IsNullOrEmpty(config.constItem.subConvertUrl))
-        //{
-        //    config.constItem.subConvertUrl = Global.SubConvertUrl;
-        //}
+        
         if (string.IsNullOrEmpty(config.ConstItem.SpeedTestUrl))
         {
             config.ConstItem.SpeedTestUrl = Global.SpeedTestUrl;
@@ -197,12 +164,12 @@ internal static class ConfigProc
     /// <summary>
     /// 克隆配置文件
     /// </summary>
-    /// <param name="config"></param>
     /// <param name="index"></param>
     /// <returns></returns>
-    public static int CopyProfile(ref Config config, List<ProfileItem> indexs)
+    public static int CopyProfile(List<ProfileItem> index)
     {
-        foreach (var item in indexs)
+        var config = LazyConfig.Instance.Config;
+        foreach (var item in index)
         {
             ProfileItem profileItem = Utils.DeepCopy(item);
             profileItem.IndexId = string.Empty;
@@ -211,13 +178,13 @@ internal static class ConfigProc
             if (string.IsNullOrEmpty(profileItem.Address) || !File.Exists(Utils.GetConfigPath(profileItem.Address)))
             {
                 profileItem.Address = string.Empty;
-                AddProfileCommon(ref config, profileItem);
+                AddProfileCommon(profileItem);
             }
             else
             {
                 var fileName = Utils.GetConfigPath(profileItem.Address);
                 profileItem.Address = string.Empty;
-                AddProfileViaPath(ref config, profileItem, fileName);
+                AddProfileViaPath(profileItem, fileName);
             }
         }
 
@@ -292,12 +259,12 @@ internal static class ConfigProc
     /// <summary>
     /// 移动配置文件
     /// </summary>
-    /// <param name="config"></param>
     /// <param name="index"></param>
     /// <param name="eMove"></param>
     /// <returns></returns>
-    public static int MoveProfile(ref Config config, int index, MovementTarget eMove, int pos = -1)
+    public static int MoveProfile(int index, MovementTarget eMove, int pos = -1)
     {
+        var config = LazyConfig.Instance.Config;
         var lstProfile = config.ProfileItems.OrderBy(it => it.Sort).ToList();
         var count = lstProfile.Count;
         if (index < 0 || index > lstProfile.Count - 1)
@@ -367,8 +334,9 @@ internal static class ConfigProc
         return 0;
     }
 
-    private static int AddProfileViaContent(ref Config config, ProfileItem profileItem, string content)
+    private static int AddProfileViaContent(ProfileItem profileItem, string content)
     {
+        var config = LazyConfig.Instance.Config;
         if (string.IsNullOrEmpty(content))
         {
             return -1;
@@ -402,15 +370,16 @@ internal static class ConfigProc
         }
 
         profileItem.Enabled = true;
-        AddProfileCommon(ref config, profileItem);
+        AddProfileCommon(profileItem);
 
         ToJsonFile(config);
 
         return 0;
     }
 
-    public static int AddProfileViaPath(ref Config config, ProfileItem profileItem, string fileName)
+    public static int AddProfileViaPath(ProfileItem profileItem, string fileName)
     {
+        var config = LazyConfig.Instance.Config;
         if (!File.Exists(fileName))
         {
             return -1;
@@ -438,21 +407,22 @@ internal static class ConfigProc
             profileItem.Remarks = $"import custom@{DateTime.Now.ToShortDateString()}";
         }
 
-        AddProfileCommon(ref config, profileItem);
+        AddProfileCommon(profileItem);
 
         ToJsonFile(config);
 
         return 0;
     }
 
-    public static int EditProfile(ref Config config, ProfileItem profileItem)
+    public static int EditProfile(ProfileItem profileItem)
     {
+        var config = LazyConfig.Instance.Config;
         if (!string.IsNullOrEmpty(profileItem.IndexId) && config.IndexId == profileItem.IndexId)
         {
             Global.reloadCore = true;
         }
 
-        AddProfileCommon(ref config, profileItem);
+        AddProfileCommon(profileItem);
 
         //TODO auto update via url
         //if (!string.IsNullOrEmpty(profileItem.url))
@@ -509,7 +479,7 @@ internal static class ConfigProc
         return 0;
     }
 
-    private static int AddProfileCommon(ref Config config, ProfileItem profileItem)
+    private static int AddProfileCommon(ProfileItem profileItem)
     {
         if (string.IsNullOrEmpty(profileItem.IndexId))
         {
@@ -521,6 +491,7 @@ internal static class ConfigProc
             profileItem.CoreType = CoreKind.ClashMeta;
         }
 
+        var config = LazyConfig.Instance.Config;
         if (!config.ProfileItems.Exists(it => it.IndexId == profileItem.IndexId))
         {
             var maxSort = config.ProfileItems.Any() ? config.ProfileItems.Max(t => t.Sort) : 0;
@@ -568,7 +539,7 @@ internal static class ConfigProc
         return content;
     }
 
-    public static int AddBatchProfiles(ref Config config, string clipboardData, string indexId, string groupId)
+    public static int AddBatchProfiles(string clipboardData, string indexId, string groupId)
     {
         if (string.IsNullOrEmpty(clipboardData))
         {
@@ -589,7 +560,7 @@ internal static class ConfigProc
                 Remarks = "clash_subscription"
             };
 
-            return EditProfile(ref config, item);
+            return EditProfile(item);
         }
 
         //maybe clashProtocol
@@ -612,7 +583,7 @@ internal static class ConfigProc
                         Remarks = "clash_subscription"
                     };
 
-                    return EditProfile(ref config, item);
+                    return EditProfile(item);
                 }
             }
         }
@@ -629,7 +600,7 @@ internal static class ConfigProc
                 Enabled = false,
                 Remarks = "clash_local_file"
             };
-            return AddProfileViaPath(ref config, item, clipboardData);
+            return AddProfileViaPath(item, clipboardData);
         }
 
         //Is Clash configuration
@@ -646,7 +617,7 @@ internal static class ConfigProc
 
         ProfileItem? profileItem = null;
         if (!string.IsNullOrEmpty(indexId))
-            profileItem = config.GetProfileItem(indexId);
+            profileItem = LazyConfig.Instance.Config.GetProfileItem(indexId);
 
         if (profileItem == null)
         {
@@ -655,7 +626,7 @@ internal static class ConfigProc
 
         profileItem.GroupId = groupId;
 
-        if (AddProfileViaContent(ref config, profileItem, clipboardData) == 0)
+        if (AddProfileViaContent(profileItem, clipboardData) == 0)
         {
             return 0;
         }
@@ -665,8 +636,9 @@ internal static class ConfigProc
         }
     }
 
-    public static void ClearAllServerStatistics(ref Config config)
+    public static void ClearAllServerStatistics()
     {
+        var config = LazyConfig.Instance.Config;
         foreach (var item in config.ProfileItems)
         {
             item.UploadRemote = 0;

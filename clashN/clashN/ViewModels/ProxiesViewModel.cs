@@ -19,8 +19,6 @@ public class ProxiesViewModel : ReactiveObject
 {
     private const int DelayTimeout = 99999999;
 
-    private static Config _config;
-
     private Dictionary<string, ProxiesItem> _proxies;
     private Dictionary<string, ProvidersItem> _providers;
     
@@ -51,13 +49,13 @@ public class ProxiesViewModel : ReactiveObject
 
     public ProxiesViewModel()
     {
-        _config = LazyConfig.Instance.Config;
+        var config = LazyConfig.Instance.Config;
 
         SelectedGroup = new ProxyModel();
         SelectedDetail = new ProxyModel();
-        AutoRefresh = _config.UiItem.ProxiesAutoRefresh;
-        EnableTun = _config.EnableTun;
-        SortingSelected = _config.UiItem.ProxiesSorting;
+        AutoRefresh = config.UiItem.ProxiesAutoRefresh;
+        EnableTun = config.EnableTun;
+        SortingSelected = config.UiItem.ProxiesSorting;
 
         //GetClashProxies(true);
         this.WhenAnyValue(
@@ -88,7 +86,7 @@ public class ProxiesViewModel : ReactiveObject
         this.WhenAnyValue(
                 x => x.AutoRefresh,
                 y => y == true)
-            .Subscribe(c => { _config.UiItem.ProxiesAutoRefresh = AutoRefresh; });
+            .Subscribe(c => { config.UiItem.ProxiesAutoRefresh = AutoRefresh; });
 
         ProxiesReloadCmd = ReactiveCommand.Create(() => { ProxiesReload(); });
         ProxiesDelayTestCmd = ReactiveCommand.Create(() => { ProxiesDelayTest(true); });
@@ -109,7 +107,7 @@ public class ProxiesViewModel : ReactiveObject
             return;
         }
 
-        if (_config.SysProxyType == (SysProxyType)SystemProxySelected)
+        if (LazyConfig.Instance.Config.SysProxyType == (SysProxyType)SystemProxySelected)
         {
             return;
         }
@@ -124,7 +122,7 @@ public class ProxiesViewModel : ReactiveObject
             return;
         }
 
-        if (_config.RuleMode == (ERuleMode)RuleModeSelected)
+        if (LazyConfig.Instance.Config.RuleMode == (ERuleMode)RuleModeSelected)
         {
             return;
         }
@@ -139,9 +137,9 @@ public class ProxiesViewModel : ReactiveObject
             return;
         }
 
-        if (SortingSelected != _config.UiItem.ProxiesSorting)
+        if (SortingSelected != LazyConfig.Instance.Config.UiItem.ProxiesSorting)
         {
-            _config.UiItem.ProxiesSorting = SortingSelected;
+            LazyConfig.Instance.Config.UiItem.ProxiesSorting = SortingSelected;
         }
 
         RefreshProxyDetails(c);
@@ -178,19 +176,19 @@ public class ProxiesViewModel : ReactiveObject
 
     public void ReloadSystemProxySelected()
     {
-        SystemProxySelected = (int)_config.SysProxyType;
+        SystemProxySelected = (int)LazyConfig.Instance.Config.SysProxyType;
     }
 
     public void ReloadRuleModeSelected()
     {
-        RuleModeSelected = (int)_config.RuleMode;
+        RuleModeSelected = (int)LazyConfig.Instance.Config.RuleMode;
     }
 
     private void DoEnableTun(bool c)
     {
-        if (_config.EnableTun != EnableTun)
+        if (LazyConfig.Instance.Config.EnableTun != EnableTun)
         {
-            _config.EnableTun = EnableTun;
+            LazyConfig.Instance.Config.EnableTun = EnableTun;
             TunModeSwitch();
         }
     }
@@ -509,9 +507,9 @@ public class ProxiesViewModel : ReactiveObject
 
                 var dtNow = DateTime.Now;
 
-                if (_config.AutoDelayTestInterval > 0)
+                if (LazyConfig.Instance.Config.AutoDelayTestInterval > 0)
                 {
-                    if ((dtNow - autoDelayTestTime).Minutes % _config.AutoDelayTestInterval == 0)
+                    if ((dtNow - autoDelayTestTime).Minutes % LazyConfig.Instance.Config.AutoDelayTestInterval == 0)
                     {
                         ProxiesDelayTest();
                         autoDelayTestTime = dtNow;
@@ -520,32 +518,6 @@ public class ProxiesViewModel : ReactiveObject
                     Thread.Sleep(1000);
                 }
             });
-
-        //Task.Run(() =>
-        //{
-        //    var autoDelayTestTime = DateTime.Now;
-
-        //    Thread.Sleep(1000);
-
-        //    while (true)
-        //    {
-        //        var dtNow = DateTime.Now;
-
-        //        if (_config.autoDelayTestInterval > 0)
-        //        {
-        //            if ((dtNow - autoDelayTestTime).Minutes % _config.autoDelayTestInterval == 0)
-        //            {
-        //                ProxiesDelayTest();
-        //                autoDelayTestTime = dtNow;
-        //            }
-        //            Thread.Sleep(1000);
-        //        }
-
-        //        Thread.Sleep(1000 * 60);
-        //    }
-        //}
-
-        //);
     }
 
     #endregion task

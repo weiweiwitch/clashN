@@ -7,8 +7,6 @@ namespace ClashN.Handler;
 
 internal class StatisticsHandler
 {
-    private readonly Config _config;
-
     //private ServerStatistics serverStatistics_;
     private bool _exitFlag;
 
@@ -30,10 +28,9 @@ internal class StatisticsHandler
     //    }
     //}
 
-    public StatisticsHandler(Config config, Action<ulong, ulong> update)
+    public StatisticsHandler(Action<ulong, ulong> update)
     {
-        _config = config;
-        Enable = config.EnableStatistics;
+        Enable = LazyConfig.Instance.Config.EnableStatistics;
         _updateFunc = update;
         _exitFlag = false;
 
@@ -48,7 +45,7 @@ internal class StatisticsHandler
 
         try
         {
-            _url = $"ws://{Global.Loopback}:{_config.ApiPort}/traffic";
+            _url = $"ws://{Global.Loopback}:{LazyConfig.Instance.Config.ApiPort}/traffic";
 
             if (_webSocket == null)
             {
@@ -106,8 +103,9 @@ internal class StatisticsHandler
                         var result = Encoding.UTF8.GetString(buffer, 0, res.Count);
                         if (!string.IsNullOrEmpty(result))
                         {
-                            var serverStatItem = _config.GetProfileItem(_config.IndexId);
-                            ParseOutput(result, out ulong up, out ulong down);
+                            var config = LazyConfig.Instance.Config;
+                            var serverStatItem = config.GetProfileItem(config.IndexId);
+                            ParseOutput(result, out var up, out var down);
                             if (up + down > 0)
                             {
                                 serverStatItem.UploadRemote += up;

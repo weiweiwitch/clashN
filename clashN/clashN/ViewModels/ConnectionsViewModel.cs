@@ -14,60 +14,46 @@ namespace ClashN.ViewModels
 {
     public class ConnectionsViewModel : ReactiveObject
     {
-        private static Config _config;
-
-        static ConnectionsViewModel()
-        {
-            _config = LazyConfig.Instance.Config;
-        }
-
-        private IObservableCollection<ConnectionModel> _connectionItems = new ObservableCollectionExtended<ConnectionModel>();
+        private IObservableCollection<ConnectionModel> _connectionItems =
+            new ObservableCollectionExtended<ConnectionModel>();
 
         public IObservableCollection<ConnectionModel> ConnectionItems => _connectionItems;
 
-        [Reactive]
-        public ConnectionModel SelectedSource { get; set; }
+        [Reactive] public ConnectionModel SelectedSource { get; set; }
 
         public ReactiveCommand<Unit, Unit> ConnectionCloseCmd { get; }
         public ReactiveCommand<Unit, Unit> ConnectionCloseAllCmd { get; }
 
-        [Reactive]
-        public int SortingSelected { get; set; }
+        [Reactive] public int SortingSelected { get; set; }
 
-        [Reactive]
-        public bool AutoRefresh { get; set; }
+        [Reactive] public bool AutoRefresh { get; set; }
 
         private int AutoRefreshInterval;
 
         public ConnectionsViewModel()
         {
             AutoRefreshInterval = 10;
-            SortingSelected = _config.UiItem.ConnectionsSorting;
-            AutoRefresh = _config.UiItem.ConnectionsAutoRefresh;
+            var config = LazyConfig.Instance.Config;
+            SortingSelected = config.UiItem.ConnectionsSorting;
+            AutoRefresh = config.UiItem.ConnectionsAutoRefresh;
 
             var canEditRemove = this.WhenAnyValue(
-             x => x.SelectedSource,
-             selectedSource => selectedSource != null && !string.IsNullOrEmpty(selectedSource.id));
+                x => x.SelectedSource,
+                selectedSource => selectedSource != null && !string.IsNullOrEmpty(selectedSource.id));
 
             this.WhenAnyValue(
-              x => x.SortingSelected,
-              y => y >= 0)
-                  .Subscribe(c => DoSortingSelected(c));
+                    x => x.SortingSelected,
+                    y => y >= 0)
+                .Subscribe(c => DoSortingSelected(c));
 
             this.WhenAnyValue(
-               x => x.AutoRefresh,
-               y => y == true)
-                   .Subscribe(c => { _config.UiItem.ConnectionsAutoRefresh = AutoRefresh; });
+                    x => x.AutoRefresh,
+                    y => y == true)
+                .Subscribe(c => { config.UiItem.ConnectionsAutoRefresh = AutoRefresh; });
 
-            ConnectionCloseCmd = ReactiveCommand.Create(() =>
-            {
-                ClashConnectionClose(false);
-            }, canEditRemove);
+            ConnectionCloseCmd = ReactiveCommand.Create(() => { ClashConnectionClose(false); }, canEditRemove);
 
-            ConnectionCloseAllCmd = ReactiveCommand.Create(() =>
-            {
-                ClashConnectionClose(true);
-            });
+            ConnectionCloseAllCmd = ReactiveCommand.Create(() => { ClashConnectionClose(true); });
 
             Init();
         }
@@ -78,9 +64,11 @@ namespace ClashN.ViewModels
             {
                 return;
             }
-            if (SortingSelected != _config.UiItem.ConnectionsSorting)
+
+            var config = LazyConfig.Instance.Config;
+            if (SortingSelected != config.UiItem.ConnectionsSorting)
             {
-                _config.UiItem.ConnectionsSorting = SortingSelected;
+                config.UiItem.ConnectionsSorting = SortingSelected;
             }
 
             GetClashConnections();
@@ -112,7 +100,8 @@ namespace ClashN.ViewModels
 
         private void GetClashConnections()
         {
-            MainFormHandler.Instance.GetClashConnections(_config, (it) =>
+            var config = LazyConfig.Instance.Config;
+            MainFormHandler.Instance.GetClashConnections(config, (it) =>
             {
                 //_noticeHandler?.SendMessage("Refresh Clash Connections", true);
                 if (it == null)
@@ -120,10 +109,7 @@ namespace ClashN.ViewModels
                     return;
                 }
 
-                Application.Current.Dispatcher.Invoke((Action)(() =>
-                {
-                    RefreshConnections(it?.Connections!);
-                }));
+                Application.Current.Dispatcher.Invoke((Action)(() => { RefreshConnections(it?.Connections!); }));
             });
         }
 
@@ -140,7 +126,8 @@ namespace ClashN.ViewModels
                 model.id = item.Id;
                 model.network = item.metadata.Network;
                 model.type = item.metadata.Type;
-                model.host = $"{(string.IsNullOrEmpty(item.metadata.Host) ? item.metadata.DestinationIP : item.metadata.Host)}:{item.metadata.DestinationPort}";
+                model.host =
+                    $"{(string.IsNullOrEmpty(item.metadata.Host) ? item.metadata.DestinationIP : item.metadata.Host)}:{item.metadata.DestinationPort}";
                 var sp = (dtNow - item.start);
                 model.time = sp.TotalSeconds < 0 ? 1 : sp.TotalSeconds;
                 model.upload = item.upload;
@@ -152,7 +139,11 @@ namespace ClashN.ViewModels
 
                 lstModel.Add(model);
             }
-            if (lstModel.Count <= 0) { return; }
+
+            if (lstModel.Count <= 0)
+            {
+                return;
+            }
 
             //sort
             switch (SortingSelected)
@@ -195,12 +186,14 @@ namespace ClashN.ViewModels
                 {
                     return;
                 }
+
                 id = item.id;
             }
             else
             {
                 _connectionItems.Clear();
             }
+
             MainFormHandler.Instance.ClashConnectionClose(id);
             GetClashConnections();
         }

@@ -82,7 +82,7 @@ public class MainWindowViewModel : ReactiveObject
     
     // For Update Profile
     private DispatcherTimer? _updateTaskDispatcherTimer;
-    private DateTime _autoUpdateSubTime;
+    private DateTime _autoUpdateSubTime = DateTime.Now;
     
     #endregion Timer
     
@@ -115,24 +115,7 @@ public class MainWindowViewModel : ReactiveObject
         
         NoticeHandler.Instance.ConfigMessageQueue(snackbarMessageQueue);
         
-        var config = LazyConfig.Instance.Config;
-
-        ThreadPool.RegisterWaitForSingleObject(App.ProgramStarted, OnProgramStarted, null, -1, false);
-
-        // init UI
-        Init();
-
-        // init core
-        InitCore();
         
-        RestoreUI();
-
-        if (config.AutoHideStartup)
-        {
-            Observable.Range(1, 1)
-                .Delay(TimeSpan.FromSeconds(1))
-                .Subscribe(x => { Application.Current.Dispatcher.Invoke((Action)(() => { ShowHideWindow(false); })); });
-        }
 
         //System proxy
         SystemProxyClearCmd = ReactiveCommand.Create(() =>
@@ -192,6 +175,25 @@ public class MainWindowViewModel : ReactiveObject
         NotifyLeftClickCmd = ReactiveCommand.Create(() => { ShowHideWindow(null); });
 
         Global.ShowInTaskbar = true; //Application.Current.MainWindow.ShowInTaskbar;
+        
+        ThreadPool.RegisterWaitForSingleObject(App.ProgramStarted, OnProgramStarted, null, -1, false);
+        
+        // Main Logic
+        // init UI
+        Init();
+
+        // init core
+        InitCore();
+        
+        RestoreUI();
+
+        var config = LazyConfig.Instance.Config;
+        if (config.AutoHideStartup)
+        {
+            Observable.Range(1, 1)
+                .Delay(TimeSpan.FromSeconds(1))
+                .Subscribe(x => { Application.Current.Dispatcher.Invoke((Action)(() => { ShowHideWindow(false); })); });
+        }
     }
 
     private void OnProgramStarted(object? state, bool timeout)
@@ -285,7 +287,7 @@ public class MainWindowViewModel : ReactiveObject
         var config = LazyConfig.Instance.Config;
         if (config.EnableStatistics)
         {
-            _statistics = new StatisticsHandler(config, UpdateStatisticsHandler);
+            _statistics = new StatisticsHandler(UpdateStatisticsHandler);
         }
 
         // Timer 4 Update 
@@ -491,11 +493,6 @@ public class MainWindowViewModel : ReactiveObject
                 ChangePrimaryColor(swatch.ExemplarHue.Color);
             }
         }
-
-        //if (!config.uiItem.mainLocation.IsEmpty)
-        //{
-        //    this.Location = config.uiItem.mainLocation;
-        //}
 
         if (config.UiItem.MainWidth > 0 && config.UiItem.MainHeight > 0)
         {

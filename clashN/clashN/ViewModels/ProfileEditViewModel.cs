@@ -15,7 +15,6 @@ namespace ClashN.ViewModels;
 
 public class ProfileEditViewModel : ReactiveValidationObject
 {
-    private static Config _config;
         
     private ProfileEditWindow _view;
 
@@ -31,8 +30,6 @@ public class ProfileEditViewModel : ReactiveValidationObject
 
     public ProfileEditViewModel(ProfileItem profileItem, ProfileEditWindow view)
     {
-        _config = LazyConfig.Instance.Config;
-
         if (string.IsNullOrEmpty(profileItem.IndexId))
         {
             SelectedSource = profileItem;
@@ -60,12 +57,12 @@ public class ProfileEditViewModel : ReactiveValidationObject
             SaveProfile();
         });
 
-        Utils.SetDarkBorder(view, _config.UiItem.ColorModeDark);
+        Utils.SetDarkBorder(view, LazyConfig.Instance.Config.UiItem.ColorModeDark);
     }
 
     private void SaveProfile()
     {
-        string remarks = SelectedSource.Remarks;
+        var remarks = SelectedSource.Remarks;
         if (string.IsNullOrEmpty(remarks))
         {
             NoticeHandler.Instance.Enqueue(ResUI.PleaseFillRemarks);
@@ -81,7 +78,7 @@ public class ProfileEditViewModel : ReactiveValidationObject
             SelectedSource.CoreType = (CoreKind)Enum.Parse(typeof(CoreKind), CoreType);
         }
 
-        var item = _config.GetProfileItem(SelectedSource.IndexId);
+        var item = LazyConfig.Instance.Config.GetProfileItem(SelectedSource.IndexId);
         if (item is null)
         {
             item = SelectedSource;
@@ -97,7 +94,7 @@ public class ProfileEditViewModel : ReactiveValidationObject
             item.EnableConvert = SelectedSource.EnableConvert;
         }
 
-        if (ConfigProc.EditProfile(ref _config, item) == 0)
+        if (ConfigProc.EditProfile(item) == 0)
         {
             Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
             NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
@@ -131,12 +128,12 @@ public class ProfileEditViewModel : ReactiveValidationObject
         {
             return;
         }
-        var item = _config.GetProfileItem(SelectedSource.IndexId);
+        var item = LazyConfig.Instance.Config.GetProfileItem(SelectedSource.IndexId);
         if (item is null)
         {
             item = SelectedSource;
         }
-        if (ConfigProc.AddProfileViaPath(ref _config, item, fileName) == 0)
+        if (ConfigProc.AddProfileViaPath(item, fileName) == 0)
         {
             NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedCustomProfile);
             Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();

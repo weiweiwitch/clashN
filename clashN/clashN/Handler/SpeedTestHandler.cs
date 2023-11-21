@@ -8,19 +8,16 @@ namespace ClashN.Handler;
 
 internal class SpeedTestHandler
 {
-    private Config _config;
     private List<ServerTestItem> _selecteds;
     private Action<string, string> _updateFunc;
 
-    public SpeedTestHandler(ref Config config)
+    public SpeedTestHandler()
     {
-        _config = config;
     }
 
-    public SpeedTestHandler(ref Config config, CoreHandler coreHandler, List<ProfileItem> selecteds,
+    public SpeedTestHandler(CoreHandler coreHandler, List<ProfileItem> selecteds,
         ESpeedActionType actionType, Action<string, string> update)
     {
-        _config = config;
         _updateFunc = update;
 
         _selecteds = new List<ServerTestItem>();
@@ -91,7 +88,7 @@ internal class SpeedTestHandler
     {
         try
         {
-            var httpPort = _config.HttpPort;
+            var httpPort = LazyConfig.Instance.Config.HttpPort;
 
             var t = Task.Run(() =>
             {

@@ -8,14 +8,12 @@ using ClashN.Base;
 using ClashN.Mode;
 using ClashN.Resx;
 using ClashN.Tool;
-using Splat;
 
 namespace ClashN.Handler;
 
 internal class UpdateHandle
 {
     private Action<bool, string> _updateFunc;
-    private Config _config;
 
     public event EventHandler<ResultEventArgs> AbsoluteCompleted;
 
@@ -31,9 +29,8 @@ internal class UpdateHandle
         }
     }
 
-    public void CheckUpdateGuiN(Config config, Action<bool, string> update)
+    public void CheckUpdateGuiN(Action<bool, string> update)
     {
-        _config = config;
         _updateFunc = update;
         var url = string.Empty;
 
@@ -99,9 +96,8 @@ internal class UpdateHandle
         CheckUpdateAsync(CoreKind.ClashN);
     }
 
-    public void CheckUpdateCore(CoreKind type, Config config, Action<bool, string> update)
+    public void CheckUpdateCore(CoreKind type, Action<bool, string> update)
     {
-        _config = config;
         _updateFunc = update;
         var url = string.Empty;
 
@@ -151,15 +147,14 @@ internal class UpdateHandle
         CheckUpdateAsync(type);
     }
 
-    public void UpdateSubscriptionProcess(Config config, bool blProxy, List<ProfileItem> profileItems,
+    public void UpdateSubscriptionProcess(bool blProxy, List<ProfileItem> profileItems,
         Action<bool, string> update)
     {
-        _config = config;
         _updateFunc = update;
 
         _updateFunc(false, ResUI.MsgUpdateSubscriptionStart);
 
-        if (config.ProfileItems == null || config.ProfileItems.Count <= 0)
+        if (LazyConfig.Instance.Config.ProfileItems == null || LazyConfig.Instance.Config.ProfileItems.Count <= 0)
         {
             _updateFunc(false, ResUI.MsgNoValidSubscription);
             return;
@@ -169,7 +164,7 @@ internal class UpdateHandle
         {
             if (profileItems == null)
             {
-                profileItems = config.ProfileItems;
+                profileItems = LazyConfig.Instance.Config.ProfileItems;
             }
 
             foreach (var item in profileItems)
@@ -189,12 +184,12 @@ internal class UpdateHandle
 
                 if (item.EnableConvert)
                 {
-                    if (string.IsNullOrEmpty(config.ConstItem.SubConvertUrl))
+                    if (string.IsNullOrEmpty(LazyConfig.Instance.Config.ConstItem.SubConvertUrl))
                     {
-                        config.ConstItem.SubConvertUrl = Global.SubConvertUrls[0];
+                        LazyConfig.Instance.Config.ConstItem.SubConvertUrl = Global.SubConvertUrls[0];
                     }
 
-                    url = string.Format(config.ConstItem.SubConvertUrl, Utils.UrlEncode(url));
+                    url = string.Format(LazyConfig.Instance.Config.ConstItem.SubConvertUrl, Utils.UrlEncode(url));
                     if (!url.Contains("config="))
                     {
                         url += $"&config={Global.SubConvertConfig[0]}";
@@ -226,7 +221,7 @@ internal class UpdateHandle
                         _updateFunc(false, $"{hashCode}{result}");
                     }
 
-                    var ret = ConfigProc.AddBatchProfiles(ref config, result.Item1, indexId, groupId);
+                    var ret = ConfigProc.AddBatchProfiles(result.Item1, indexId, groupId);
                     if (ret == 0)
                     {
                         item.UpdateTime = ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();
@@ -282,9 +277,8 @@ internal class UpdateHandle
         return dicInfo.ContainsKey(key) ? Convert.ToUInt64(dicInfo?[key]) : 0;
     }
 
-    public void UpdateGeoFile(string geoName, Config config, Action<bool, string> update)
+    public void UpdateGeoFile(string geoName, Action<bool, string> update)
     {
-        _config = config;
         _updateFunc = update;
         var url = string.Format(Global.GeoUrl, geoName);
 
@@ -494,7 +488,7 @@ internal class UpdateHandle
 
     private int HttpProxyTest()
     {
-        var statistics = new SpeedTestHandler(ref _config);
+        var statistics = new SpeedTestHandler();
         return statistics.RunAvailabilityCheck();
     }
 

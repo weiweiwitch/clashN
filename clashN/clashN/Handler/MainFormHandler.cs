@@ -132,7 +132,7 @@ public sealed class MainFormHandler
         Task.Run(() =>
         {
             Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Runs In Timer Thread");
-            updateHandle.UpdateSubscriptionProcess(config, true, null, (success, msg) =>
+            updateHandle.UpdateSubscriptionProcess(true, null, (success, msg) =>
             {
                 update(success, msg);
                 if (success)

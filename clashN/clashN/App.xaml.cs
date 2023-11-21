@@ -1,8 +1,8 @@
-﻿using ClashN.Handler;
-using ClashN.Mode;
-using ClashN.Tool;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Threading;
+using ClashN.Handler;
+using ClashN.Tool;
 
 namespace ClashN;
 
@@ -12,8 +12,6 @@ namespace ClashN;
 public partial class App
 {
     public static readonly EventWaitHandle? ProgramStarted;
-    
-    private Config? _config;
 
     static App()
     {
@@ -58,14 +56,14 @@ public partial class App
         Init();
 
         var lang = Utils.RegReadValue(Global.MyRegPath, Global.MyRegKeyLanguage, Global.Languages[0]);
-        Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(lang);
+        Thread.CurrentThread.CurrentUICulture = new CultureInfo(lang);
 
         base.OnStartup(e);
     }
 
     private void Init()
     {
-        if (ConfigProc.LoadConfig(ref _config) != 0)
+        if (ConfigProc.LoadConfig() != 0)
         {
             Utils.SaveLogError($"Loading GUI configuration file is abnormal, please restart the application {Environment.NewLine} 加载GUI配置文件异常,请重启应用");
             UI.ShowWarning($"Loading GUI configuration file is abnormal,please restart the application{Environment.NewLine}加载GUI配置文件异常,请重启应用");
