@@ -329,7 +329,7 @@ public class MainWindowViewModel : ReactiveObject
         SetRuleMode(config.RuleMode);
 
         proxiesViewModel?.ProxiesReload();
-        proxiesViewModel?.ProxiesDelayTest();
+        proxiesViewModel?.ProxiesDelayTest(true);
 
         Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
 

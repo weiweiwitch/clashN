@@ -243,8 +243,9 @@ public sealed class MainFormHandler
         }
 
         Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest - Start to wait all task");
-        Task.WaitAll(tasks.ToArray());
-
+        await Task.Run((() => { Task.WaitAll(tasks.ToArray()); }));
+        Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest - Wait all task finished");
+        
         await Task.Delay(1000);
 
         update(null, "");
@@ -323,7 +324,7 @@ public sealed class MainFormHandler
 
     public async void GetClashConnections(Config config, Action<ClashConnections> update)
     {
-       await GetClashConnectionsAsync(update);
+        await GetClashConnectionsAsync(update);
     }
 
     private async Task GetClashConnectionsAsync(Action<ClashConnections> update)

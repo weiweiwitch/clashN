@@ -145,11 +145,6 @@ public class ProxiesViewModel : ReactiveObject
         RefreshProxyDetails(c);
     }
 
-    private static void UpdateHandler(string msg)
-    {
-        NoticeHandler.SendMessage4ClashN(msg);
-    }
-
     public void ProxiesReload()
     {
         Utils.SaveLogDebug($"ProxiesViewModel:ProxiesReload - Start");
@@ -166,13 +161,6 @@ public class ProxiesViewModel : ReactiveObject
 
         _proxyGroups.Clear();
         _proxyDetails.Clear();
-    }
-
-    public void ProxiesDelayTest()
-    {
-        Utils.SaveLogDebug($"ProxiesViewModel:ProxiesDelayTest - Start");
-
-        ProxiesDelayTest(true);
     }
 
     public void ReloadSystemProxySelected()
@@ -207,7 +195,7 @@ public class ProxiesViewModel : ReactiveObject
     {
         MainFormHandler.Instance.GetClashProxies((it, it2) =>
         {
-            UpdateHandler("Refresh Clash Proxies");
+            NoticeHandler.SendMessage4ClashN("Refresh Clash Proxies");
 
             _proxies = it?.proxies;
             _providers = it2?.providers;
@@ -438,13 +426,13 @@ public class ProxiesViewModel : ReactiveObject
         NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
     }
 
-    private void ProxiesDelayTest(bool blAll)
+    public void ProxiesDelayTest(bool blAll)
     {
-        UpdateHandler("ProxiesViewModel:ProxiesDelayTest - Clash Proxies Latency Test");
+        NoticeHandler.SendMessage4ClashN("ProxiesViewModel:ProxiesDelayTest - Clash Proxies Latency Test");
 
         MainFormHandler.Instance.ClashProxiesDelayTest(blAll, _proxyDetails.ToList(), (item, result) =>
         {
-            UpdateHandler("ProxiesViewModel:ProxiesDelayTest - Exec Clash Proxies Latency Test Callback");
+            NoticeHandler.SendMessage4ClashN("ProxiesViewModel:ProxiesDelayTest - Exec Clash Proxies Latency Test Callback");
 
             if (item == null)
             {
@@ -457,7 +445,7 @@ public class ProxiesViewModel : ReactiveObject
                 return;
             }
 
-            var detail = _proxyDetails.Where(it => it.name == item.name).FirstOrDefault();
+            var detail = _proxyDetails.FirstOrDefault(it => it.name == item.name);
             if (detail != null)
             {
                 var dicResult = Utils.FromJson<Dictionary<string, object>>(result);
@@ -474,7 +462,7 @@ public class ProxiesViewModel : ReactiveObject
                 else
                 {
                     detail.delay = DelayTimeout;
-                    detail.delayName = String.Empty;
+                    detail.delayName = string.Empty;
                 }
 
                 _proxyDetails.Replace(detail, Utils.DeepCopy(detail));
@@ -500,11 +488,12 @@ public class ProxiesViewModel : ReactiveObject
 
                 var dtNow = DateTime.Now;
 
-                if (LazyConfig.Instance.Config.AutoDelayTestInterval > 0)
+                var autoDelayTestInterval = LazyConfig.Instance.Config.AutoDelayTestInterval;
+                if (autoDelayTestInterval > 0)
                 {
-                    if ((dtNow - autoDelayTestTime).Minutes % LazyConfig.Instance.Config.AutoDelayTestInterval == 0)
+                    if ((dtNow - autoDelayTestTime).Minutes % autoDelayTestInterval == 0)
                     {
-                        ProxiesDelayTest();
+                        ProxiesDelayTest(true);
 
                         autoDelayTestTime = dtNow;
                     }
