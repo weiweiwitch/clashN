@@ -4,7 +4,7 @@ public class ClashConnections
 {
     public ulong DownloadTotal { get; set; }
     public ulong UploadTotal { get; set; }
-    public List<ConnectionItem> Connections { get; } = new List<ConnectionItem>();
+    public List<ConnectionItem> Connections { get; } = new();
 }
 
 public class ConnectionItem

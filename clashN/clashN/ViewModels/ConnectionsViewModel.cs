@@ -8,6 +8,7 @@ using Splat;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Threading;
 using ClashN.Tool;
 
 namespace ClashN.ViewModels;
@@ -75,9 +76,12 @@ public class ConnectionsViewModel : ReactiveObject
 
     private void Init()
     {
+        Utils.SaveLog("ConnectionsViewModel:Init - Start");
+
         Observable.Interval(TimeSpan.FromSeconds(AutoRefreshInterval))
             .Subscribe(x =>
             {
+                Utils.SaveLog($"ConnectionsViewModel:Init - Try GetClashConnections after delay {AutoRefreshInterval}");
                 if (AutoRefresh && Global.ShowInTaskbar)
                 {
                     GetClashConnections();
@@ -87,15 +91,14 @@ public class ConnectionsViewModel : ReactiveObject
 
     private void GetClashConnections()
     {
-        var config = LazyConfig.Instance.Config;
-        MainFormHandler.Instance.GetClashConnections(config, it =>
+        MainFormHandler.Instance.GetClashConnections(it =>
         {
             if (it == null)
             {
                 return;
             }
 
-            RefreshConnections(it?.Connections!);
+            Application.Current.Dispatcher.Invoke(() => { RefreshConnections(it.Connections); });
         });
     }
 
@@ -107,13 +110,15 @@ public class ConnectionsViewModel : ReactiveObject
         var lstModel = new List<ConnectionModel>();
         foreach (var item in connections)
         {
-            ConnectionModel model = new();
+            ConnectionModel model = new()
+            {
+                id = item.Id,
+                network = item.metadata.Network,
+                type = item.metadata.Type,
+                host =
+                    $"{(string.IsNullOrEmpty(item.metadata.Host) ? item.metadata.DestinationIP : item.metadata.Host)}:{item.metadata.DestinationPort}"
+            };
 
-            model.id = item.Id;
-            model.network = item.metadata.Network;
-            model.type = item.metadata.Type;
-            model.host =
-                $"{(string.IsNullOrEmpty(item.metadata.Host) ? item.metadata.DestinationIP : item.metadata.Host)}:{item.metadata.DestinationPort}";
             var sp = (dtNow - item.start);
             model.time = sp.TotalSeconds < 0 ? 1 : sp.TotalSeconds;
             model.upload = item.upload;
@@ -132,32 +137,16 @@ public class ConnectionsViewModel : ReactiveObject
         }
 
         //sort
-        switch (SortingSelected)
+        lstModel = SortingSelected switch
         {
-            case 0:
-                lstModel = lstModel.OrderBy(t => t.upload / t.time).ToList();
-                break;
-
-            case 1:
-                lstModel = lstModel.OrderBy(t => t.download / t.time).ToList();
-                break;
-
-            case 2:
-                lstModel = lstModel.OrderBy(t => t.upload).ToList();
-                break;
-
-            case 3:
-                lstModel = lstModel.OrderBy(t => t.download).ToList();
-                break;
-
-            case 4:
-                lstModel = lstModel.OrderBy(t => t.time).ToList();
-                break;
-
-            case 5:
-                lstModel = lstModel.OrderBy(t => t.host).ToList();
-                break;
-        }
+            0 => lstModel.OrderBy(t => t.upload / t.time).ToList(),
+            1 => lstModel.OrderBy(t => t.download / t.time).ToList(),
+            2 => lstModel.OrderBy(t => t.upload).ToList(),
+            3 => lstModel.OrderBy(t => t.download).ToList(),
+            4 => lstModel.OrderBy(t => t.time).ToList(),
+            5 => lstModel.OrderBy(t => t.host).ToList(),
+            _ => lstModel
+        };
 
         _connectionItems.AddRange(lstModel);
     }
@@ -181,6 +170,7 @@ public class ConnectionsViewModel : ReactiveObject
         }
 
         MainFormHandler.Instance.ClashConnectionClose(id);
+
         GetClashConnections();
     }
 }

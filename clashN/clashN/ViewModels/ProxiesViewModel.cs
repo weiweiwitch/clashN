@@ -9,6 +9,7 @@ using Splat;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Threading;
 using ClashN.Tool;
 using static ClashN.Mode.ClashProviders;
 using static ClashN.Mode.ClashProxies;
@@ -197,19 +198,22 @@ public class ProxiesViewModel : ReactiveObject
         {
             NoticeHandler.SendMessage4ClashN("Refresh Clash Proxies");
 
-            _proxies = it?.proxies;
-            _providers = it2?.providers;
-
-            LazyConfig.Instance.SetProxies(_proxies);
-            if (_proxies == null)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                return;
-            }
+                _proxies = it.proxies;
+                _providers = it2.providers;
 
-            if (refreshUI)
-            {
-                RefreshProxyGroups();
-            }
+                LazyConfig.Instance.SetProxies(_proxies);
+                if (_proxies == null)
+                {
+                    return;
+                }
+
+                if (refreshUI)
+                {
+                    RefreshProxyGroups();
+                }
+            });
         });
     }
 
@@ -244,14 +248,14 @@ public class ProxiesViewModel : ReactiveObject
         }
 
         //from api
-        foreach (KeyValuePair<string, ProxiesItem> kv in _proxies)
+        foreach (var kv in _proxies)
         {
             if (!Global.AllowSelectType.Contains(kv.Value.type.ToLower()))
             {
                 continue;
             }
 
-            var item = _proxyGroups.Where(t => t.name == kv.Key).FirstOrDefault();
+            var item = _proxyGroups.FirstOrDefault(t => t.name == kv.Key);
             if (item != null && !string.IsNullOrEmpty(item.name))
             {
                 continue;
@@ -432,41 +436,39 @@ public class ProxiesViewModel : ReactiveObject
 
         MainFormHandler.Instance.ClashProxiesDelayTest(blAll, _proxyDetails.ToList(), (item, result) =>
         {
-            NoticeHandler.SendMessage4ClashN("ProxiesViewModel:ProxiesDelayTest - Exec Clash Proxies Latency Test Callback");
-
-            if (item == null)
-            {
-                GetClashProxies(true);
-                return;
-            }
+            NoticeHandler.SendMessage4ClashN(
+                "ProxiesViewModel:ProxiesDelayTest - Exec Clash Proxies Latency Test Callback");
 
             if (string.IsNullOrEmpty(result))
             {
                 return;
             }
 
-            var detail = _proxyDetails.FirstOrDefault(it => it.name == item.name);
-            if (detail != null)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                var dicResult = Utils.FromJson<Dictionary<string, object>>(result);
-                if (dicResult != null && dicResult.ContainsKey("delay"))
+                var detail = _proxyDetails.FirstOrDefault(it => it.name == item.name);
+                if (detail != null)
                 {
-                    detail.delay = Convert.ToInt32(dicResult["delay"]);
-                    detail.delayName = $"{dicResult["delay"]}ms";
-                }
-                else if (dicResult != null && dicResult.ContainsKey("message"))
-                {
-                    detail.delay = DelayTimeout;
-                    detail.delayName = $"{dicResult["message"]}";
-                }
-                else
-                {
-                    detail.delay = DelayTimeout;
-                    detail.delayName = string.Empty;
-                }
+                    var dicResult = Utils.FromJson<Dictionary<string, object>>(result);
+                    if (dicResult != null && dicResult.ContainsKey("delay"))
+                    {
+                        detail.delay = Convert.ToInt32(dicResult["delay"]);
+                        detail.delayName = $"{dicResult["delay"]}ms";
+                    }
+                    else if (dicResult != null && dicResult.ContainsKey("message"))
+                    {
+                        detail.delay = DelayTimeout;
+                        detail.delayName = $"{dicResult["message"]}";
+                    }
+                    else
+                    {
+                        detail.delay = DelayTimeout;
+                        detail.delayName = string.Empty;
+                    }
 
-                _proxyDetails.Replace(detail, Utils.DeepCopy(detail));
-            }
+                    _proxyDetails.Replace(detail, Utils.DeepCopy(detail));
+                }
+            });
         });
     }
 
@@ -481,23 +483,26 @@ public class ProxiesViewModel : ReactiveObject
         Observable.Interval(TimeSpan.FromSeconds(60))
             .Subscribe(x =>
             {
-                if (!AutoRefresh || !Global.ShowInTaskbar)
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    return;
-                }
-
-                var dtNow = DateTime.Now;
-
-                var autoDelayTestInterval = LazyConfig.Instance.Config.AutoDelayTestInterval;
-                if (autoDelayTestInterval > 0)
-                {
-                    if ((dtNow - autoDelayTestTime).Minutes % autoDelayTestInterval == 0)
+                    if (!AutoRefresh || !Global.ShowInTaskbar)
                     {
-                        ProxiesDelayTest(true);
-
-                        autoDelayTestTime = dtNow;
+                        return;
                     }
-                }
+
+                    var dtNow = DateTime.Now;
+
+                    var autoDelayTestInterval = LazyConfig.Instance.Config.AutoDelayTestInterval;
+                    if (autoDelayTestInterval > 0)
+                    {
+                        if ((dtNow - autoDelayTestTime).Minutes % autoDelayTestInterval == 0)
+                        {
+                            ProxiesDelayTest(true);
+
+                            autoDelayTestTime = dtNow;
+                        }
+                    }
+                });
             });
     }
 

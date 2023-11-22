@@ -11,14 +11,14 @@ internal class StatisticsHandler
 
     public static StatisticsHandler Instance => _instance.Value;
 
-    private bool _exitFlag = false;
+    private bool _exitFlag;
 
-    private ClientWebSocket? _webSocket = null;
+    private ClientWebSocket? _webSocket;
     private string _url = string.Empty;
 
-    public Action<ulong, ulong> CbStatisticUpdateFunc;
+    public Action<ulong, ulong>? CbStatisticUpdate;
 
-    private bool Enable { get; set; } = LazyConfig.Instance.Config.EnableStatistics;
+    private bool Enable { get; } = LazyConfig.Instance.Config.EnableStatistics;
 
     public void Close()
     {
@@ -192,7 +192,7 @@ internal class StatisticsHandler
                         }
                     }
 
-                    CbStatisticUpdateFunc(up, down);
+                    CbStatisticUpdate?.Invoke(up, down);
                 }
 
                 res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None)

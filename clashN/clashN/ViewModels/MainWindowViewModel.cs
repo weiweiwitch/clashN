@@ -248,7 +248,7 @@ public class MainWindowViewModel : ReactiveObject
 
         MainFormHandler.InitRegister();
 
-        StatisticsHandler.Instance.CbStatisticUpdateFunc = CbStatisticUpdate;
+        StatisticsHandler.Instance.CbStatisticUpdate = CbStatisticUpdate;
         StatisticsHandler.Instance.Run();
 
         // HotKey

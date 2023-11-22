@@ -150,12 +150,7 @@ public sealed class MainFormHandler
         }
     }
 
-    public async void GetClashProxies(Action<ClashProxies, ClashProviders> update)
-    {
-        await GetClashProxiesAsync(update);
-    }
-
-    private async Task GetClashProxiesAsync(Action<ClashProxies, ClashProviders> update)
+    public async void GetClashProxies(Action<ClashProxies, ClashProviders> cbUpdate)
     {
         for (var i = 0; i < 5; i++)
         {
@@ -169,17 +164,16 @@ public sealed class MainFormHandler
 
             if (clashProxies != null || clashProviders != null)
             {
-                update(clashProxies, clashProviders);
+                cbUpdate(clashProxies, clashProviders);
                 return;
             }
 
             await Task.Delay(5000);
         }
-
-        update(null, null);
     }
 
-    public async void ClashProxiesDelayTest(bool blAll, List<ProxyModel> lstProxy, Action<ProxyModel?, string> update)
+    public async void ClashProxiesDelayTest(bool blAll, List<ProxyModel> lstProxy,
+        Action<ProxyModel, string> cb4EachProxyTest)
     {
         Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest");
 
@@ -238,17 +232,20 @@ public sealed class MainFormHandler
             tasks.Add(Task.Run(async () =>
             {
                 var result = await HttpClientHelper.GetInstance().TryGetAsync(url);
-                update(it, result);
+                if (result == null)
+                {
+                    result = "";
+                }
+
+                cb4EachProxyTest(it, result);
             }));
         }
 
         Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest - Start to wait all task");
-        await Task.Run((() => { Task.WaitAll(tasks.ToArray()); }));
+        await Task.WhenAll(tasks);
         Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest - Wait all task finished");
-        
-        await Task.Delay(1000);
 
-        update(null, "");
+        await Task.Delay(1000);
     }
 
     public static void InitRegister()
@@ -322,12 +319,7 @@ public sealed class MainFormHandler
         }
     }
 
-    public async void GetClashConnections(Config config, Action<ClashConnections> update)
-    {
-        await GetClashConnectionsAsync(update);
-    }
-
-    private async Task GetClashConnectionsAsync(Action<ClashConnections> update)
+    public async void GetClashConnections(Action<ClashConnections> cbUpdate)
     {
         try
         {
@@ -335,7 +327,7 @@ public sealed class MainFormHandler
             var result = await HttpClientHelper.GetInstance().TryGetAsync(url);
             var clashConnections = Utils.FromJson<ClashConnections>(result);
 
-            update(clashConnections);
+            cbUpdate(clashConnections);
         }
         catch (Exception ex)
         {

@@ -2,7 +2,7 @@
 
 public class ClashProxies
 {
-    public Dictionary<String, ProxiesItem> proxies { get; set; }
+    public Dictionary<string, ProxiesItem> proxies { get; set; }
 
     public class ProxiesItem
     {
