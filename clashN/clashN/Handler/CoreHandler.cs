@@ -108,6 +108,10 @@ internal class CoreHandler
             if (_process != null)
             {
                 KillProcess(_process);
+                
+                Utils.SaveLogDebug(
+                    $"CoreHandler:CoreStop - KillProcess finished: {DateTime.Now.ToString(CultureInfo.CurrentCulture)}");
+                
                 _process.Dispose();
                 _process = null;
             }
@@ -131,28 +135,6 @@ internal class CoreHandler
                     }
                 }
             }
-
-            //bool blExist = true;
-            //if (processId > 0)
-            //{
-            //    Process p1 = Process.GetProcessById(processId);
-            //    if (p1 != null)
-            //    {
-            //        p1.Kill();
-            //        blExist = false;
-            //    }
-            //}
-            //if (blExist)
-            //{
-            //    foreach (string vName in lstCore)
-            //    {
-            //        Process[] killPro = Process.GetProcessesByName(vName);
-            //        foreach (Process p in killPro)
-            //        {
-            //            p.Kill();
-            //        }
-            //    }
-            //}
         }
         catch (Exception ex)
         {
@@ -283,21 +265,22 @@ internal class CoreHandler
         }
     }
 
-    private void ShowMsg(bool updateToTrayTooltip, LogType logType, string msg)
+    private static void ShowMsg(bool updateToTrayTooltip, LogType logType, string msg)
     {
         NoticeHandler.Instance.OnShowMsg(updateToTrayTooltip, logType, msg);
     }
 
-    private void KillProcess(Process p)
+    private static void KillProcess(Process p)
     {
         try
         {
             p.CloseMainWindow();
-            p.WaitForExit(100);
+            
+            p.WaitForExit(1000);
             if (!p.HasExited)
             {
                 p.Kill();
-                p.WaitForExit(100);
+                p.WaitForExit(1000);
             }
         }
         catch (Exception ex)

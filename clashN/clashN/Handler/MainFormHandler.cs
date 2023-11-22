@@ -21,7 +21,7 @@ public sealed class MainFormHandler
     public static MainFormHandler Instance => _instance.Value;
 
 
-    public Icon GetNotifyIcon(Config config)
+    public static Icon GetNotifyIcon(Config config)
     {
         try
         {
@@ -34,22 +34,14 @@ public sealed class MainFormHandler
                 return new Icon(fileName);
             }
 
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return Resources.NotifyIcon1;
-
-                case 1:
-                    return Resources.NotifyIcon2;
-
-                case 2:
-                    return Resources.NotifyIcon3;
-
-                case 3:
-                    return Resources.NotifyIcon2;
-            }
-
-            return Resources.NotifyIcon1;
+                0 => Resources.NotifyIcon1,
+                1 => Resources.NotifyIcon2,
+                2 => Resources.NotifyIcon3,
+                3 => Resources.NotifyIcon2,
+                _ => Resources.NotifyIcon1
+            };
         }
         catch (Exception ex)
         {

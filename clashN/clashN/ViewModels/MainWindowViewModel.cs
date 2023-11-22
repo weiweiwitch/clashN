@@ -233,8 +233,9 @@ public class MainWindowViewModel : ReactiveObject
 
             ConfigProc.SaveConfig();
         }
-        catch
+        catch(Exception e)
         {
+            Utils.SaveLog("Exit error", e);
         }
         finally
         {
@@ -298,7 +299,7 @@ public class MainWindowViewModel : ReactiveObject
         };
 
         // HotKey
-        MainFormHandler.RegisterGlobalHotkey(config, OnHotkeyHandler);
+        // MainFormHandler.RegisterGlobalHotkey(config, OnHotkeyHandler);
 
         OnProgramStarted("shown", true);
 
@@ -322,7 +323,6 @@ public class MainWindowViewModel : ReactiveObject
 
     private void CbStatisticUpdate(ulong up, ulong down)
     {
-        Utils.SaveLogDebug("MainWindowViewModel:CbStatisticUpdate - Start");
         try
         {
             Application.Current.Dispatcher.Invoke((Action)(() =>
@@ -380,6 +380,8 @@ public class MainWindowViewModel : ReactiveObject
 
     public void CloseCore()
     {
+        Utils.SaveLog("MainWindowViewModel:CloseCore - SysProxyType: ForcedClear");
+        
         ConfigProc.SaveConfig(false);
 
         ChangePACButtonStatus(SysProxyType.ForcedClear);
@@ -393,6 +395,8 @@ public class MainWindowViewModel : ReactiveObject
 
     public void SetListenerType(SysProxyType type)
     {
+        Utils.SaveLog("MainWindowViewModel:SetListenerType - SysProxyType: {type}");
+        
         var config = LazyConfig.Instance.Config;
         if (config.SysProxyType == type)
         {
@@ -407,6 +411,8 @@ public class MainWindowViewModel : ReactiveObject
 
     private void ChangePACButtonStatus(SysProxyType type)
     {
+        Utils.SaveLog("MainWindowViewModel:ChangePACButtonStatus - SysProxyType: {type}");
+        
         SysProxyHandle.UpdateSysProxy(false);
 
         BlSystemProxyClear = type == SysProxyType.ForcedClear;
@@ -419,7 +425,9 @@ public class MainWindowViewModel : ReactiveObject
         ConfigProc.SaveConfig(false);
 
         var config = LazyConfig.Instance.Config;
-        NotifyIcon = MainFormHandler.Instance.GetNotifyIcon(config);
+        NotifyIcon = MainFormHandler.GetNotifyIcon(config);
+        
+        Utils.SaveLog("MainWindowViewModel:ChangePACButtonStatus - Finished");
     }
 
     public void SetRuleModeCheck(ERuleMode mode)
@@ -533,7 +541,7 @@ public class MainWindowViewModel : ReactiveObject
         }
     }
 
-    private void StorageUI()
+    private static void StorageUI()
     {
         var config = LazyConfig.Instance.Config;
         config.UiItem.MainWidth = Application.Current.MainWindow.Width;
