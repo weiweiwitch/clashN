@@ -143,30 +143,25 @@ public class ProfilesViewModel : ReactiveObject
     {
         MainWindowViewModel.ShowHideWindow(false);
 
-        Task.Run(() =>
+        var result = Utils.ScanScreen();
+
+
+        MainWindowViewModel.ShowHideWindow(true);
+
+        if (string.IsNullOrEmpty(result))
         {
-            var result = Utils.ScanScreen();
-
-            Application.Current.Dispatcher.Invoke((Action)(() =>
+            NoticeHandler.Instance.Enqueue(ResUI.NoValidQRcodeFound);
+        }
+        else
+        {
+            var ret = ConfigHandler.AddBatchProfiles(result, "", "");
+            if (ret == 0)
             {
-                MainWindowViewModel.ShowHideWindow(true);
+                RefreshProfiles();
 
-                if (string.IsNullOrEmpty(result))
-                {
-                    NoticeHandler.Instance.Enqueue(ResUI.NoValidQRcodeFound);
-                }
-                else
-                {
-                    var ret = ConfigHandler.AddBatchProfiles(result, "", "");
-                    if (ret == 0)
-                    {
-                        RefreshProfiles();
-
-                        NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedProfileViaScan);
-                    }
-                }
-            }));
-        });
+                NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedProfileViaScan);
+            }
+        }
     }
 
     public void AddProfilesViaClipboard(bool bClear)
@@ -221,21 +216,18 @@ public class ProfilesViewModel : ReactiveObject
                 profileItems = new List<ProfileItem> { item };
             }
         }
-
-        Task.Run(() =>
+        
+        UpdateHandle.UpdateSubscriptionProcess(blProxy, profileItems, (success, msg) =>
         {
-            UpdateHandle.UpdateSubscriptionProcess(blProxy, profileItems, (success, msg) =>
+            NoticeHandler.SendMessage4ClashN(msg);
+
+            if (success)
             {
-                NoticeHandler.SendMessage4ClashN(msg);
+                Utils.SaveLog(
+                    $"ProfilesViewModel:UpdateSubscriptionProcess - UpdateSubscriptionProcess Finished: {msg}");
 
-                if (success)
-                {
-                    Utils.SaveLog(
-                        $"ProfilesViewModel:UpdateSubscriptionProcess - UpdateSubscriptionProcess Finished: {msg}");
-
-                    Application.Current.Dispatcher.Invoke((Action)(() => { RefreshProfiles(); }));
-                }
-            });
+                Application.Current.Dispatcher.Invoke((Action)(() => { RefreshProfiles(); }));
+            }
         });
     }
 
@@ -252,7 +244,7 @@ public class ProfilesViewModel : ReactiveObject
             return;
         }
 
-        ConfigHandler.RemoveProfile(LazyConfig.Instance.Config, new List<ProfileItem>() { item });
+        ConfigHandler.RemoveProfile(LazyConfig.Instance.Config, new List<ProfileItem> { item });
 
         NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
 
@@ -272,7 +264,7 @@ public class ProfilesViewModel : ReactiveObject
         if (ConfigHandler.CopyProfile(new List<ProfileItem> { item }) == 0)
         {
             NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
-            
+
             RefreshProfiles();
         }
     }
@@ -300,7 +292,7 @@ public class ProfilesViewModel : ReactiveObject
         if (ConfigHandler.SetDefaultProfile(config, item) == 0)
         {
             NoticeHandler.SendMessage4ClashN(ResUI.OperationSuccess);
-            
+
             RefreshProfiles();
 
             Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();

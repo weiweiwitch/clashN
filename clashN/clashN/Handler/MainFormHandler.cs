@@ -283,8 +283,7 @@ public sealed class MainFormHandler
         try
         {
             var url = $"{GetApiUrl()}/proxies/{name}";
-            var headers = new Dictionary<string, string>();
-            headers.Add("name", nameNode);
+            var headers = new Dictionary<string, string> { { "name", nameNode } };
             await HttpClientHelper.GetInstance().PutAsync(url, headers);
         }
         catch (Exception ex)
@@ -302,7 +301,6 @@ public sealed class MainFormHandler
         }
 
         var urlBase = $"{GetApiUrl()}/configs";
-
         await HttpClientHelper.GetInstance().PatchAsync(urlBase, headers);
     }
 
@@ -325,10 +323,10 @@ public sealed class MainFormHandler
 
     public async void GetClashConnections(Config config, Action<ClashConnections> update)
     {
-       await GetClashConnectionsAsync(config, update);
+       await GetClashConnectionsAsync(update);
     }
 
-    private async Task GetClashConnectionsAsync(Config config, Action<ClashConnections> update)
+    private async Task GetClashConnectionsAsync(Action<ClashConnections> update)
     {
         try
         {

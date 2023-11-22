@@ -10,7 +10,7 @@ internal class StatisticsHandler
     private static Lazy<StatisticsHandler> _instance = new(() => new StatisticsHandler());
 
     public static StatisticsHandler Instance => _instance.Value;
-    
+
     private bool _exitFlag = false;
 
     private ClientWebSocket? _webSocket = null;
@@ -42,40 +42,43 @@ internal class StatisticsHandler
         }
     }
 
-    public async Task Run()
+    public void Run()
     {
-        await Init();
-
-        while (!_exitFlag)
+        Task.Run(async () =>
         {
-            var receiveRt = await ReceiveStatistic();
-            if (!receiveRt)
+            await Init();
+
+            while (!_exitFlag)
             {
-                if (_exitFlag)
+                var receiveRt = await ReceiveStatistic();
+                if (!receiveRt)
                 {
-                    Utils.SaveLog("ReceiveStatistic failed. Because app existed");
-                    break;
-                }
+                    if (_exitFlag)
+                    {
+                        Utils.SaveLog("ReceiveStatistic failed. Because app existed");
+                        break;
+                    }
 
-                Utils.SaveLogWarn("ReceiveStatistic failed. Try reset and reconnect");
+                    Utils.SaveLogWarn("ReceiveStatistic failed. Try reset and reconnect");
 
-                Reset();
-
-                await Task.Delay(5000).ConfigureAwait(true);
-
-                var connectRt = await ConnectToBackend();
-                while (!_exitFlag && !connectRt)
-                {
-                    Utils.SaveLogWarn("Connect to the backend failed when reset. Try again later");
+                    Reset();
 
                     await Task.Delay(5000).ConfigureAwait(true);
 
-                    connectRt = await ConnectToBackend();
-                }
-            }
+                    var connectRt = await ConnectToBackend();
+                    while (!_exitFlag && !connectRt)
+                    {
+                        Utils.SaveLogWarn("Connect to the backend failed when reset. Try again later");
 
-            await Task.Delay(1000).ConfigureAwait(true);
-        }
+                        await Task.Delay(5000).ConfigureAwait(true);
+
+                        connectRt = await ConnectToBackend();
+                    }
+                }
+
+                await Task.Delay(1000).ConfigureAwait(true);
+            }
+        });
     }
 
     private async Task Init()
@@ -170,7 +173,8 @@ internal class StatisticsHandler
             }
 
             var buffer = new byte[1024];
-            var res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None).ConfigureAwait(true);
+            var res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None)
+                .ConfigureAwait(true);
             while (!res.CloseStatus.HasValue)
             {
                 var result = Encoding.UTF8.GetString(buffer, 0, res.Count);
@@ -187,10 +191,12 @@ internal class StatisticsHandler
                             serverStatItem.DownloadRemote += down;
                         }
                     }
+
                     CbStatisticUpdateFunc(up, down);
                 }
 
-                res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None).ConfigureAwait(true);
+                res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None)
+                    .ConfigureAwait(true);
             }
         }
         catch (Exception e)

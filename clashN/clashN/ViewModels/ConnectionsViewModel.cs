@@ -87,20 +87,16 @@ public class ConnectionsViewModel : ReactiveObject
 
     private void GetClashConnections()
     {
-        Task.Run(() =>
+        var config = LazyConfig.Instance.Config;
+        MainFormHandler.Instance.GetClashConnections(config, it =>
         {
-            var config = LazyConfig.Instance.Config;
-            MainFormHandler.Instance.GetClashConnections(config, (it) =>
+            if (it == null)
             {
-                if (it == null)
-                {
-                    return;
-                }
+                return;
+            }
 
-                Application.Current.Dispatcher.Invoke((Action)(() => { RefreshConnections(it?.Connections!); }));
-            });
+            RefreshConnections(it?.Connections!);
         });
-        
     }
 
     private void RefreshConnections(List<ConnectionItem> connections)

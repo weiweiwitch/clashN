@@ -17,7 +17,7 @@ internal class CoreHandler
     private static Lazy<CoreHandler> _instance = new(() => new CoreHandler());
 
     public static CoreHandler Instance => _instance.Value;
-    
+
     private const string CoreConfigRes = Global.CoreConfigFileName;
 
     private CoreInfo _coreInfo;
@@ -26,7 +26,7 @@ internal class CoreHandler
     /// <summary>
     /// 载入Core
     /// </summary>
-    public void LoadCore()
+    public async Task LoadCore()
     {
         Utils.SaveLogDebug($"CoreHandler:LoadCore - Start to Load Core: {Global.ReloadCore}");
 
@@ -64,7 +64,7 @@ internal class CoreHandler
         if (CoreConfigHandler.GenerateClientConfig(item, fileName, false, out var msg) != 0)
         {
             Utils.SaveLogDebug("CoreHandler:LoadCore - GenerateClientConfig Failed");
-            
+
             CoreStop();
 
             ShowMsg(false, LogType.Log4ClashN, msg);
@@ -79,18 +79,18 @@ internal class CoreHandler
         }
         else
         {
-            CoreRestart(item);
+            await CoreRestart(item);
         }
     }
 
     /// <summary>
     /// Core重启
     /// </summary>
-    private void CoreRestart(ProfileItem item)
+    private async Task CoreRestart(ProfileItem item)
     {
         CoreStop();
 
-        Thread.Sleep(1000);
+        await Task.Delay(1000).ConfigureAwait(true);
 
         CoreStart(item);
     }
@@ -108,10 +108,10 @@ internal class CoreHandler
             if (_process != null)
             {
                 KillProcess(_process);
-                
+
                 Utils.SaveLogDebug(
                     $"CoreHandler:CoreStop - KillProcess finished: {DateTime.Now.ToString(CultureInfo.CurrentCulture)}");
-                
+
                 _process.Dispose();
                 _process = null;
             }
@@ -275,7 +275,7 @@ internal class CoreHandler
         try
         {
             p.CloseMainWindow();
-            
+
             p.WaitForExit(1000);
             if (!p.HasExited)
             {
