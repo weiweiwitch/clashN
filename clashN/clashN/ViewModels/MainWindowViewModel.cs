@@ -79,7 +79,6 @@ public class MainWindowViewModel : ReactiveObject
 
     // For Update Profile
     private DispatcherTimer? _updateTaskDispatcherTimer;
-    private DispatcherTimer? _testDispatcherTimer;
 
     #endregion Timer
 
@@ -162,22 +161,22 @@ public class MainWindowViewModel : ReactiveObject
         {
             Utils.SaveLogDebug($"MainWindowViewModel:OnProgramStarted - Invoke");
             
-            var clipboardData = Utils.GetClipboardData();
-            // Utils.SaveLogDebug($"MainWindowViewModel:OnProgramStarted - After GetClipboardData {clipboardData}, ClashProtocol: {Global.ClashProtocol}");
-            // if (state != null && clipboardData != null)
-            // {
-            //     if (string.IsNullOrEmpty(clipboardData) || !clipboardData.StartsWith(Global.ClashProtocol))
-            //     {
-            //         return;
-            //     }
-            // }
-
-            // ShowHideWindow(true);
-
-            Locator.Current.GetService<ProfilesViewModel>()?.AddProfilesViaClipboard(true);
-
             StartAllTimerTask();
-
+            
+            // ShowHideWindow(true);
+            
+            var clipboardData = Utils.GetClipboardData();
+            Utils.SaveLogDebug($"MainWindowViewModel:OnProgramStarted - After GetClipboardData {clipboardData}, ClashProtocol: {Global.ClashProtocol}");
+            if (state != null && clipboardData != null)
+            {
+                if (string.IsNullOrEmpty(clipboardData) || !clipboardData.StartsWith(Global.ClashProtocol))
+                {
+                    return;
+                }
+            }
+            
+            Locator.Current.GetService<ProfilesViewModel>()?.AddProfilesViaClipboard(true);
+            
             Utils.SaveLogDebug($"MainWindowViewModel:OnProgramStarted - Finished");
         }));
     }
@@ -267,15 +266,6 @@ public class MainWindowViewModel : ReactiveObject
         _updateTaskDispatcherTimer.Tick += (_, _) =>
         {
             MainFormHandler.Instance.OnTimer4UpdateTask(CbUpdateTaskFinish);
-        };
-        
-        _testDispatcherTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromSeconds(1)
-        };
-        _testDispatcherTimer.Tick += (_, _) =>
-        {
-            Utils.SaveLog("UI thread test");
         };
 
         OnProgramStarted("shown", true);
@@ -583,15 +573,13 @@ public class MainWindowViewModel : ReactiveObject
 
     #endregion UI
 
-    public void StartAllTimerTask()
+    private void StartAllTimerTask()
     {
         _updateTaskDispatcherTimer?.Start();
-        _testDispatcherTimer?.Start();
     }
 
-    public void StopAllTimerTask()
+    private void StopAllTimerTask()
     {
         _updateTaskDispatcherTimer?.Stop();
-        _testDispatcherTimer?.Stop();
     }
 }
