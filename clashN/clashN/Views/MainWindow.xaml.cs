@@ -35,9 +35,6 @@ public partial class MainWindow
                 .DisposeWith(disposables);
             this.OneWayBind(ViewModel, vm => vm.GetSettingsView, v => v.SettingsTabItem.Content)
                 .DisposeWith(disposables);
-            this.OneWayBind(ViewModel, vm => vm.GetHelpView, v => v.HelpTabItem.Content).DisposeWith(disposables);
-            this.OneWayBind(ViewModel, vm => vm.GetPromotionView, v => v.PromotionTabItem.Content)
-                .DisposeWith(disposables);
 
             this.OneWayBind(ViewModel, vm => vm.SpeedUpload, v => v.TxtSpeedUpload.Text).DisposeWith(disposables);
             this.OneWayBind(ViewModel, vm => vm.SpeedDownload, v => v.TxtSpeedDownload.Text).DisposeWith(disposables);

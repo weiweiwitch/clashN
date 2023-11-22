@@ -10,178 +10,177 @@ using System.Reactive.Linq;
 using System.Windows;
 using ClashN.Tool;
 
-namespace ClashN.ViewModels
+namespace ClashN.ViewModels;
+
+public class ConnectionsViewModel : ReactiveObject
 {
-    public class ConnectionsViewModel : ReactiveObject
+    private IObservableCollection<ConnectionModel> _connectionItems =
+        new ObservableCollectionExtended<ConnectionModel>();
+
+    public IObservableCollection<ConnectionModel> ConnectionItems => _connectionItems;
+
+    [Reactive] public ConnectionModel SelectedSource { get; set; }
+
+    public ReactiveCommand<Unit, Unit> ConnectionCloseCmd { get; }
+    public ReactiveCommand<Unit, Unit> ConnectionCloseAllCmd { get; }
+
+    [Reactive] public int SortingSelected { get; set; }
+
+    [Reactive] public bool AutoRefresh { get; set; }
+
+    private const int AutoRefreshInterval = 10;
+
+    public ConnectionsViewModel()
     {
-        private IObservableCollection<ConnectionModel> _connectionItems =
-            new ObservableCollectionExtended<ConnectionModel>();
+        var config = LazyConfig.Instance.Config;
+        SortingSelected = config.UiItem.ConnectionsSorting;
+        AutoRefresh = config.UiItem.ConnectionsAutoRefresh;
 
-        public IObservableCollection<ConnectionModel> ConnectionItems => _connectionItems;
+        var canEditRemove = this.WhenAnyValue(
+            x => x.SelectedSource,
+            selectedSource => selectedSource != null && !string.IsNullOrEmpty(selectedSource.id));
 
-        [Reactive] public ConnectionModel SelectedSource { get; set; }
+        this.WhenAnyValue(
+                x => x.SortingSelected,
+                y => y >= 0)
+            .Subscribe(c => DoSortingSelected(c));
 
-        public ReactiveCommand<Unit, Unit> ConnectionCloseCmd { get; }
-        public ReactiveCommand<Unit, Unit> ConnectionCloseAllCmd { get; }
+        this.WhenAnyValue(
+                x => x.AutoRefresh,
+                y => y == true)
+            .Subscribe(c => { config.UiItem.ConnectionsAutoRefresh = AutoRefresh; });
 
-        [Reactive] public int SortingSelected { get; set; }
+        ConnectionCloseCmd = ReactiveCommand.Create(() => { ClashConnectionClose(false); }, canEditRemove);
 
-        [Reactive] public bool AutoRefresh { get; set; }
+        ConnectionCloseAllCmd = ReactiveCommand.Create(() => { ClashConnectionClose(true); });
 
-        private const int AutoRefreshInterval = 10;
+        Init();
+    }
 
-        public ConnectionsViewModel()
+    private void DoSortingSelected(bool c)
+    {
+        if (!c)
         {
-            var config = LazyConfig.Instance.Config;
-            SortingSelected = config.UiItem.ConnectionsSorting;
-            AutoRefresh = config.UiItem.ConnectionsAutoRefresh;
-
-            var canEditRemove = this.WhenAnyValue(
-                x => x.SelectedSource,
-                selectedSource => selectedSource != null && !string.IsNullOrEmpty(selectedSource.id));
-
-            this.WhenAnyValue(
-                    x => x.SortingSelected,
-                    y => y >= 0)
-                .Subscribe(c => DoSortingSelected(c));
-
-            this.WhenAnyValue(
-                    x => x.AutoRefresh,
-                    y => y == true)
-                .Subscribe(c => { config.UiItem.ConnectionsAutoRefresh = AutoRefresh; });
-
-            ConnectionCloseCmd = ReactiveCommand.Create(() => { ClashConnectionClose(false); }, canEditRemove);
-
-            ConnectionCloseAllCmd = ReactiveCommand.Create(() => { ClashConnectionClose(true); });
-
-            Init();
+            return;
         }
 
-        private void DoSortingSelected(bool c)
+        var config = LazyConfig.Instance.Config;
+        if (SortingSelected != config.UiItem.ConnectionsSorting)
         {
-            if (!c)
+            config.UiItem.ConnectionsSorting = SortingSelected;
+        }
+
+        GetClashConnections();
+    }
+
+    private void Init()
+    {
+        Observable.Interval(TimeSpan.FromSeconds(AutoRefreshInterval))
+            .Subscribe(x =>
+            {
+                if (AutoRefresh && Global.ShowInTaskbar)
+                {
+                    GetClashConnections();
+                }
+            });
+    }
+
+    private void GetClashConnections()
+    {
+        var config = LazyConfig.Instance.Config;
+        MainFormHandler.Instance.GetClashConnections(config, (it) =>
+        {
+            if (it == null)
             {
                 return;
             }
 
-            var config = LazyConfig.Instance.Config;
-            if (SortingSelected != config.UiItem.ConnectionsSorting)
+            Application.Current.Dispatcher.Invoke((Action)(() => { RefreshConnections(it?.Connections!); }));
+        });
+    }
+
+    private void RefreshConnections(List<ConnectionItem> connections)
+    {
+        _connectionItems.Clear();
+
+        var dtNow = DateTime.Now;
+        var lstModel = new List<ConnectionModel>();
+        foreach (var item in connections)
+        {
+            ConnectionModel model = new();
+
+            model.id = item.Id;
+            model.network = item.metadata.Network;
+            model.type = item.metadata.Type;
+            model.host =
+                $"{(string.IsNullOrEmpty(item.metadata.Host) ? item.metadata.DestinationIP : item.metadata.Host)}:{item.metadata.DestinationPort}";
+            var sp = (dtNow - item.start);
+            model.time = sp.TotalSeconds < 0 ? 1 : sp.TotalSeconds;
+            model.upload = item.upload;
+            model.download = item.download;
+            model.uploadTraffic = $"{Utils.HumanFy(item.upload)}";
+            model.downloadTraffic = $"{Utils.HumanFy(item.download)}";
+            model.elapsed = sp.ToString(@"hh\:mm\:ss");
+            model.chain = item.Chains.Count > 0 ? item.Chains[0] : String.Empty;
+
+            lstModel.Add(model);
+        }
+
+        if (lstModel.Count <= 0)
+        {
+            return;
+        }
+
+        //sort
+        switch (SortingSelected)
+        {
+            case 0:
+                lstModel = lstModel.OrderBy(t => t.upload / t.time).ToList();
+                break;
+
+            case 1:
+                lstModel = lstModel.OrderBy(t => t.download / t.time).ToList();
+                break;
+
+            case 2:
+                lstModel = lstModel.OrderBy(t => t.upload).ToList();
+                break;
+
+            case 3:
+                lstModel = lstModel.OrderBy(t => t.download).ToList();
+                break;
+
+            case 4:
+                lstModel = lstModel.OrderBy(t => t.time).ToList();
+                break;
+
+            case 5:
+                lstModel = lstModel.OrderBy(t => t.host).ToList();
+                break;
+        }
+
+        _connectionItems.AddRange(lstModel);
+    }
+
+    public void ClashConnectionClose(bool all)
+    {
+        var id = string.Empty;
+        if (!all)
+        {
+            var item = SelectedSource;
+            if (item is null)
             {
-                config.UiItem.ConnectionsSorting = SortingSelected;
+                return;
             }
 
-            GetClashConnections();
+            id = item.id;
         }
-
-        private void Init()
-        {
-            Observable.Interval(TimeSpan.FromSeconds(AutoRefreshInterval))
-                .Subscribe(x =>
-                {
-                    if (AutoRefresh && Global.ShowInTaskbar)
-                    {
-                        GetClashConnections();
-                    }
-                });
-        }
-
-        private void GetClashConnections()
-        {
-            var config = LazyConfig.Instance.Config;
-            MainFormHandler.Instance.GetClashConnections(config, (it) =>
-            {
-                if (it == null)
-                {
-                    return;
-                }
-
-                Application.Current.Dispatcher.Invoke((Action)(() => { RefreshConnections(it?.Connections!); }));
-            });
-        }
-
-        private void RefreshConnections(List<ConnectionItem> connections)
+        else
         {
             _connectionItems.Clear();
-
-            var dtNow = DateTime.Now;
-            var lstModel = new List<ConnectionModel>();
-            foreach (var item in connections)
-            {
-                ConnectionModel model = new();
-
-                model.id = item.Id;
-                model.network = item.metadata.Network;
-                model.type = item.metadata.Type;
-                model.host =
-                    $"{(string.IsNullOrEmpty(item.metadata.Host) ? item.metadata.DestinationIP : item.metadata.Host)}:{item.metadata.DestinationPort}";
-                var sp = (dtNow - item.start);
-                model.time = sp.TotalSeconds < 0 ? 1 : sp.TotalSeconds;
-                model.upload = item.upload;
-                model.download = item.download;
-                model.uploadTraffic = $"{Utils.HumanFy(item.upload)}";
-                model.downloadTraffic = $"{Utils.HumanFy(item.download)}";
-                model.elapsed = sp.ToString(@"hh\:mm\:ss");
-                model.chain = item.Chains.Count > 0 ? item.Chains[0] : String.Empty;
-
-                lstModel.Add(model);
-            }
-
-            if (lstModel.Count <= 0)
-            {
-                return;
-            }
-
-            //sort
-            switch (SortingSelected)
-            {
-                case 0:
-                    lstModel = lstModel.OrderBy(t => t.upload / t.time).ToList();
-                    break;
-
-                case 1:
-                    lstModel = lstModel.OrderBy(t => t.download / t.time).ToList();
-                    break;
-
-                case 2:
-                    lstModel = lstModel.OrderBy(t => t.upload).ToList();
-                    break;
-
-                case 3:
-                    lstModel = lstModel.OrderBy(t => t.download).ToList();
-                    break;
-
-                case 4:
-                    lstModel = lstModel.OrderBy(t => t.time).ToList();
-                    break;
-
-                case 5:
-                    lstModel = lstModel.OrderBy(t => t.host).ToList();
-                    break;
-            }
-
-            _connectionItems.AddRange(lstModel);
         }
 
-        public void ClashConnectionClose(bool all)
-        {
-            var id = string.Empty;
-            if (!all)
-            {
-                var item = SelectedSource;
-                if (item is null)
-                {
-                    return;
-                }
-
-                id = item.id;
-            }
-            else
-            {
-                _connectionItems.Clear();
-            }
-
-            MainFormHandler.Instance.ClashConnectionClose(id);
-            GetClashConnections();
-        }
+        MainFormHandler.Instance.ClashConnectionClose(id);
+        GetClashConnections();
     }
 }

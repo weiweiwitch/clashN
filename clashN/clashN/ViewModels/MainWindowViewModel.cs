@@ -27,21 +27,17 @@ public class MainWindowViewModel : ReactiveObject
 
     #region Views
 
-    //public DashboardView GetDashboardView { get; }
     public ProxiesView GetProxyView { get; }
-
     public ProfilesView GetProfilesView { get; }
     public LogsView GetLogsView { get; }
     public ConnectionsView GetConnectionsView { get; }
     public SettingsView GetSettingsView { get; }
-    public HelpView GetHelpView { get; }
-    public PromotionView GetPromotionView { get; }
-
+    
+    #endregion Views
+    
     [Reactive] public string SpeedUpload { get; set; } = "0.00";
 
     [Reactive] public string SpeedDownload { get; set; } = "0.00";
-
-    #endregion Views
 
     #region System Proxy
 
@@ -104,14 +100,11 @@ public class MainWindowViewModel : ReactiveObject
     public MainWindowViewModel(ISnackbarMessageQueue snackbarMessageQueue)
     {
         // Views
-        //GetDashboardView = new();
         GetProxyView = new ProxiesView();
         GetProfilesView = new ProfilesView();
         GetLogsView = new LogsView();
         GetConnectionsView = new ConnectionsView();
         GetSettingsView = new SettingsView();
-        GetHelpView = new HelpView();
-        GetPromotionView = new PromotionView();
 
         NoticeHandler.Instance.ConfigMessageQueue(content =>
         {
@@ -233,7 +226,7 @@ public class MainWindowViewModel : ReactiveObject
 
             ConfigProc.SaveConfig();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Utils.SaveLog("Exit error", e);
         }
@@ -381,7 +374,7 @@ public class MainWindowViewModel : ReactiveObject
     public void CloseCore()
     {
         Utils.SaveLog("MainWindowViewModel:CloseCore - SysProxyType: ForcedClear");
-        
+
         ConfigProc.SaveConfig(false);
 
         ChangePACButtonStatus(SysProxyType.ForcedClear);
@@ -396,7 +389,7 @@ public class MainWindowViewModel : ReactiveObject
     public void SetListenerType(SysProxyType type)
     {
         Utils.SaveLog("MainWindowViewModel:SetListenerType - SysProxyType: {type}");
-        
+
         var config = LazyConfig.Instance.Config;
         if (config.SysProxyType == type)
         {
@@ -412,7 +405,7 @@ public class MainWindowViewModel : ReactiveObject
     private void ChangePACButtonStatus(SysProxyType type)
     {
         Utils.SaveLog("MainWindowViewModel:ChangePACButtonStatus - SysProxyType: {type}");
-        
+
         SysProxyHandle.UpdateSysProxy(false);
 
         BlSystemProxyClear = type == SysProxyType.ForcedClear;
@@ -426,7 +419,7 @@ public class MainWindowViewModel : ReactiveObject
 
         var config = LazyConfig.Instance.Config;
         NotifyIcon = MainFormHandler.GetNotifyIcon(config);
-        
+
         Utils.SaveLog("MainWindowViewModel:ChangePACButtonStatus - Finished");
     }
 

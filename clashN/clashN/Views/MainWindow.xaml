@@ -79,26 +79,7 @@
                                 ToolTip="{x:Static resx:ResUI.TbReloadCore}" />
                         </StackPanel>
                     </materialDesign:NavigationRailAssist.FloatingContent>
-                    <!--<TabItem
-                    x:Name="dashboardTabItem"
-                    Height="auto"
-                    Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
-                    <TabItem.Header>
-                        <StackPanel Width="auto" Height="auto">
-                            <materialDesign:PackIcon
-                                Width="24"
-                                Height="24"
-                                Margin="8"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Kind="Speedometer" />
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Text="Dashboard" />
-                        </StackPanel>
-                    </TabItem.Header>
-                </TabItem>-->
+                    
                     <TabItem x:Name="ProxiesTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
                         <TabItem.Header>
                             <StackPanel Width="auto" Height="auto">
@@ -174,36 +155,7 @@
                             </StackPanel>
                         </TabItem.Header>
                     </TabItem>
-                    <TabItem x:Name="HelpTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
-                        <TabItem.Header>
-                            <StackPanel Width="auto" Height="auto">
-                                <materialDesign:PackIcon
-                                    Width="24"
-                                    Height="24"
-                                    HorizontalAlignment="Center"
-                                    Kind="HelpCircleOutline" />
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    Style="{StaticResource TabItemTitle}"
-                                    Text="{x:Static resx:ResUI.TbHelp}" />
-                            </StackPanel>
-                        </TabItem.Header>
-                    </TabItem>
-                    <TabItem x:Name="PromotionTabItem" Style="{StaticResource MyMaterialDesignNavigationRailTabItem}">
-                        <TabItem.Header>
-                            <StackPanel Width="auto" Height="auto">
-                                <materialDesign:PackIcon
-                                    Width="24"
-                                    Height="24"
-                                    HorizontalAlignment="Center"
-                                    Kind="VolumeHigh" />
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    Style="{StaticResource TabItemTitle}"
-                                    Text="{x:Static resx:ResUI.TbPromotion}" />
-                            </StackPanel>
-                        </TabItem.Header>
-                    </TabItem>
+                    
                 </TabControl>
 
                 <tb:TaskbarIcon
