@@ -208,23 +208,26 @@ public class ProxiesViewModel : ReactiveObject
 
     private void GetClashProxies(bool refreshUI)
     {
-        MainFormHandler.Instance.GetClashProxies((it, it2) =>
+        Task.Run(() =>
         {
-            UpdateHandler("Refresh Clash Proxies");
-
-            _proxies = it?.proxies;
-            _providers = it2?.providers;
-
-            LazyConfig.Instance.SetProxies(_proxies);
-            if (_proxies == null)
+            MainFormHandler.Instance.GetClashProxies((it, it2) =>
             {
-                return;
-            }
+                UpdateHandler("Refresh Clash Proxies");
 
-            if (refreshUI)
-            {
-                Application.Current.Dispatcher.Invoke((Action)(() => { RefreshProxyGroups(); }));
-            }
+                _proxies = it?.proxies;
+                _providers = it2?.providers;
+
+                LazyConfig.Instance.SetProxies(_proxies);
+                if (_proxies == null)
+                {
+                    return;
+                }
+
+                if (refreshUI)
+                {
+                    Application.Current.Dispatcher.Invoke((Action)(() => { RefreshProxyGroups(); }));
+                }
+            });
         });
     }
 
@@ -436,63 +439,59 @@ public class ProxiesViewModel : ReactiveObject
             _proxyGroups.Replace(group, group2);
 
             SelectedGroup = group2;
-
-            //var index = _proxyGroups.IndexOf(group);
-            //_proxyGroups.Remove(group);
-            //_proxyGroups.Insert(index, group);
         }
 
         NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
-
-        //RefreshProxyDetails(true);
-        //GetClashProxies(true);
     }
 
     private void ProxiesDelayTest(bool blAll)
     {
         UpdateHandler("ProxiesViewModel:ProxiesDelayTest - Clash Proxies Latency Test");
 
-        MainFormHandler.Instance.ClashProxiesDelayTest(blAll, _proxyDetails.ToList(), (item, result) =>
+        Task.Run(async () =>
         {
-            UpdateHandler("ProxiesViewModel:ProxiesDelayTest - Exec Clash Proxies Latency Test Callback");
-            
-            if (item == null)
+            MainFormHandler.Instance.ClashProxiesDelayTest(blAll, _proxyDetails.ToList(), (item, result) =>
             {
-                GetClashProxies(true);
-                return;
-            }
+                UpdateHandler("ProxiesViewModel:ProxiesDelayTest - Exec Clash Proxies Latency Test Callback");
 
-            if (string.IsNullOrEmpty(result))
-            {
-                return;
-            }
-
-            Application.Current.Dispatcher.Invoke((Action)(() =>
-            {
-                //UpdateHandler(false, $"{item.name}={result}");
-                var detail = _proxyDetails.Where(it => it.name == item.name).FirstOrDefault();
-                if (detail != null)
+                if (item == null)
                 {
-                    var dicResult = Utils.FromJson<Dictionary<string, object>>(result);
-                    if (dicResult != null && dicResult.ContainsKey("delay"))
-                    {
-                        detail.delay = Convert.ToInt32(dicResult["delay"]);
-                        detail.delayName = $"{dicResult["delay"]}ms";
-                    }
-                    else if (dicResult != null && dicResult.ContainsKey("message"))
-                    {
-                        detail.delay = DelayTimeout;
-                        detail.delayName = $"{dicResult["message"]}";
-                    }
-                    else
-                    {
-                        detail.delay = DelayTimeout;
-                        detail.delayName = String.Empty;
-                    }
-
-                    _proxyDetails.Replace(detail, Utils.DeepCopy(detail));
+                    GetClashProxies(true);
+                    return;
                 }
-            }));
+
+                if (string.IsNullOrEmpty(result))
+                {
+                    return;
+                }
+
+                Application.Current.Dispatcher.Invoke((Action)(() =>
+                {
+                    //UpdateHandler(false, $"{item.name}={result}");
+                    var detail = _proxyDetails.Where(it => it.name == item.name).FirstOrDefault();
+                    if (detail != null)
+                    {
+                        var dicResult = Utils.FromJson<Dictionary<string, object>>(result);
+                        if (dicResult != null && dicResult.ContainsKey("delay"))
+                        {
+                            detail.delay = Convert.ToInt32(dicResult["delay"]);
+                            detail.delayName = $"{dicResult["delay"]}ms";
+                        }
+                        else if (dicResult != null && dicResult.ContainsKey("message"))
+                        {
+                            detail.delay = DelayTimeout;
+                            detail.delayName = $"{dicResult["message"]}";
+                        }
+                        else
+                        {
+                            detail.delay = DelayTimeout;
+                            detail.delayName = String.Empty;
+                        }
+
+                        _proxyDetails.Replace(detail, Utils.DeepCopy(detail));
+                    }
+                }));
+            });
         });
     }
 

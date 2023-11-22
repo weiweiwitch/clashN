@@ -36,7 +36,7 @@ internal class CoreHandler
         }
 
         var config = LazyConfig.Instance.Config;
-        var item = ConfigProc.GetDefaultProfile(ref config);
+        var item = ConfigHandler.GetDefaultProfile(ref config);
         if (item == null)
         {
             CoreStop();

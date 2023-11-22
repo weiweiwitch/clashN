@@ -19,35 +19,8 @@ public sealed class MainFormHandler
 
     public static MainFormHandler Instance => _instance.Value;
 
+    private DateTime _autoUpdateSubTime = DateTime.Now;
 
-    public static Icon GetNotifyIcon(Config config)
-    {
-        try
-        {
-            var index = (int)config.SysProxyType;
-
-            //Load from local file
-            var fileName = Utils.GetPath($"NotifyIcon{index + 1}.ico");
-            if (File.Exists(fileName))
-            {
-                return new Icon(fileName);
-            }
-
-            return index switch
-            {
-                0 => Resources.NotifyIcon1,
-                1 => Resources.NotifyIcon2,
-                2 => Resources.NotifyIcon3,
-                3 => Resources.NotifyIcon2,
-                _ => Resources.NotifyIcon1
-            };
-        }
-        catch (Exception ex)
-        {
-            Utils.SaveLog(ex.Message, ex);
-            return Resources.NotifyIcon1;
-        }
-    }
 
     public static void BackupGuiNConfig(bool auto = false)
     {
@@ -95,31 +68,30 @@ public sealed class MainFormHandler
         }
     }
 
-    public static void OnTimer4UpdateTask(ref DateTime autoUpdateSubTime, Config config,
-        Action<bool, string> cbUpdateSubscriptionFinish)
+    public void OnTimer4UpdateTask(Action<bool, string> cbUpdateSubscriptionFinish)
     {
         Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Run");
 
+        var config = LazyConfig.Instance.Config;
         if (config.AutoUpdateSubInterval <= 0)
         {
             return;
         }
 
         var dtNow = DateTime.Now;
-        var diffTime = dtNow - autoUpdateSubTime;
+        var diffTime = dtNow - _autoUpdateSubTime;
         if (diffTime.Hours % config.AutoUpdateSubInterval != 0)
         {
             return;
         }
 
         // Update
-        autoUpdateSubTime = dtNow;
+        _autoUpdateSubTime = dtNow;
 
         // Run time update task
         Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Runs In Timer Thread");
 
-        var updateHandle = new UpdateHandle();
-        updateHandle.UpdateSubscriptionProcess(true, new List<ProfileItem>(), (success, msg) =>
+        UpdateHandle.UpdateSubscriptionProcess(true, new List<ProfileItem>(), (success, msg) =>
         {
             NoticeHandler.SendMessage4ClashN(msg);
 
@@ -127,15 +99,16 @@ public sealed class MainFormHandler
             {
                 Utils.SaveLog($"MainFormHandler:OnTimer4UpdateTask - UpdateSubscriptionProcess Finished: {msg}");
             }
-            
+
             cbUpdateSubscriptionFinish(success, msg);
         });
     }
 
-    public static void RegisterGlobalHotkey(Config config, EventHandler<HotkeyEventArgs> handler)
+    public static void RegisterGlobalHotkey(EventHandler<HotkeyEventArgs> handler)
     {
         Utils.SaveLog($"MainFormHandler:RegisterGlobalHotkey");
 
+        var config = LazyConfig.Instance.Config;
         foreach (var item in config.GlobalHotkeys)
         {
             if (item.KeyCode == null)
@@ -177,9 +150,9 @@ public sealed class MainFormHandler
         }
     }
 
-    public void GetClashProxies(Action<ClashProxies, ClashProviders> update)
+    public async void GetClashProxies(Action<ClashProxies, ClashProviders> update)
     {
-        Task.Run(() => GetClashProxiesAsync(update));
+        await GetClashProxiesAsync(update);
     }
 
     private async Task GetClashProxiesAsync(Action<ClashProxies, ClashProviders> update)
@@ -206,90 +179,84 @@ public sealed class MainFormHandler
         update(null, null);
     }
 
-    public void ClashProxiesDelayTest(bool blAll, List<ProxyModel> lstProxy, Action<ProxyModel?, string> update)
+    public async void ClashProxiesDelayTest(bool blAll, List<ProxyModel> lstProxy, Action<ProxyModel?, string> update)
     {
         Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest");
 
-        Task.Run(async () =>
+        if (blAll)
         {
-            if (blAll)
+            for (var i = 0; i < 5; i++)
             {
-                for (var i = 0; i < 5; i++)
+                if (LazyConfig.Instance.GetProxies() != null)
                 {
-                    if (LazyConfig.Instance.GetProxies() != null)
-                    {
-                        break;
-                    }
-
-                    await Task.Delay(5000);
+                    break;
                 }
 
-                var proxies = LazyConfig.Instance.GetProxies();
-                if (proxies == null)
-                {
-                    return;
-                }
-
-                lstProxy = new List<ProxyModel>();
-                foreach (var kv in proxies)
-                {
-                    if (Global.NotAllowTestType.Contains(kv.Value.type.ToLower()))
-                    {
-                        continue;
-                    }
-
-                    lstProxy.Add(new ProxyModel()
-                    {
-                        name = kv.Value.name,
-                        type = kv.Value.type.ToLower(),
-                    });
-                }
+                await Task.Delay(5000);
             }
 
-            if (lstProxy == null)
+            var proxies = LazyConfig.Instance.GetProxies();
+            if (proxies == null)
             {
                 return;
             }
 
-            var urlBase = $"{GetApiUrl()}/proxies";
-            urlBase += @"/{0}/delay?timeout=10000&url=" + LazyConfig.Instance.Config.ConstItem.SpeedPingTestUrl;
-
-            var tasks = new List<Task>();
-            foreach (var it in lstProxy)
+            lstProxy = new List<ProxyModel>();
+            foreach (var kv in proxies)
             {
-                if (Global.NotAllowTestType.Contains(it.type.ToLower()))
+                if (Global.NotAllowTestType.Contains(kv.Value.type.ToLower()))
                 {
                     continue;
                 }
 
-                var name = it.name;
-                var url = string.Format(urlBase, name);
-                tasks.Add(Task.Run(async () =>
+                lstProxy.Add(new ProxyModel()
                 {
-                    var result = await HttpClientHelper.GetInstance().TryGetAsync(url);
-                    update(it, result);
-                }));
+                    name = kv.Value.name,
+                    type = kv.Value.type.ToLower(),
+                });
+            }
+        }
+
+        if (lstProxy == null)
+        {
+            return;
+        }
+
+        var urlBase = $"{GetApiUrl()}/proxies";
+        urlBase += @"/{0}/delay?timeout=10000&url=" + LazyConfig.Instance.Config.ConstItem.SpeedPingTestUrl;
+
+        var tasks = new List<Task>();
+        foreach (var it in lstProxy)
+        {
+            if (Global.NotAllowTestType.Contains(it.type.ToLower()))
+            {
+                continue;
             }
 
-            Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest - Start to wait all task");
-            Task.WaitAll(tasks.ToArray());
+            var name = it.name;
+            var url = string.Format(urlBase, name);
+            tasks.Add(Task.Run(async () =>
+            {
+                var result = await HttpClientHelper.GetInstance().TryGetAsync(url);
+                update(it, result);
+            }));
+        }
 
-            await Task.Delay(1000);
-            
-            update(null, "");
-        });
+        Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest - Start to wait all task");
+        Task.WaitAll(tasks.ToArray());
+
+        await Task.Delay(1000);
+
+        update(null, "");
     }
 
     public static void InitRegister()
     {
-        Task.Run(() =>
-        {
-            //URL Schemes
-            Utils.RegWriteValue(Global.MyRegPathClasses, "", "URL:clash");
-            Utils.RegWriteValue(Global.MyRegPathClasses, "URL Protocol", "");
-            Utils.RegWriteValue($"{Global.MyRegPathClasses}\\shell\\open\\command", "",
-                $"\"{Utils.GetExePath()}\" \"%1\"");
-        });
+        //URL Schemes
+        Utils.RegWriteValue(Global.MyRegPathClasses, "", "URL:clash");
+        Utils.RegWriteValue(Global.MyRegPathClasses, "URL Protocol", "");
+        Utils.RegWriteValue($"{Global.MyRegPathClasses}\\shell\\open\\command", "",
+            $"\"{Utils.GetExePath()}\" \"%1\"");
     }
 
     public static List<ProxiesItem> GetClashProxyGroups()
@@ -326,20 +293,17 @@ public sealed class MainFormHandler
         }
     }
 
-    public void ClashConfigUpdate(Dictionary<string, string> headers)
+    public async void ClashConfigUpdate(Dictionary<string, string> headers)
     {
-        Task.Run(async () =>
+        var proxies = LazyConfig.Instance.GetProxies();
+        if (proxies == null)
         {
-            var proxies = LazyConfig.Instance.GetProxies();
-            if (proxies == null)
-            {
-                return;
-            }
+            return;
+        }
 
-            var urlBase = $"{GetApiUrl()}/configs";
+        var urlBase = $"{GetApiUrl()}/configs";
 
-            await HttpClientHelper.GetInstance().PatchAsync(urlBase, headers);
-        });
+        await HttpClientHelper.GetInstance().PatchAsync(urlBase, headers);
     }
 
     public async void ClashConfigReload(string filePath)
@@ -359,9 +323,9 @@ public sealed class MainFormHandler
         }
     }
 
-    public void GetClashConnections(Config config, Action<ClashConnections> update)
+    public async void GetClashConnections(Config config, Action<ClashConnections> update)
     {
-        Task.Run(() => GetClashConnectionsAsync(config, update));
+       await GetClashConnectionsAsync(config, update);
     }
 
     private async Task GetClashConnectionsAsync(Config config, Action<ClashConnections> update)

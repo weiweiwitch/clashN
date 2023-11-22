@@ -8,7 +8,7 @@ namespace ClashN.Handler;
 /// <summary>
 /// 本软件配置文件处理类
 /// </summary>
-internal static class ConfigProc
+internal static class ConfigHandler
 {
     private static readonly object ObjLock = new();
 
@@ -48,7 +48,7 @@ internal static class ConfigProc
             // 转成Json
             config = Utils.FromJson<Config>(result);
         }
-        
+
         if (string.IsNullOrEmpty(config.ConstItem.SpeedTestUrl))
         {
             config.ConstItem.SpeedTestUrl = Global.SpeedTestUrl;
@@ -199,11 +199,6 @@ internal static class ConfigProc
     /// <returns></returns>
     public static int SetDefaultProfile(Config config, ProfileItem item)
     {
-        if (item == null)
-        {
-            return -1;
-        }
-
         config.IndexId = item.IndexId;
         Global.ReloadCore = true;
 
@@ -212,7 +207,7 @@ internal static class ConfigProc
         return 0;
     }
 
-    public static int SetDefaultProfile(Config config, List<ProfileItem> lstProfile)
+    public static int PointDefaultProfile(Config config, List<ProfileItem> lstProfile)
     {
         if (lstProfile.Exists(t => t.IndexId == config.IndexId))
         {
@@ -562,7 +557,7 @@ internal static class ConfigProc
         }
 
         //maybe clashProtocol
-        if (string.IsNullOrEmpty(indexId) && (clipboardData.StartsWith(Global.ClashProtocol)))
+        if (string.IsNullOrEmpty(indexId) && clipboardData.StartsWith(Global.ClashProtocol))
         {
             var url = new Uri(clipboardData);
             if (url.Host == "install-config")
@@ -602,10 +597,10 @@ internal static class ConfigProc
         }
 
         //Is Clash configuration
-        if (((clipboardData.IndexOf("port") >= 0 && clipboardData.IndexOf("socks-port") >= 0)
-             || clipboardData.IndexOf("mixed-port") >= 0)
-            && clipboardData.IndexOf("proxies") >= 0
-            && clipboardData.IndexOf("rules") >= 0)
+        if (((clipboardData.Contains("port") && clipboardData.Contains("socks-port")) ||
+             clipboardData.Contains("mixed-port"))
+            && clipboardData.Contains("proxies")
+            && clipboardData.Contains("rules"))
         {
         }
         else

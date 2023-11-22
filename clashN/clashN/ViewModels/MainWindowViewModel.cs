@@ -9,12 +9,14 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
 using System.Drawing;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
 using System.Windows.Threading;
+using ClashN.Properties;
 using ClashN.Tool;
 using Application = System.Windows.Application;
 
@@ -22,7 +24,6 @@ namespace ClashN.ViewModels;
 
 public class MainWindowViewModel : ReactiveObject
 {
-    private StatisticsHandler? _statistics;
     private readonly PaletteHelper _paletteHelper = new();
 
     #region Views
@@ -32,9 +33,9 @@ public class MainWindowViewModel : ReactiveObject
     public LogsView GetLogsView { get; }
     public ConnectionsView GetConnectionsView { get; }
     public SettingsView GetSettingsView { get; }
-    
+
     #endregion Views
-    
+
     [Reactive] public string SpeedUpload { get; set; } = "0.00";
 
     [Reactive] public string SpeedDownload { get; set; } = "0.00";
@@ -78,7 +79,8 @@ public class MainWindowViewModel : ReactiveObject
 
     // For Update Profile
     private DispatcherTimer? _updateTaskDispatcherTimer;
-    private DateTime _autoUpdateSubTime = DateTime.Now;
+
+    // private DispatcherTimer? _testDispatcherTimer;
 
     #endregion Timer
 
@@ -209,22 +211,28 @@ public class MainWindowViewModel : ReactiveObject
     {
         try
         {
-            _statistics?.Close();
-
-            CoreHandler.Instance.CoreStop();
-
-            if (blWindowsShutDown)
+            StopAllTimerTask();
+            
+            var task = Task.Run(() =>
             {
-                SysProxyHandle.ResetIEProxy4WindowsShutDown();
-            }
-            else
-            {
-                SysProxyHandle.UpdateSysProxy(true);
-            }
+                StatisticsHandler.Instance.Close();
 
-            StorageUI();
+                CoreHandler.Instance.CoreStop();
 
-            ConfigProc.SaveConfig();
+                if (blWindowsShutDown)
+                {
+                    SysProxyHandle.ResetIEProxy4WindowsShutDown();
+                }
+                else
+                {
+                    SysProxyHandle.UpdateSysProxy(true);
+                }
+
+                StorageUI();
+
+                ConfigHandler.SaveConfig();
+            });
+            task.Wait();
         }
         catch (Exception e)
         {
@@ -267,32 +275,40 @@ public class MainWindowViewModel : ReactiveObject
 
     private void Init()
     {
-        Utils.SaveLog("MainWindowViewModel:Init");
+        // _testDispatcherTimer = new DispatcherTimer
+        // {
+        //     Interval = TimeSpan.FromSeconds(1)
+        // };
+        // _testDispatcherTimer.Tick += (sender, args) =>
+        // {
+        //     Utils.SaveLogDebug("Test Timer Trigger");
+        // };
 
-        MainFormHandler.BackupGuiNConfig(true);
+        Utils.SaveLog("MainWindowViewModel:Init - Start");
 
-        MainFormHandler.InitRegister();
-
-        var config = LazyConfig.Instance.Config;
-        if (config.EnableStatistics)
+        Task.Run(async () =>
         {
-            _statistics = new StatisticsHandler(CbStatisticUpdate);
-        }
+            MainFormHandler.BackupGuiNConfig(true);
+
+            MainFormHandler.InitRegister();
+
+            StatisticsHandler.Instance.CbStatisticUpdateFunc = CbStatisticUpdate;
+            await StatisticsHandler.Instance.Run();
+
+            // HotKey
+            MainFormHandler.RegisterGlobalHotkey(OnHotkeyHandler);
+        });
 
         // Timer 4 Update 
         Utils.SaveLog($"MainWindowViewModel:Init - Create Timer 4 UpdateTask");
-        _autoUpdateSubTime = DateTime.Now;
         _updateTaskDispatcherTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromHours(1)
         };
         _updateTaskDispatcherTimer.Tick += (_, _) =>
         {
-            MainFormHandler.OnTimer4UpdateTask(ref _autoUpdateSubTime, config, CbUpdateTaskFinish);
+            Task.Run(() => MainFormHandler.Instance.OnTimer4UpdateTask(CbUpdateTaskFinish));
         };
-
-        // HotKey
-        MainFormHandler.RegisterGlobalHotkey(config, OnHotkeyHandler);
 
         OnProgramStarted("shown", true);
 
@@ -350,12 +366,12 @@ public class MainWindowViewModel : ReactiveObject
         {
             CoreHandler.Instance.LoadCore();
 
+            Global.ReloadCore = false;
+            
+            ConfigHandler.SaveConfig(false);
+            
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                Global.ReloadCore = false;
-
-                ConfigProc.SaveConfig(false);
-
                 var config = LazyConfig.Instance.Config;
                 ChangePACButtonStatus(config.SysProxyType);
 
@@ -375,7 +391,7 @@ public class MainWindowViewModel : ReactiveObject
     {
         Utils.SaveLog("MainWindowViewModel:CloseCore - SysProxyType: ForcedClear");
 
-        ConfigProc.SaveConfig(false);
+        ConfigHandler.SaveConfig(false);
 
         ChangePACButtonStatus(SysProxyType.ForcedClear);
 
@@ -406,21 +422,54 @@ public class MainWindowViewModel : ReactiveObject
     {
         Utils.SaveLog("MainWindowViewModel:ChangePACButtonStatus - SysProxyType: {type}");
 
-        SysProxyHandle.UpdateSysProxy(false);
-
         BlSystemProxyClear = type == SysProxyType.ForcedClear;
         BlSystemProxySet = type == SysProxyType.ForcedChange;
         BlSystemProxyNothing = type == SysProxyType.Unchanged;
         BlSystemProxyPac = type == SysProxyType.Pac;
 
-        NoticeHandler.SendMessage4ClashN($"Change system proxy");
+        NotifyIcon = GetNotifyIcon();
 
-        ConfigProc.SaveConfig(false);
+        Task.Run(() =>
+        {
+            SysProxyHandle.UpdateSysProxy(false);
 
-        var config = LazyConfig.Instance.Config;
-        NotifyIcon = MainFormHandler.GetNotifyIcon(config);
+            NoticeHandler.SendMessage4ClashN("Change system proxy");
+
+            ConfigHandler.SaveConfig(false);
+        });
 
         Utils.SaveLog("MainWindowViewModel:ChangePACButtonStatus - Finished");
+    }
+
+    private static Icon GetNotifyIcon()
+    {
+        var config = LazyConfig.Instance.Config;
+
+        try
+        {
+            var index = (int)config.SysProxyType;
+
+            //Load from local file
+            var fileName = Utils.GetPath($"NotifyIcon{index + 1}.ico");
+            if (File.Exists(fileName))
+            {
+                return new Icon(fileName);
+            }
+
+            return index switch
+            {
+                0 => Resources.NotifyIcon1,
+                1 => Resources.NotifyIcon2,
+                2 => Resources.NotifyIcon3,
+                3 => Resources.NotifyIcon2,
+                _ => Resources.NotifyIcon1
+            };
+        }
+        catch (Exception ex)
+        {
+            Utils.SaveLog(ex.Message, ex);
+            return Resources.NotifyIcon1;
+        }
     }
 
     public void SetRuleModeCheck(ERuleMode mode)
@@ -435,7 +484,7 @@ public class MainWindowViewModel : ReactiveObject
 
         Locator.Current.GetService<ProxiesViewModel>()?.ReloadRuleModeSelected();
 
-        ConfigProc.SaveConfig(false);
+        Task.Run(() => { ConfigHandler.SaveConfig(false); });
     }
 
     private void SetRuleMode(ERuleMode mode)
@@ -456,7 +505,8 @@ public class MainWindowViewModel : ReactiveObject
             {
                 { "mode", config.RuleMode.ToString().ToLower() }
             };
-            MainFormHandler.Instance.ClashConfigUpdate(headers);
+
+            Task.Run(async () => { MainFormHandler.Instance.ClashConfigUpdate(headers); });
         }
     }
 
@@ -553,8 +603,6 @@ public class MainWindowViewModel : ReactiveObject
 
     public void ChangePrimaryColor(System.Windows.Media.Color color)
     {
-        //  var  Swatches = new SwatchesProvider().Swatches;
-
         var theme = _paletteHelper.GetTheme();
 
         theme.PrimaryLight = new ColorPair(color.Lighten());

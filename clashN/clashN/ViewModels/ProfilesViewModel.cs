@@ -48,8 +48,6 @@ public class ProfilesViewModel : ReactiveObject
     {
         SelectedSource = new();
 
-        RefreshProfiles();
-
         var canEditRemove = this.WhenAnyValue(
             x => x.SelectedSource,
             selectedSource => selectedSource != null && !string.IsNullOrEmpty(selectedSource.IndexId));
@@ -79,11 +77,14 @@ public class ProfilesViewModel : ReactiveObject
 
         ClearStatisticCmd = ReactiveCommand.Create(() =>
         {
-            ConfigProc.ClearAllServerStatistics();
+            ConfigHandler.ClearAllServerStatistics();
             RefreshProfiles();
         });
         ProfileReloadCmd = ReactiveCommand.Create(() => { RefreshProfiles(); });
         ProfileQrcodeCmd = ReactiveCommand.Create(() => { ProfileQrcode(); }, canEditRemove);
+
+        // Logic
+        RefreshProfiles();
 
         Utils.SaveLogDebug("ProfilesViewModel:ProfilesViewModel - Finished");
     }
@@ -108,7 +109,7 @@ public class ProfilesViewModel : ReactiveObject
         }
     }
 
-    public void EditProfile(bool blNew)
+    private void EditProfile(bool blNew)
     {
         ProfileItem item;
         if (blNew)
@@ -129,7 +130,7 @@ public class ProfilesViewModel : ReactiveObject
 
         var dialog = new ProfileEditWindow(item)
         {
-            Owner = App.Current.MainWindow,
+            Owner = Application.Current.MainWindow,
         };
 
         if (dialog.ShowDialog() == true)
@@ -145,6 +146,7 @@ public class ProfilesViewModel : ReactiveObject
         Task.Run(() =>
         {
             var result = Utils.ScanScreen();
+
             Application.Current.Dispatcher.Invoke((Action)(() =>
             {
                 MainWindowViewModel.ShowHideWindow(true);
@@ -155,7 +157,7 @@ public class ProfilesViewModel : ReactiveObject
                 }
                 else
                 {
-                    var ret = ConfigProc.AddBatchProfiles(result, "", "");
+                    var ret = ConfigHandler.AddBatchProfiles(result, "", "");
                     if (ret == 0)
                     {
                         RefreshProfiles();
@@ -175,7 +177,7 @@ public class ProfilesViewModel : ReactiveObject
             return;
         }
 
-        var ret = ConfigProc.AddBatchProfiles(clipboardData, "", "");
+        var ret = ConfigHandler.AddBatchProfiles(clipboardData, "", "");
         if (ret == 0)
         {
             if (bClear)
@@ -184,6 +186,7 @@ public class ProfilesViewModel : ReactiveObject
             }
 
             RefreshProfiles();
+
             NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedProfileViaClipboard);
         }
     }
@@ -196,7 +199,7 @@ public class ProfilesViewModel : ReactiveObject
             return;
         }
 
-        var content = ConfigProc.GetProfileContent(item);
+        var content = ConfigHandler.GetProfileContent(item);
         if (string.IsNullOrEmpty(content))
         {
             content = item.Url;
@@ -219,17 +222,20 @@ public class ProfilesViewModel : ReactiveObject
             }
         }
 
-        new UpdateHandle().UpdateSubscriptionProcess(blProxy, profileItems, (success, msg) =>
+        Task.Run(() =>
         {
-            NoticeHandler.SendMessage4ClashN(msg);
-
-            if (success)
+            UpdateHandle.UpdateSubscriptionProcess(blProxy, profileItems, (success, msg) =>
             {
-                Utils.SaveLog(
-                    $"ProfilesViewModel:UpdateSubscriptionProcess - UpdateSubscriptionProcess Finished: {msg}");
+                NoticeHandler.SendMessage4ClashN(msg);
 
-                Application.Current.Dispatcher.Invoke((Action)(() => { RefreshProfiles(); }));
-            }
+                if (success)
+                {
+                    Utils.SaveLog(
+                        $"ProfilesViewModel:UpdateSubscriptionProcess - UpdateSubscriptionProcess Finished: {msg}");
+
+                    Application.Current.Dispatcher.Invoke((Action)(() => { RefreshProfiles(); }));
+                }
+            });
         });
     }
 
@@ -246,7 +252,7 @@ public class ProfilesViewModel : ReactiveObject
             return;
         }
 
-        ConfigProc.RemoveProfile(LazyConfig.Instance.Config, new List<ProfileItem>() { item });
+        ConfigHandler.RemoveProfile(LazyConfig.Instance.Config, new List<ProfileItem>() { item });
 
         NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
 
@@ -263,9 +269,10 @@ public class ProfilesViewModel : ReactiveObject
             return;
         }
 
-        if (ConfigProc.CopyProfile(new List<ProfileItem>() { item }) == 0)
+        if (ConfigHandler.CopyProfile(new List<ProfileItem> { item }) == 0)
         {
             NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
+            
             RefreshProfiles();
         }
     }
@@ -284,15 +291,16 @@ public class ProfilesViewModel : ReactiveObject
         }
 
         var item = config.GetProfileItem(SelectedSource.IndexId);
-        if (item is null)
+        if (item == null)
         {
             NoticeHandler.Instance.Enqueue(ResUI.PleaseSelectProfile);
             return;
         }
 
-        if (ConfigProc.SetDefaultProfile(config, item) == 0)
+        if (ConfigHandler.SetDefaultProfile(config, item) == 0)
         {
             NoticeHandler.SendMessage4ClashN(ResUI.OperationSuccess);
+            
             RefreshProfiles();
 
             Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
@@ -301,10 +309,10 @@ public class ProfilesViewModel : ReactiveObject
 
     public void RefreshProfiles()
     {
-        Utils.SaveLog($"ProfilesViewModel:RefreshProfiles - Start");
+        Utils.SaveLog("ProfilesViewModel:RefreshProfiles - Start");
 
         var config = LazyConfig.Instance.Config;
-        ConfigProc.SetDefaultProfile(config, config.ProfileItems);
+        ConfigHandler.PointDefaultProfile(config, config.ProfileItems);
 
         var lstModel = new List<ProfileItemModel>();
         foreach (var item in config.ProfileItems.OrderBy(it => it.Sort))
@@ -325,14 +333,14 @@ public class ProfilesViewModel : ReactiveObject
         var targetIndex = _profileItems.IndexOf(targetItem);
         if (startIndex >= 0 && targetIndex >= 0 && startIndex != targetIndex)
         {
-            if (ConfigProc.MoveProfile(startIndex, MovementTarget.Position, targetIndex) == 0)
+            if (ConfigHandler.MoveProfile(startIndex, MovementTarget.Position, targetIndex) == 0)
             {
                 RefreshProfiles();
             }
         }
     }
 
-    public async void ProfileQrcode()
+    private async void ProfileQrcode()
     {
         var item = LazyConfig.Instance.Config.GetProfileItem(SelectedSource.IndexId);
         if (item is null)

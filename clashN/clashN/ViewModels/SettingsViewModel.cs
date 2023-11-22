@@ -154,7 +154,7 @@ public class SettingsViewModel : ReactiveValidationObject
                 {
                     config.UiItem.ColorModeDark = ColorModeDark;
                     Locator.Current.GetService<MainWindowViewModel>()?.ModifyTheme(ColorModeDark);
-                    ConfigProc.SaveConfig();
+                    ConfigHandler.SaveConfig();
                 }
             });
 
@@ -176,7 +176,7 @@ public class SettingsViewModel : ReactiveValidationObject
                     config.UiItem.ColorPrimaryName = SelectedSwatch?.Name;
                     Locator.Current.GetService<MainWindowViewModel>()
                         ?.ChangePrimaryColor(SelectedSwatch.ExemplarHue.Color);
-                    ConfigProc.SaveConfig();
+                    ConfigHandler.SaveConfig();
                 }
             });
 
@@ -201,7 +201,7 @@ public class SettingsViewModel : ReactiveValidationObject
                 {
                     config.UiItem.ColorModeDark = ColorModeDark;
                     Locator.Current.GetService<MainWindowViewModel>()?.ModifyTheme(ColorModeDark);
-                    ConfigProc.SaveConfig();
+                    ConfigHandler.SaveConfig();
                 }
             });
 
@@ -219,7 +219,7 @@ public class SettingsViewModel : ReactiveValidationObject
                     Application.Current.Resources["StdFontSize3"] = size + 2;
                     Application.Current.Resources["StdFontSize4"] = size + 3;
 
-                    ConfigProc.SaveConfig();
+                    ConfigHandler.SaveConfig();
                 }
             });
 
@@ -256,7 +256,7 @@ public class SettingsViewModel : ReactiveValidationObject
         config.SystemProxyAdvancedProtocol = systemProxyAdvancedProtocol;
         config.PacPort = PacPort;
 
-        if (ConfigProc.SaveConfig() == 0)
+        if (ConfigHandler.SaveConfig() == 0)
         {
             NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
                 

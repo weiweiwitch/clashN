@@ -62,7 +62,7 @@ public partial class App
 
     private void Init()
     {
-        if (ConfigProc.LoadConfig() != 0)
+        if (ConfigHandler.LoadConfig() != 0)
         {
             Utils.SaveLogError($"Loading GUI configuration file is abnormal, please restart the application {Environment.NewLine} 加载GUI配置文件异常,请重启应用");
             UI.ShowWarning($"Loading GUI configuration file is abnormal,please restart the application{Environment.NewLine}加载GUI配置文件异常,请重启应用");

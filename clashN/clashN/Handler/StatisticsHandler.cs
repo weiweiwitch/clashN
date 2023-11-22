@@ -7,25 +7,18 @@ namespace ClashN.Handler;
 
 internal class StatisticsHandler
 {
-    private bool _exitFlag;
+    private static Lazy<StatisticsHandler> _instance = new(() => new StatisticsHandler());
+
+    public static StatisticsHandler Instance => _instance.Value;
+    
+    private bool _exitFlag = false;
 
     private ClientWebSocket? _webSocket = null;
     private string _url = string.Empty;
 
-    private readonly Action<ulong, ulong> _cbStatisticUpdateFunc;
+    public Action<ulong, ulong> CbStatisticUpdateFunc;
 
-    private bool Enable { get; set; }
-
-    public StatisticsHandler(Action<ulong, ulong> cbStatisticUpdate)
-    {
-        _cbStatisticUpdateFunc = cbStatisticUpdate;
-
-        Enable = LazyConfig.Instance.Config.EnableStatistics;
-        _exitFlag = false;
-
-        Task.Run(Run);
-    }
-
+    private bool Enable { get; set; } = LazyConfig.Instance.Config.EnableStatistics;
 
     public void Close()
     {
@@ -49,7 +42,7 @@ internal class StatisticsHandler
         }
     }
 
-    private async Task Run()
+    public async Task Run()
     {
         await Init();
 
@@ -194,7 +187,7 @@ internal class StatisticsHandler
                             serverStatItem.DownloadRemote += down;
                         }
                     }
-                    _cbStatisticUpdateFunc(up, down);
+                    CbStatisticUpdateFunc(up, down);
                 }
 
                 res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None).ConfigureAwait(true);

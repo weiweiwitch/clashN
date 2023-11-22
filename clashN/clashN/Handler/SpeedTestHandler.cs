@@ -15,7 +15,7 @@ internal class SpeedTestHandler
     {
     }
 
-    public SpeedTestHandler(CoreHandler coreHandler, List<ProfileItem> selecteds,
+    public SpeedTestHandler(List<ProfileItem> selecteds,
         ESpeedActionType actionType, Action<string, string> update)
     {
         _updateFunc = update;
@@ -76,9 +76,9 @@ internal class SpeedTestHandler
 
     private void RunTcping()
     {
-        RunPingSub((ServerTestItem it) =>
+        RunPingSub(it =>
         {
-            int time = GetTcpingTime(it.Address, it.Port);
+            var time = GetTcpingTime(it.Address, it.Port);
 
             _updateFunc(it.IndexId, FormatOut(time, "ms"));
         });
@@ -95,7 +95,7 @@ internal class SpeedTestHandler
                 try
                 {
                     var webProxy = new WebProxy(Global.Loopback, httpPort);
-                    var responseTime = -1;
+                    int responseTime;
                     var status = GetRealPingTime(LazyConfig.Instance.Config.ConstItem.SpeedPingTestUrl, webProxy,
                         out responseTime);
                     var noError = string.IsNullOrEmpty(status);
@@ -124,7 +124,7 @@ internal class SpeedTestHandler
         {
             if (!IPAddress.TryParse(url, out IPAddress ipAddress))
             {
-                IPHostEntry ipHostInfo = System.Net.Dns.GetHostEntry(url);
+                var ipHostInfo = System.Net.Dns.GetHostEntry(url);
                 ipAddress = ipHostInfo.AddressList[0];
             }
 
@@ -192,6 +192,6 @@ internal class SpeedTestHandler
             return "Timeout";
         }
 
-        return string.Format("{0}{1}", time, unit).PadLeft(8, ' ');
+        return $"{time}{unit}".PadLeft(8, ' ');
     }
 }

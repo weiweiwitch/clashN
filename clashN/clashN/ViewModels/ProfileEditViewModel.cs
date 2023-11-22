@@ -15,7 +15,7 @@ namespace ClashN.ViewModels;
 
 public class ProfileEditViewModel : ReactiveValidationObject
 {
-    private ProfileEditWindow _view;
+    private readonly ProfileEditWindow _view;
 
     [Reactive] public ProfileItem SelectedSource { get; set; }
 
@@ -37,6 +37,7 @@ public class ProfileEditViewModel : ReactiveValidationObject
         }
 
         _view = view;
+        
         CoreType = (SelectedSource.CoreType ?? CoreKind.Clash).ToString();
 
         BrowseProfileCmd = ReactiveCommand.Create(() => { BrowseProfile(); });
@@ -82,11 +83,13 @@ public class ProfileEditViewModel : ReactiveValidationObject
             item.EnableConvert = SelectedSource.EnableConvert;
         }
 
-        if (ConfigProc.EditProfile(item) == 0)
+        if (ConfigHandler.EditProfile(item) == 0)
         {
             Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
+            
             NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
-            _view?.Close();
+            
+            _view.Close();
         }
         else
         {
@@ -125,11 +128,13 @@ public class ProfileEditViewModel : ReactiveValidationObject
             item = SelectedSource;
         }
 
-        if (ConfigProc.AddProfileViaPath(item, fileName) == 0)
+        if (ConfigHandler.AddProfileViaPath(item, fileName) == 0)
         {
             NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedCustomProfile);
+            
             Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
-            _view?.Close();
+            
+            _view.Close();
         }
         else
         {
