@@ -28,11 +28,10 @@ namespace ClashN.ViewModels
 
         [Reactive] public bool AutoRefresh { get; set; }
 
-        private int AutoRefreshInterval;
+        private const int AutoRefreshInterval = 10;
 
         public ConnectionsViewModel()
         {
-            AutoRefreshInterval = 10;
             var config = LazyConfig.Instance.Config;
             SortingSelected = config.UiItem.ConnectionsSorting;
             AutoRefresh = config.UiItem.ConnectionsAutoRefresh;
@@ -91,7 +90,6 @@ namespace ClashN.ViewModels
             var config = LazyConfig.Instance.Config;
             MainFormHandler.Instance.GetClashConnections(config, (it) =>
             {
-                //_noticeHandler?.SendMessage("Refresh Clash Connections", true);
                 if (it == null)
                 {
                     return;

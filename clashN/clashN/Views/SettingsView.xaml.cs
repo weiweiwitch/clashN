@@ -41,17 +41,12 @@ public partial class SettingsView
             foreach (var it in files)
             {
                 var families = Fonts.GetFontFamilies(Utils.GetFontsPath(it.Name));
-                foreach (FontFamily family in families)
+                foreach (var family in families)
                 {
                     var typefaces = family.GetTypefaces();
-                    foreach (Typeface typeface in typefaces)
+                    foreach (var typeface in typefaces)
                     {
                         typeface.TryGetGlyphTypeface(out GlyphTypeface glyph);
-                        //var fontFace = glyph.Win32FaceNames[new CultureInfo("en-us")];
-                        //if (!fontFace.Equals("Regular") && !fontFace.Equals("Normal"))
-                        //{
-                        //    continue;
-                        //}
                         var fontFamily = glyph.Win32FamilyNames[new CultureInfo(culture)];
                         if (string.IsNullOrEmpty(fontFamily))
                         {

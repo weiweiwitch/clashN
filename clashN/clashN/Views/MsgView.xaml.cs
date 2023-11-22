@@ -39,10 +39,10 @@ public partial class MsgView
         {
             ClearMsg();
         }
-        this.TxtMsg.AppendText(msg);
+        TxtMsg.AppendText(msg);
         if (!msg.EndsWith(Environment.NewLine))
         {
-            this.TxtMsg.AppendText(Environment.NewLine);
+            TxtMsg.AppendText(Environment.NewLine);
         }
         TxtMsg.ScrollToEnd();
     }

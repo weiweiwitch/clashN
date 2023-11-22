@@ -28,8 +28,6 @@ public partial class App
 
     public App()
     {
-        // Locator.CurrentMutable.RegisterViewsForViewModels(Assembly.GetCallingAssembly());
-
         DispatcherUnhandledException += App_DispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
@@ -50,14 +48,15 @@ public partial class App
 
         // Logging
         Logging.Setup();
-        Utils.SaveLog($"ClashN start up | {Utils.GetVersion()} | {Utils.GetExePath()}");
+        Utils.SaveLog($"App:OnStartup - ClashN start up | {Utils.GetVersion()} | {Utils.GetExePath()}");
         Logging.ClearLogs();
 
         Init();
 
         var lang = Utils.RegReadValue(Global.MyRegPath, Global.MyRegKeyLanguage, Global.Languages[0]);
         Thread.CurrentThread.CurrentUICulture = new CultureInfo(lang);
-
+        Utils.SaveLog($"App:OnStartup - Thread.CurrentThread.CurrentUICulture Set {lang}");
+        
         base.OnStartup(e);
     }
 
@@ -85,6 +84,10 @@ public partial class App
         if (e.ExceptionObject != null)
         {
             Utils.SaveLog("CurrentDomain_UnhandledException", (Exception)e.ExceptionObject!);
+        }
+        else
+        {
+            Utils.SaveLog("CurrentDomain_UnhandledException");
         }
     }
 
