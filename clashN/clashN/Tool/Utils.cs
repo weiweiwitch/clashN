@@ -331,38 +331,38 @@ internal static class Utils
     /// <param name="unit">单位</param>
     public static void ToHumanReadable(ulong amount, out double result, out string unit)
     {
-        var factor = 1024u;
-        var KBs = amount / factor;
-        if (KBs > 0)
+        const uint factor = 1024u;
+        var kbs = amount / factor;
+        if (kbs > 0)
         {
             // multi KB
-            var MBs = KBs / factor;
-            if (MBs > 0)
+            var mbs = kbs / factor;
+            if (mbs > 0)
             {
                 // multi MB
-                var GBs = MBs / factor;
-                if (GBs > 0)
+                var gbs = mbs / factor;
+                if (gbs > 0)
                 {
                     // multi GB
-                    ulong TBs = GBs / factor;
-                    if (TBs > 0)
+                    var tbs = gbs / factor;
+                    if (tbs > 0)
                     {
-                        result = TBs + (GBs % factor / (factor + 0.0));
+                        result = tbs + (gbs % factor / (factor + 0.0));
                         unit = "TB";
                         return;
                     }
 
-                    result = GBs + (MBs % factor / (factor + 0.0));
+                    result = gbs + (mbs % factor / (factor + 0.0));
                     unit = "GB";
                     return;
                 }
 
-                result = MBs + (KBs % factor / (factor + 0.0));
+                result = mbs + (kbs % factor / (factor + 0.0));
                 unit = "MB";
                 return;
             }
 
-            result = KBs + (amount % factor / (factor + 0.0));
+            result = kbs + (amount % factor / (factor + 0.0));
             unit = "KB";
         }
         else
@@ -494,7 +494,7 @@ internal static class Utils
     /// </summary>
     /// <param name="input">输入字符串</param>
     /// <param name="pattern">模式字符串</param>
-    public static bool IsMatch(string input, string pattern)
+    private static bool IsMatch(string input, string pattern)
     {
         return Regex.IsMatch(input, pattern, RegexOptions.IgnoreCase);
     }
@@ -504,17 +504,12 @@ internal static class Utils
         IPAddress address;
         if (IPAddress.TryParse(ip, out address))
         {
-            switch (address.AddressFamily)
+            return address.AddressFamily switch
             {
-                case AddressFamily.InterNetwork:
-                    return false;
-
-                case AddressFamily.InterNetworkV6:
-                    return true;
-
-                default:
-                    return false;
-            }
+                AddressFamily.InterNetwork => false,
+                AddressFamily.InterNetworkV6 => true,
+                _ => false
+            };
         }
 
         return false;
@@ -524,18 +519,10 @@ internal static class Utils
 
     #region 开机自动启动
 
-    private static string _autoRunName = "clashNAutoRun";
+    private const string AutoRunName = "clashNAutoRun";
 
     private static string AutoRunRegPath => @"Software\Microsoft\Windows\CurrentVersion\Run";
 
-    //if (Environment.Is64BitProcess)
-    //{
-    //    return @"Software\Microsoft\Windows\CurrentVersion\Run";
-    //}
-    //else
-    //{
-    //    return @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run";
-    //}
     /// <summary>
     /// 开机自动启动
     /// </summary>
@@ -546,22 +533,22 @@ internal static class Utils
         try
         {
             //delete first
-            RegWriteValue(AutoRunRegPath, _autoRunName, null);
+            RegWriteValue(AutoRunRegPath, AutoRunName, null);
             if (IsAdministrator())
             {
-                AutoStart(_autoRunName, "", "");
+                AutoStart(AutoRunName, "", "");
             }
 
             if (run)
             {
-                string exePath = $"\"{GetExePath()}\"";
+                var exePath = $"\"{GetExePath()}\"";
                 if (IsAdministrator())
                 {
-                    AutoStart(_autoRunName, exePath, "");
+                    AutoStart(AutoRunName, exePath, "");
                 }
                 else
                 {
-                    RegWriteValue(AutoRunRegPath, _autoRunName, exePath);
+                    RegWriteValue(AutoRunRegPath, AutoRunName, exePath);
                 }
             }
         }
@@ -579,7 +566,7 @@ internal static class Utils
     {
         try
         {
-            var value = RegReadValue(AutoRunRegPath, _autoRunName, "");
+            var value = RegReadValue(AutoRunRegPath, AutoRunName, "");
             var exePath = GetExePath();
             if (value?.Equals(exePath) == true || value?.Equals($"\"{exePath}\"") == true)
             {
@@ -703,44 +690,42 @@ internal static class Utils
     /// <param name="fileName"></param>
     /// <param name="description"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public static void AutoStart(string taskName, string fileName, string description)
+    private static void AutoStart(string taskName, string fileName, string description)
     {
         if (string.IsNullOrEmpty(taskName))
         {
             return;
         }
 
-        var TaskName = taskName;
         var logonUser = WindowsIdentity.GetCurrent().Name;
         var taskDescription = description;
-        var deamonFileName = fileName;
+        var daemonFileName = fileName;
 
-        using (var taskService = new TaskService())
+        using var taskService = new TaskService();
+
+        var tasks = taskService.RootFolder.GetTasks(new Regex(taskName));
+        foreach (var t in tasks)
         {
-            var tasks = taskService.RootFolder.GetTasks(new Regex(TaskName));
-            foreach (var t in tasks)
-            {
-                taskService.RootFolder.DeleteTask(t.Name);
-            }
-
-            if (string.IsNullOrEmpty(fileName))
-            {
-                return;
-            }
-
-            var task = taskService.NewTask();
-            task.RegistrationInfo.Description = taskDescription;
-            task.Settings.DisallowStartIfOnBatteries = false;
-            task.Settings.StopIfGoingOnBatteries = false;
-            task.Settings.RunOnlyIfIdle = false;
-            task.Settings.IdleSettings.StopOnIdleEnd = false;
-            task.Settings.ExecutionTimeLimit = TimeSpan.Zero;
-            task.Triggers.Add(new LogonTrigger { UserId = logonUser, Delay = TimeSpan.FromMinutes(1) });
-            task.Principal.RunLevel = TaskRunLevel.Highest;
-            task.Actions.Add(new ExecAction(deamonFileName));
-
-            taskService.RootFolder.RegisterTaskDefinition(TaskName, task);
+            taskService.RootFolder.DeleteTask(t.Name);
         }
+
+        if (string.IsNullOrEmpty(fileName))
+        {
+            return;
+        }
+
+        var task = taskService.NewTask();
+        task.RegistrationInfo.Description = taskDescription;
+        task.Settings.DisallowStartIfOnBatteries = false;
+        task.Settings.StopIfGoingOnBatteries = false;
+        task.Settings.RunOnlyIfIdle = false;
+        task.Settings.IdleSettings.StopOnIdleEnd = false;
+        task.Settings.ExecutionTimeLimit = TimeSpan.Zero;
+        task.Triggers.Add(new LogonTrigger { UserId = logonUser, Delay = TimeSpan.FromMinutes(1) });
+        task.Principal.RunLevel = TaskRunLevel.Highest;
+        task.Actions.Add(new ExecAction(daemonFileName));
+
+        taskService.RootFolder.RegisterTaskDefinition(taskName, task);
     }
 
     #endregion 开机自动启动
@@ -757,12 +742,12 @@ internal static class Utils
         long roundtripTime = -1;
         try
         {
-            var timeout = 30;
-            var echoNum = 2;
+            const int timeOut = 30;
+            const int echoNum = 2;
             var pingSender = new Ping();
             for (var i = 0; i < echoNum; i++)
             {
-                var reply = pingSender.Send(host, timeout);
+                var reply = pingSender.Send(host, timeOut);
                 if (reply.Status == IPStatus.Success)
                 {
                     if (reply.RoundtripTime < 0)
@@ -795,8 +780,8 @@ internal static class Utils
         var lstIPAddress = new List<string>();
         try
         {
-            var IpEntry = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (var ipa in IpEntry.AddressList)
+            var ipEntry = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ipa in ipEntry.AddressList)
             {
                 if (ipa.AddressFamily == AddressFamily.InterNetwork)
                     lstIPAddress.Add(ipa.ToString());
@@ -989,8 +974,8 @@ internal static class Utils
     {
         try
         {
-            WindowsIdentity current = WindowsIdentity.GetCurrent();
-            WindowsPrincipal windowsPrincipal = new WindowsPrincipal(current);
+            var current = WindowsIdentity.GetCurrent();
+            var windowsPrincipal = new WindowsPrincipal(current);
             //WindowsBuiltInRole可以枚举出很多权限，例如系统用户、User、Guest等等
             return windowsPrincipal.IsInRole(WindowsBuiltInRole.Administrator);
         }
@@ -1317,13 +1302,13 @@ internal static class Utils
 
     #endregion Interop
 
-    public static System.Windows.Forms.IWin32Window WpfWindow2WinFormWin32Window(this System.Windows.Window wpfWindow)
+    public static IWin32Window WpfWindow2WinFormWin32Window(this System.Windows.Window wpfWindow)
     {
         return new WinFormWin32WindowWrapper(
             new System.Windows.Interop.WindowInteropHelper(wpfWindow).Handle);
     }
 
-    private class WinFormWin32WindowWrapper : System.Windows.Forms.IWin32Window
+    private class WinFormWin32WindowWrapper : IWin32Window
     {
         public WinFormWin32WindowWrapper(IntPtr hwnd)
         {

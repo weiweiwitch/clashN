@@ -176,7 +176,7 @@ public class MainWindowViewModel : ReactiveObject
 
         NotifyLeftClickCmd = ReactiveCommand.Create(() => { ShowHideWindow(null); });
 
-        Global.ShowInTaskbar = true; //Application.Current.MainWindow.ShowInTaskbar;
+        Global.ShowInTaskbar = true;
 
         ThreadPool.RegisterWaitForSingleObject(App.ProgramStarted, OnProgramStarted, null, -1, false);
 
@@ -299,7 +299,7 @@ public class MainWindowViewModel : ReactiveObject
         };
 
         // HotKey
-        // MainFormHandler.RegisterGlobalHotkey(config, OnHotkeyHandler);
+        MainFormHandler.RegisterGlobalHotkey(config, OnHotkeyHandler);
 
         OnProgramStarted("shown", true);
 
