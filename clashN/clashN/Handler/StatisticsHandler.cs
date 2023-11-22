@@ -68,20 +68,20 @@ internal class StatisticsHandler
 
                 Reset();
 
-                await Task.Delay(5000);
+                await Task.Delay(5000).ConfigureAwait(true);
 
                 var connectRt = await ConnectToBackend();
                 while (!_exitFlag && !connectRt)
                 {
                     Utils.SaveLogWarn("Connect to the backend failed when reset. Try again later");
 
-                    await Task.Delay(5000);
+                    await Task.Delay(5000).ConfigureAwait(true);
 
                     connectRt = await ConnectToBackend();
                 }
             }
 
-            await Task.Delay(1000);
+            await Task.Delay(1000).ConfigureAwait(true);
         }
     }
 
@@ -89,14 +89,14 @@ internal class StatisticsHandler
     {
         Utils.SaveLog($"StatisticsHandler:Init - _exitFlag: {_exitFlag}");
 
-        await Task.Delay(5000);
+        await Task.Delay(5000).ConfigureAwait(true);
 
         var connectRt = await ConnectToBackend();
         while (!_exitFlag && !connectRt)
         {
             Utils.SaveLogWarn("Connect to the backend failed when init. Try again later");
 
-            await Task.Delay(5000);
+            await Task.Delay(5000).ConfigureAwait(true);
 
             connectRt = await ConnectToBackend();
         }
@@ -124,7 +124,7 @@ internal class StatisticsHandler
             _url = $"ws://{Global.Loopback}:{LazyConfig.Instance.Config.ApiPort}/traffic";
 
             var webSocket = new ClientWebSocket();
-            await webSocket.ConnectAsync(new Uri(_url), CancellationToken.None);
+            await webSocket.ConnectAsync(new Uri(_url), CancellationToken.None).ConfigureAwait(true);
 
             if (webSocket.State != WebSocketState.Open)
             {
@@ -177,7 +177,7 @@ internal class StatisticsHandler
             }
 
             var buffer = new byte[1024];
-            var res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            var res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None).ConfigureAwait(true);
             while (!res.CloseStatus.HasValue)
             {
                 var result = Encoding.UTF8.GetString(buffer, 0, res.Count);
@@ -198,7 +198,7 @@ internal class StatisticsHandler
                     _cbStatisticUpdateFunc(up, down);
                 }
 
-                res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                res = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None).ConfigureAwait(true);
             }
         }
         catch (Exception e)
