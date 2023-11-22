@@ -79,6 +79,7 @@ public class MainWindowViewModel : ReactiveObject
 
     // For Update Profile
     private DispatcherTimer? _updateTaskDispatcherTimer;
+    private DispatcherTimer? _testDispatcherTimer;
 
     #endregion Timer
 
@@ -141,9 +142,9 @@ public class MainWindowViewModel : ReactiveObject
         });
 
         NotifyLeftClickCmd = ReactiveCommand.Create(() => { ShowHideWindow(null); });
-
+        
         Global.ShowInTaskbar = true;
-
+        
         ThreadPool.RegisterWaitForSingleObject(App.ProgramStarted, OnProgramStarted, null, -1, false);
 
         RestoreUI();
@@ -159,16 +160,19 @@ public class MainWindowViewModel : ReactiveObject
 
         Application.Current.Dispatcher.Invoke((Action)(() =>
         {
+            Utils.SaveLogDebug($"MainWindowViewModel:OnProgramStarted - Invoke");
+            
             var clipboardData = Utils.GetClipboardData();
-            if (state != null && clipboardData != null)
-            {
-                if (string.IsNullOrEmpty(clipboardData) || !clipboardData.StartsWith(Global.ClashProtocol))
-                {
-                    return;
-                }
-            }
+            // Utils.SaveLogDebug($"MainWindowViewModel:OnProgramStarted - After GetClipboardData {clipboardData}, ClashProtocol: {Global.ClashProtocol}");
+            // if (state != null && clipboardData != null)
+            // {
+            //     if (string.IsNullOrEmpty(clipboardData) || !clipboardData.StartsWith(Global.ClashProtocol))
+            //     {
+            //         return;
+            //     }
+            // }
 
-            ShowHideWindow(true);
+            // ShowHideWindow(true);
 
             Locator.Current.GetService<ProfilesViewModel>()?.AddProfilesViaClipboard(true);
 
@@ -264,9 +268,18 @@ public class MainWindowViewModel : ReactiveObject
         {
             MainFormHandler.Instance.OnTimer4UpdateTask(CbUpdateTaskFinish);
         };
+        
+        _testDispatcherTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        _testDispatcherTimer.Tick += (_, _) =>
+        {
+            Utils.SaveLog("UI thread test");
+        };
 
         OnProgramStarted("shown", true);
-
+        
         LoadCore();
     }
 
@@ -463,26 +476,35 @@ public class MainWindowViewModel : ReactiveObject
 
     public static void ShowHideWindow(bool? blShow)
     {
-        Utils.SaveLog($"MainWindowViewModel:ShowHideWindow");
+        Utils.SaveLog($"MainWindowViewModel:ShowHideWindow - blShow: {blShow}");
 
         var bl = blShow.HasValue ? blShow.Value : !Global.ShowInTaskbar;
-        if (bl)
+        var window = Application.Current.MainWindow;
+        if (window != null)
         {
-            Application.Current.MainWindow.Show();
-            if (Application.Current.MainWindow.WindowState == WindowState.Minimized)
+            Utils.SaveLog($"MainWindowViewModel:ShowHideWindow - blShow: {blShow}  bl: {bl} window.WindowState: {window.WindowState} " +
+                          $"ShowActivated: {window.ShowActivated}, " +
+                          $"IsActive: {window.IsActive}");
+            if (bl)
             {
-                Application.Current.MainWindow.WindowState = WindowState.Normal;
+                window.Show();
+                if (window.WindowState == WindowState.Minimized)
+                {
+                    window.WindowState = WindowState.Normal;
+                }
+                
+                window.Activate();
+                window.Focus();
             }
-
-            Application.Current.MainWindow.Activate();
-            Application.Current.MainWindow.Focus();
-        }
-        else
-        {
-            Application.Current.MainWindow.Hide();
+            else
+            {
+                window.Hide();
+            }
         }
 
         Global.ShowInTaskbar = bl;
+        
+        Utils.SaveLog($"MainWindowViewModel:ShowHideWindow - Finished. ShowInTaskbar: {bl}");
     }
 
     private void RestoreUI()
@@ -564,10 +586,12 @@ public class MainWindowViewModel : ReactiveObject
     public void StartAllTimerTask()
     {
         _updateTaskDispatcherTimer?.Start();
+        _testDispatcherTimer?.Start();
     }
 
     public void StopAllTimerTask()
     {
         _updateTaskDispatcherTimer?.Stop();
+        _testDispatcherTimer?.Stop();
     }
 }

@@ -144,8 +144,7 @@ public class ProfilesViewModel : ReactiveObject
         MainWindowViewModel.ShowHideWindow(false);
 
         var result = Utils.ScanScreen();
-
-
+        
         MainWindowViewModel.ShowHideWindow(true);
 
         if (string.IsNullOrEmpty(result))

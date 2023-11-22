@@ -121,7 +121,7 @@ public class SettingsViewModel : ReactiveValidationObject
                 this.IsValid());
         SetGlobalHotkeyCmd = ReactiveCommand.Create(() =>
         {
-            GlobalHotkeySettingWindow dialog = new GlobalHotkeySettingWindow()
+            var dialog = new GlobalHotkeySettingWindow()
             {
                 Owner = App.Current.MainWindow
             };
@@ -213,7 +213,7 @@ public class SettingsViewModel : ReactiveValidationObject
                 if (CurrentFontSize >= Global.MinFontSize)
                 {
                     config.UiItem.CurrentFontSize = CurrentFontSize;
-                    double size = (long)CurrentFontSize;
+                    double size = CurrentFontSize;
                     Application.Current.Resources["StdFontSize1"] = size;
                     Application.Current.Resources["StdFontSize2"] = size + 1;
                     Application.Current.Resources["StdFontSize3"] = size + 2;
