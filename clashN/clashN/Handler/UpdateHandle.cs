@@ -11,27 +11,24 @@ using ClashN.Tool;
 
 namespace ClashN.Handler;
 
+public class ResultEventArgs : EventArgs
+{
+    public readonly bool Success;
+    public readonly string Msg;
+
+    public ResultEventArgs(bool success, string msg)
+    {
+        Success = success;
+        Msg = msg;
+    }
+}
+
 internal class UpdateHandle
 {
-    private Action<bool, string> _updateFunc;
-
     public event EventHandler<ResultEventArgs> AbsoluteCompleted;
 
-    public class ResultEventArgs : EventArgs
+    public void CheckUpdateGuiN(Action<bool, string> cbUpdate)
     {
-        public bool Success;
-        public string Msg;
-
-        public ResultEventArgs(bool success, string msg)
-        {
-            Success = success;
-            Msg = msg;
-        }
-    }
-
-    public void CheckUpdateGuiN(Action<bool, string> update)
-    {
-        _updateFunc = update;
         var url = string.Empty;
 
         DownloadHandle downloadHandle = null;
@@ -43,7 +40,7 @@ internal class UpdateHandle
             {
                 if (args.Success)
                 {
-                    _updateFunc(false, ResUI.MsgDownloadCoreSuccessfully);
+                    cbUpdate(false, ResUI.MsgDownloadCoreSuccessfully);
 
                     try
                     {
@@ -61,27 +58,27 @@ internal class UpdateHandle
                         process.Start();
                         if (process.Id > 0)
                         {
-                            _updateFunc(true, "");
+                            cbUpdate(true, "");
                         }
                     }
                     catch (Exception ex)
                     {
-                        _updateFunc(false, ex.Message);
+                        cbUpdate(false, ex.Message);
                     }
                 }
                 else
                 {
-                    _updateFunc(false, args.Msg);
+                    cbUpdate(false, args.Msg);
                 }
             };
-            downloadHandle.Error += (sender2, args) => { _updateFunc(false, args.GetException().Message); };
+            downloadHandle.Error += (sender2, args) => { cbUpdate(false, args.GetException().Message); };
         }
 
         AbsoluteCompleted += (sender2, args) =>
         {
             if (args.Success)
             {
-                _updateFunc(false, string.Format(ResUI.MsgParsingSuccessfully, "ClashN"));
+                cbUpdate(false, string.Format(ResUI.MsgParsingSuccessfully, "ClashN"));
 
                 url = args.Msg;
                 AskToDownload(downloadHandle, url, true);
@@ -89,16 +86,17 @@ internal class UpdateHandle
             else
             {
                 NoticeHandler.Instance.Enqueue(args.Msg);
-                _updateFunc(false, args.Msg);
+                cbUpdate(false, args.Msg);
             }
         };
-        _updateFunc(false, string.Format(ResUI.MsgStartUpdating, "ClashN"));
-        CheckUpdateAsync(CoreKind.ClashN);
+
+        cbUpdate(false, string.Format(ResUI.MsgStartUpdating, "ClashN"));
+
+        CheckUpdateAsync(CoreKind.ClashN, cbUpdate);
     }
 
-    public void CheckUpdateCore(CoreKind type, Action<bool, string> update)
+    public void CheckUpdateCore(CoreKind type, Action<bool, string> cbUpdate)
     {
-        _updateFunc = update;
         var url = string.Empty;
 
         DownloadHandle downloadHandle = null;
@@ -109,60 +107,58 @@ internal class UpdateHandle
             {
                 if (args.Success)
                 {
-                    _updateFunc(false, ResUI.MsgDownloadCoreSuccessfully);
-                    _updateFunc(false, ResUI.MsgUnpacking);
+                    cbUpdate(false, ResUI.MsgDownloadCoreSuccessfully);
+                    cbUpdate(false, ResUI.MsgUnpacking);
 
                     try
                     {
-                        _updateFunc(true, url);
+                        cbUpdate(true, url);
                     }
                     catch (Exception ex)
                     {
-                        _updateFunc(false, ex.Message);
+                        cbUpdate(false, ex.Message);
                     }
                 }
                 else
                 {
-                    _updateFunc(false, args.Msg);
+                    cbUpdate(false, args.Msg);
                 }
             };
-            downloadHandle.Error += (sender2, args) => { _updateFunc(true, args.GetException().Message); };
+            downloadHandle.Error += (sender2, args) => { cbUpdate(true, args.GetException().Message); };
         }
 
         AbsoluteCompleted += (sender2, args) =>
         {
             if (args.Success)
             {
-                _updateFunc(false, string.Format(ResUI.MsgParsingSuccessfully, "Core"));
+                cbUpdate(false, string.Format(ResUI.MsgParsingSuccessfully, "Core"));
                 url = args.Msg;
                 AskToDownload(downloadHandle, url, true);
             }
             else
             {
                 NoticeHandler.Instance.Enqueue(args.Msg);
-                _updateFunc(false, args.Msg);
+                cbUpdate(false, args.Msg);
             }
         };
-        _updateFunc(false, string.Format(ResUI.MsgStartUpdating, "Core"));
-        CheckUpdateAsync(type);
+        cbUpdate(false, string.Format(ResUI.MsgStartUpdating, "Core"));
+
+        CheckUpdateAsync(type, cbUpdate);
     }
 
-    public void UpdateSubscriptionProcess(bool blProxy, List<ProfileItem> profileItems,
-        Action<bool, string> update)
+    public void UpdateSubscriptionProcess(bool blProxy, List<ProfileItem> profileItems, Action<bool, string> cbUpdateSubscription)
     {
-        _updateFunc = update;
+        cbUpdateSubscription(false, ResUI.MsgUpdateSubscriptionStart);
 
-        _updateFunc(false, ResUI.MsgUpdateSubscriptionStart);
-
-        if (LazyConfig.Instance.Config.ProfileItems == null || LazyConfig.Instance.Config.ProfileItems.Count <= 0)
+        if (LazyConfig.Instance.Config.ProfileItems.Count == 0 || LazyConfig.Instance.Config.ProfileItems.Count == 0)
         {
-            _updateFunc(false, ResUI.MsgNoValidSubscription);
+            cbUpdateSubscription(false, ResUI.MsgNoValidSubscription);
             return;
         }
 
         Task.Run(async () =>
         {
-            if (profileItems == null)
+            if (profileItems.Count == 0)
             {
                 profileItems = LazyConfig.Instance.Config.ProfileItems;
             }
@@ -176,11 +172,11 @@ internal class UpdateHandle
                 var hashCode = $"{item.Remarks}->";
                 if (item.Enabled == false || string.IsNullOrEmpty(indexId) || string.IsNullOrEmpty(url))
                 {
-                    _updateFunc(false, $"{hashCode}{ResUI.MsgSkipSubscriptionUpdate}");
+                    cbUpdateSubscription(false, $"{hashCode}{ResUI.MsgSkipSubscriptionUpdate}");
                     continue;
                 }
 
-                _updateFunc(false, $"{hashCode}{ResUI.MsgStartGettingSubscriptions}");
+                cbUpdateSubscription(false, $"{hashCode}{ResUI.MsgStartGettingSubscriptions}");
 
                 if (item.EnableConvert)
                 {
@@ -199,7 +195,7 @@ internal class UpdateHandle
                 var downloadHandle = new DownloadHandle();
                 downloadHandle.Error += (_, args) =>
                 {
-                    _updateFunc(false, $"{hashCode}{args.GetException().Message}");
+                    cbUpdateSubscription(false, $"{hashCode}{args.GetException().Message}");
                 };
                 var result = await downloadHandle.DownloadStringAsync(url, blProxy, userAgent) ??
                              throw new Exception();
@@ -211,14 +207,14 @@ internal class UpdateHandle
 
                 if (string.IsNullOrEmpty(result.Item1))
                 {
-                    _updateFunc(false, $"{hashCode}{ResUI.MsgSubscriptionDecodingFailed}");
+                    cbUpdateSubscription(false, $"{hashCode}{ResUI.MsgSubscriptionDecodingFailed}");
                 }
                 else
                 {
-                    _updateFunc(false, $"{hashCode}{ResUI.MsgGetSubscriptionSuccessfully}");
+                    cbUpdateSubscription(false, $"{hashCode}{ResUI.MsgGetSubscriptionSuccessfully}");
                     if (result.Item1.Length < 99)
                     {
-                        _updateFunc(false, $"{hashCode}{result}");
+                        cbUpdateSubscription(false, $"{hashCode}{result}");
                     }
 
                     var ret = ConfigProc.AddBatchProfiles(result.Item1, indexId, groupId);
@@ -254,32 +250,26 @@ internal class UpdateHandle
                         }
                         catch (Exception ex)
                         {
-                            _updateFunc(false, ex.Message);
+                            cbUpdateSubscription(false, ex.Message);
                         }
 
-                        _updateFunc(false, $"{hashCode}{ResUI.MsgUpdateSubscriptionEnd}");
+                        cbUpdateSubscription(false, $"{hashCode}{ResUI.MsgUpdateSubscriptionEnd}");
                     }
                     else
                     {
-                        _updateFunc(false, $"{hashCode}{ResUI.MsgFailedImportSubscription}");
+                        cbUpdateSubscription(false, $"{hashCode}{ResUI.MsgFailedImportSubscription}");
                     }
                 }
 
-                _updateFunc(false, $"-------------------------------------------------------");
+                cbUpdateSubscription(false, $"-------------------------------------------------------");
             }
-            
-            _updateFunc(true, $"{ResUI.MsgUpdateSubscriptionEnd}");
+
+            cbUpdateSubscription(true, $"{ResUI.MsgUpdateSubscriptionEnd}");
         });
     }
-
-    private ulong ParseRemoteInfo(Dictionary<string, string> dicInfo, string key)
+    
+    public void UpdateGeoFile(string geoName, Action<bool, string> cbUpdate)
     {
-        return dicInfo.ContainsKey(key) ? Convert.ToUInt64(dicInfo?[key]) : 0;
-    }
-
-    public void UpdateGeoFile(string geoName, Action<bool, string> update)
-    {
-        _updateFunc = update;
         var url = string.Format(Global.GeoUrl, geoName);
 
         DownloadHandle downloadHandle = null;
@@ -291,7 +281,7 @@ internal class UpdateHandle
             {
                 if (args.Success)
                 {
-                    _updateFunc(false, string.Format(ResUI.MsgDownloadGeoFileSuccessfully, geoName));
+                    cbUpdate(false, string.Format(ResUI.MsgDownloadGeoFileSuccessfully, geoName));
 
                     try
                     {
@@ -305,20 +295,20 @@ internal class UpdateHandle
                             }
 
                             File.Move(fileName, targetPath);
-                            //_updateFunc(true, "");
+                            //update(true, "");
                         }
                     }
                     catch (Exception ex)
                     {
-                        _updateFunc(false, ex.Message);
+                        cbUpdate(false, ex.Message);
                     }
                 }
                 else
                 {
-                    _updateFunc(false, args.Msg);
+                    cbUpdate(false, args.Msg);
                 }
             };
-            downloadHandle.Error += (sender2, args) => { _updateFunc(false, args.GetException().Message); };
+            downloadHandle.Error += (sender2, args) => { cbUpdate(false, args.GetException().Message); };
         }
 
         AskToDownload(downloadHandle, url, false);
@@ -326,17 +316,22 @@ internal class UpdateHandle
 
     #region private
 
-    private async void CheckUpdateAsync(CoreKind type)
+    private ulong ParseRemoteInfo(Dictionary<string, string> dicInfo, string key)
+    {
+        return dicInfo.ContainsKey(key) ? Convert.ToUInt64(dicInfo?[key]) : 0;
+    }
+
+    private async void CheckUpdateAsync(CoreKind type, Action<bool, string> cbUpdate)
     {
         try
         {
             var coreInfo = LazyConfig.Instance.GetCoreInfo(type);
-            string url = coreInfo.CoreLatestUrl;
+            var url = coreInfo.CoreLatestUrl;
 
             var result = await (new DownloadHandle()).UrlRedirectAsync(url, true);
             if (!string.IsNullOrEmpty(result))
             {
-                ResponseHandler(type, result);
+                ResponseHandler(type, result, cbUpdate);
             }
             else
             {
@@ -347,10 +342,10 @@ internal class UpdateHandle
         catch (Exception ex)
         {
             Utils.SaveLog(ex.Message, ex);
-            _updateFunc(false, ex.Message);
+            cbUpdate(false, ex.Message);
             if (ex.InnerException != null)
             {
-                _updateFunc(false, ex.InnerException.Message);
+                cbUpdate(false, ex.InnerException.Message);
             }
         }
     }
@@ -358,7 +353,7 @@ internal class UpdateHandle
     /// <summary>
     /// 获取Core版本
     /// </summary>
-    private string GetCoreVersion(CoreKind type)
+    private string GetCoreVersion(CoreKind type, Action<bool, string> cbUpdate)
     {
         try
         {
@@ -393,17 +388,20 @@ internal class UpdateHandle
             p.WaitForExit(5000);
             var echo = p.StandardOutput.ReadToEnd();
             var version = Regex.Match(echo, $"v[0-9.]+").Groups[0].Value;
+
             return version;
         }
         catch (Exception ex)
         {
             Utils.SaveLog(ex.Message, ex);
-            _updateFunc(false, ex.Message);
+
+            cbUpdate(false, ex.Message);
+
             return "";
         }
     }
 
-    private void ResponseHandler(CoreKind type, string redirectUrl)
+    private void ResponseHandler(CoreKind type, string redirectUrl, Action<bool, string> cbUpdate)
     {
         try
         {
@@ -415,7 +413,7 @@ internal class UpdateHandle
             string url;
             if (type == CoreKind.Clash)
             {
-                curVersion = GetCoreVersion(type);
+                curVersion = GetCoreVersion(type, cbUpdate);
                 message = string.Format(ResUI.IsLatestCore, curVersion);
                 if (Environment.Is64BitProcess)
                 {
@@ -428,7 +426,7 @@ internal class UpdateHandle
             }
             else if (type == CoreKind.ClashMeta)
             {
-                curVersion = GetCoreVersion(type);
+                curVersion = GetCoreVersion(type, cbUpdate);
                 message = string.Format(ResUI.IsLatestCore, curVersion);
                 if (Environment.Is64BitProcess)
                 {
@@ -461,11 +459,11 @@ internal class UpdateHandle
         catch (Exception ex)
         {
             Utils.SaveLog(ex.Message, ex);
-            _updateFunc(false, ex.Message);
+            cbUpdate(false, ex.Message);
         }
     }
 
-    private void AskToDownload(DownloadHandle downloadHandle, string url, bool blAsk)
+    private static void AskToDownload(DownloadHandle downloadHandle, string url, bool blAsk)
     {
         var blDownload = false;
         if (blAsk)

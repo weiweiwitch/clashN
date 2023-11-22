@@ -21,7 +21,7 @@ public class ProxiesViewModel : ReactiveObject
 
     private Dictionary<string, ProxiesItem> _proxies;
     private Dictionary<string, ProvidersItem> _providers;
-    
+
     private IObservableCollection<ProxyModel> _proxyGroups = new ObservableCollectionExtended<ProxyModel>();
     private IObservableCollection<ProxyModel> _proxyDetails = new ObservableCollectionExtended<ProxyModel>();
 
@@ -153,7 +153,7 @@ public class ProxiesViewModel : ReactiveObject
     public void ProxiesReload()
     {
         Utils.SaveLogDebug($"ProxiesViewModel:ProxiesReload - Start");
-        
+
         GetClashProxies(true);
     }
 
@@ -174,7 +174,7 @@ public class ProxiesViewModel : ReactiveObject
     public void ProxiesDelayTest()
     {
         Utils.SaveLogDebug($"ProxiesViewModel:ProxiesDelayTest - Start");
-        
+
         ProxiesDelayTest(true);
     }
 
@@ -200,7 +200,8 @@ public class ProxiesViewModel : ReactiveObject
     private static void TunModeSwitch()
     {
         Global.ReloadCore = true;
-        _ = Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
+
+        Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
     }
 
     #region proxy function

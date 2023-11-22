@@ -60,7 +60,7 @@ public class ProfilesViewModel : ReactiveObject
         EditProfileCmd = ReactiveCommand.Create(() => { EditProfile(false); }, canEditRemove);
 
         AddProfileCmd = ReactiveCommand.Create(() => { EditProfile(true); });
-        AddProfileViaScanCmd = ReactiveCommand.CreateFromTask(() => { return ScanScreenTaskAsync(); });
+        AddProfileViaScanCmd = ReactiveCommand.Create(() => { ScanScreenTaskAsync(); });
         AddProfileViaClipboardCmd = ReactiveCommand.Create(() => { AddProfilesViaClipboard(false); });
 
         ExportProfileCmd = ReactiveCommand.Create(() => { ExportProfile2Clipboard(); }, canEditRemove);
@@ -84,7 +84,7 @@ public class ProfilesViewModel : ReactiveObject
         });
         ProfileReloadCmd = ReactiveCommand.Create(() => { RefreshProfiles(); });
         ProfileQrcodeCmd = ReactiveCommand.Create(() => { ProfileQrcode(); }, canEditRemove);
-        
+
         Utils.SaveLogDebug("ProfilesViewModel:ProfilesViewModel - Finished");
     }
 
@@ -138,27 +138,32 @@ public class ProfilesViewModel : ReactiveObject
         }
     }
 
-    public async Task ScanScreenTaskAsync()
+    public void ScanScreenTaskAsync()
     {
         MainWindowViewModel.ShowHideWindow(false);
 
-        var result = await Task.Run(() => { return Utils.ScanScreen(); });
-
-        MainWindowViewModel.ShowHideWindow(true);
-
-        if (string.IsNullOrEmpty(result))
+        Task.Run(() =>
         {
-            NoticeHandler.Instance.Enqueue(ResUI.NoValidQRcodeFound);
-        }
-        else
-        {
-            int ret = ConfigProc.AddBatchProfiles(result, "", "");
-            if (ret == 0)
+            var result = Utils.ScanScreen();
+            Application.Current.Dispatcher.Invoke((Action)(() =>
             {
-                RefreshProfiles();
-                NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedProfileViaScan);
-            }
-        }
+                MainWindowViewModel.ShowHideWindow(true);
+
+                if (string.IsNullOrEmpty(result))
+                {
+                    NoticeHandler.Instance.Enqueue(ResUI.NoValidQRcodeFound);
+                }
+                else
+                {
+                    var ret = ConfigProc.AddBatchProfiles(result, "", "");
+                    if (ret == 0)
+                    {
+                        RefreshProfiles();
+                        NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedProfileViaScan);
+                    }
+                }
+            }));
+        });
     }
 
     public void AddProfilesViaClipboard(bool bClear)
@@ -203,25 +208,30 @@ public class ProfilesViewModel : ReactiveObject
 
     public void UpdateSubscriptionProcess(bool blProxy, bool blSelected)
     {
-        List<ProfileItem> profileItems = null;
+        var profileItems = new List<ProfileItem>();
         if (blSelected)
         {
             var item = LazyConfig.Instance.Config.GetProfileItem(SelectedSource.IndexId);
-            profileItems = new List<ProfileItem>() { item };
+            if (item != null)
+            {
+                profileItems = new List<ProfileItem> { item };
+            }
         }
 
-        new UpdateHandle().UpdateSubscriptionProcess(blProxy, profileItems, UpdateUi);
-        return;
-
-        void UpdateUi(bool success, string msg)
+        new UpdateHandle().UpdateSubscriptionProcess(blProxy, profileItems, (success, msg) =>
         {
             NoticeHandler.SendMessage4ClashN(msg);
 
             if (success)
             {
-                RefreshProfiles();
+                Utils.SaveLog($"ProfilesViewModel:UpdateSubscriptionProcess - UpdateSubscriptionProcess Finished: {msg}");
+                
+                Application.Current.Dispatcher.Invoke((Action)(() =>
+                {
+                    RefreshProfiles();
+                }));
             }
-        }
+        });
     }
 
     public void RemoveProfile()
@@ -293,7 +303,7 @@ public class ProfilesViewModel : ReactiveObject
     public void RefreshProfiles()
     {
         Utils.SaveLog($"ProfilesViewModel:RefreshProfiles - Start");
-        
+
         var config = LazyConfig.Instance.Config;
         ConfigProc.SetDefaultProfile(config, config.ProfileItems);
 
@@ -304,13 +314,10 @@ public class ProfilesViewModel : ReactiveObject
             model.IsActive = config.IsActiveNode(item);
             lstModel.Add(model);
         }
-
-        Application.Current.Dispatcher.Invoke((Action)(() =>
-        {
-            _profileItems.Clear();
-            _profileItems.AddRange(lstModel);
-        }));
         
+        _profileItems.Clear();
+        _profileItems.AddRange(lstModel);
+
         Utils.SaveLogDebug($"ProfilesViewModel:RefreshProfiles - Finished");
     }
 

@@ -19,11 +19,8 @@ public sealed class MainFormHandler
     private static Lazy<MainFormHandler> _instance = new(() => new MainFormHandler());
 
     public static MainFormHandler Instance => _instance.Value;
-    
-    
-   
-    
-    
+
+
     public Icon GetNotifyIcon(Config config)
     {
         try
@@ -107,18 +104,17 @@ public sealed class MainFormHandler
         }
     }
 
-    public void OnTimer4UpdateTask(ref DateTime autoUpdateSubTime, Config config, Action<bool, string> update)
+    public static void OnTimer4UpdateTask(ref DateTime autoUpdateSubTime, Config config,
+        Action<bool, string> cbUpdateSubscriptionFinish)
     {
         Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Run");
-
-        var updateHandle = new UpdateHandle();
-        var dtNow = DateTime.Now;
 
         if (config.AutoUpdateSubInterval <= 0)
         {
             return;
         }
 
+        var dtNow = DateTime.Now;
         var diffTime = dtNow - autoUpdateSubTime;
         if (diffTime.Hours % config.AutoUpdateSubInterval != 0)
         {
@@ -129,24 +125,26 @@ public sealed class MainFormHandler
         autoUpdateSubTime = dtNow;
 
         // Run time update task
-        Task.Run(() =>
+        Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Runs In Timer Thread");
+
+        var updateHandle = new UpdateHandle();
+        updateHandle.UpdateSubscriptionProcess(true, new List<ProfileItem>(), (success, msg) =>
         {
-            Utils.SaveLog($"MainFormHandler:CreateUpdateTask - Update Task Runs In Timer Thread");
-            updateHandle.UpdateSubscriptionProcess(true, null, (success, msg) =>
+            NoticeHandler.SendMessage4ClashN(msg);
+
+            if (success)
             {
-                update(success, msg);
-                if (success)
-                {
-                    Utils.SaveLog("subscription" + msg);
-                }
-            });
+                Utils.SaveLog($"MainFormHandler:OnTimer4UpdateTask - UpdateSubscriptionProcess Finished: {msg}");
+            }
+            
+            cbUpdateSubscriptionFinish(success, msg);
         });
     }
 
     public static void RegisterGlobalHotkey(Config config, EventHandler<HotkeyEventArgs> handler)
     {
         Utils.SaveLog($"MainFormHandler:RegisterGlobalHotkey");
-        
+
         foreach (var item in config.GlobalHotkeys)
         {
             if (item.KeyCode == null)
@@ -195,7 +193,6 @@ public sealed class MainFormHandler
 
     private async Task GetClashProxiesAsync(Action<ClashProxies, ClashProviders> update)
     {
-        
         for (var i = 0; i < 5; i++)
         {
             var url = $"{GetApiUrl()}/proxies";
@@ -221,7 +218,7 @@ public sealed class MainFormHandler
     public void ClashProxiesDelayTest(bool blAll, List<ProxyModel> lstProxy, Action<ProxyModel?, string> update)
     {
         Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest");
-        
+
         Task.Run(() =>
         {
             if (blAll)

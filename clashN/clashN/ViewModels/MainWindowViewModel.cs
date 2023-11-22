@@ -113,8 +113,10 @@ public class MainWindowViewModel : ReactiveObject
         GetHelpView = new HelpView();
         GetPromotionView = new PromotionView();
 
-        NoticeHandler.Instance.ConfigMessageQueue(snackbarMessageQueue);
-
+        NoticeHandler.Instance.ConfigMessageQueue(content =>
+        {
+            Application.Current.Dispatcher.Invoke(() => { snackbarMessageQueue.Enqueue(content); });
+        });
 
         //System proxy
         SystemProxyClearCmd = ReactiveCommand.Create(() =>
@@ -153,9 +155,9 @@ public class MainWindowViewModel : ReactiveObject
         }); //, this.WhenAnyValue(x => x.BlModeNothing, y => !y));
 
         //Other
-        AddProfileViaScanCmd = ReactiveCommand.CreateFromTask(() =>
+        AddProfileViaScanCmd = ReactiveCommand.Create(() =>
         {
-            return Locator.Current.GetService<ProfilesViewModel>()?.ScanScreenTaskAsync();
+            Locator.Current.GetService<ProfilesViewModel>()?.ScanScreenTaskAsync();
         });
         SubUpdateCmd = ReactiveCommand.Create(() =>
         {
@@ -168,7 +170,8 @@ public class MainWindowViewModel : ReactiveObject
         ReloadCmd = ReactiveCommand.Create(() =>
         {
             Global.ReloadCore = true;
-            _ = LoadCore();
+
+            LoadCore();
         });
 
         NotifyLeftClickCmd = ReactiveCommand.Create(() => { ShowHideWindow(null); });
@@ -204,7 +207,7 @@ public class MainWindowViewModel : ReactiveObject
             Locator.Current.GetService<ProfilesViewModel>()?.AddProfilesViaClipboard(true);
 
             StartAllTimerTask();
-            
+
             Utils.SaveLogDebug($"MainWindowViewModel:OnProgramStarted - Finished");
         }));
     }
@@ -213,9 +216,10 @@ public class MainWindowViewModel : ReactiveObject
     {
         try
         {
+            _statistics?.Close();
+            
             CoreHandler.Instance.CoreStop();
 
-            //HttpProxyHandle.CloseHttpAgent(config);
             if (blWindowsShutDown)
             {
                 SysProxyHandle.ResetIEProxy4WindowsShutDown();
@@ -228,11 +232,10 @@ public class MainWindowViewModel : ReactiveObject
             StorageUI();
 
             ConfigProc.SaveConfig();
-
-            _statistics?.Close();
         }
         catch
         {
+            
         }
         finally
         {
@@ -272,7 +275,7 @@ public class MainWindowViewModel : ReactiveObject
     private void Init()
     {
         Utils.SaveLog("MainWindowViewModel:Init");
-        
+
         MainFormHandler.BackupGuiNConfig(true);
 
         MainFormHandler.InitRegister();
@@ -292,7 +295,7 @@ public class MainWindowViewModel : ReactiveObject
         };
         _updateTaskDispatcherTimer.Tick += (_, _) =>
         {
-            MainFormHandler.Instance.OnTimer4UpdateTask(ref _autoUpdateSubTime, config, CbUpdateTaskFinish);
+            MainFormHandler.OnTimer4UpdateTask(ref _autoUpdateSubTime, config, CbUpdateTaskFinish);
         };
 
         // HotKey
@@ -300,19 +303,22 @@ public class MainWindowViewModel : ReactiveObject
 
         OnProgramStarted("shown", true);
 
-        _ = LoadCore();
+        LoadCore();
     }
 
-    private async void CbUpdateTaskFinish(bool success, string msg)
+    private void CbUpdateTaskFinish(bool success, string msg)
     {
-        NoticeHandler.SendMessage4ClashN(msg);
+        if (!success)
+        {
+            return;
+        }
 
-        if (success)
+        Application.Current.Dispatcher.Invoke(() =>
         {
             Global.ReloadCore = true;
 
-            await LoadCore();
-        }
+            LoadCore();
+        });
     }
 
     private void CbStatisticUpdate(ulong up, ulong down)
@@ -340,30 +346,36 @@ public class MainWindowViewModel : ReactiveObject
 
     #region Core
 
-    public async Task LoadCore()
+    public void LoadCore()
     {
         Utils.SaveLog("MainWindowViewModel:LoadCore");
 
         var proxiesViewModel = Locator.Current.GetService<ProxiesViewModel>();
         proxiesViewModel?.ProxiesClear();
 
-        await Task.Run(() => { CoreHandler.Instance.LoadCore(); });
+        Task.Run(() =>
+        {
+            CoreHandler.Instance.LoadCore();
 
-        Global.ReloadCore = false;
+            Application.Current.Dispatcher.Invoke((Action)(() =>
+            {
+                Global.ReloadCore = false;
 
-        ConfigProc.SaveConfig(false);
+                ConfigProc.SaveConfig(false);
 
-        var config = LazyConfig.Instance.Config;
-        ChangePACButtonStatus(config.SysProxyType);
+                var config = LazyConfig.Instance.Config;
+                ChangePACButtonStatus(config.SysProxyType);
 
-        SetRuleMode(config.RuleMode);
+                SetRuleMode(config.RuleMode);
 
-        proxiesViewModel?.ProxiesReload();
-        proxiesViewModel?.ProxiesDelayTest();
-        
-        Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
-        
-        Utils.SaveLogDebug($"MainWindowViewModel:LoadCore - Finished: {Global.ReloadCore}");
+                proxiesViewModel?.ProxiesReload();
+                proxiesViewModel?.ProxiesDelayTest();
+
+                Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
+
+                Utils.SaveLogDebug($"MainWindowViewModel:LoadCore - Finished: {Global.ReloadCore}");
+            }));
+        });
     }
 
     public void CloseCore()
@@ -421,7 +433,7 @@ public class MainWindowViewModel : ReactiveObject
         SetRuleMode(mode);
 
         Locator.Current.GetService<ProxiesViewModel>()?.ReloadRuleModeSelected();
-        
+
         ConfigProc.SaveConfig(false);
     }
 
@@ -478,7 +490,7 @@ public class MainWindowViewModel : ReactiveObject
     private void RestoreUI()
     {
         Utils.SaveLog("MainWindowViewModel:RestoreUI");
-        
+
         var config = LazyConfig.Instance.Config;
 
         ModifyTheme(config.UiItem.ColorModeDark);

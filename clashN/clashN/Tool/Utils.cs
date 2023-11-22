@@ -92,7 +92,7 @@ internal static class Utils
     {
         try
         {
-            T obj = JsonConvert.DeserializeObject<T>(strJson);
+            var obj = JsonConvert.DeserializeObject<T>(strJson);
             return obj;
         }
         catch
@@ -331,16 +331,16 @@ internal static class Utils
     /// <param name="unit">单位</param>
     public static void ToHumanReadable(ulong amount, out double result, out string unit)
     {
-        uint factor = 1024u;
-        ulong KBs = amount / factor;
+        var factor = 1024u;
+        var KBs = amount / factor;
         if (KBs > 0)
         {
             // multi KB
-            ulong MBs = KBs / factor;
+            var MBs = KBs / factor;
             if (MBs > 0)
             {
                 // multi MB
-                ulong GBs = MBs / factor;
+                var GBs = MBs / factor;
                 if (GBs > 0)
                 {
                     // multi GB
@@ -364,7 +364,6 @@ internal static class Utils
 
             result = KBs + (amount % factor / (factor + 0.0));
             unit = "KB";
-            return;
         }
         else
         {
@@ -449,7 +448,7 @@ internal static class Utils
         //可能是CIDR
         if (ip.IndexOf(@"/") > 0)
         {
-            string[] cidr = ip.Split('/');
+            var cidr = ip.Split('/');
             if (cidr.Length == 2)
             {
                 if (!IsNumberic(cidr[0]))
@@ -462,7 +461,7 @@ internal static class Utils
         }
 
         //模式字符串
-        string pattern = @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$";
+        var pattern = @"^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$";
 
         //验证
         return IsMatch(ip, pattern);
@@ -484,7 +483,7 @@ internal static class Utils
         //domain = domain.TrimEx();
 
         //模式字符串
-        string pattern = @"^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$";
+        var pattern = @"^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$";
 
         //验证
         return IsMatch(domain, pattern);
@@ -525,24 +524,18 @@ internal static class Utils
 
     #region 开机自动启动
 
-    private static string autoRunName = "clashNAutoRun";
+    private static string _autoRunName = "clashNAutoRun";
 
-    private static string autoRunRegPath
-    {
-        get
-        {
-            return @"Software\Microsoft\Windows\CurrentVersion\Run";
-            //if (Environment.Is64BitProcess)
-            //{
-            //    return @"Software\Microsoft\Windows\CurrentVersion\Run";
-            //}
-            //else
-            //{
-            //    return @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run";
-            //}
-        }
-    }
+    private static string AutoRunRegPath => @"Software\Microsoft\Windows\CurrentVersion\Run";
 
+    //if (Environment.Is64BitProcess)
+    //{
+    //    return @"Software\Microsoft\Windows\CurrentVersion\Run";
+    //}
+    //else
+    //{
+    //    return @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run";
+    //}
     /// <summary>
     /// 开机自动启动
     /// </summary>
@@ -553,10 +546,10 @@ internal static class Utils
         try
         {
             //delete first
-            RegWriteValue(autoRunRegPath, autoRunName, null);
+            RegWriteValue(AutoRunRegPath, _autoRunName, null);
             if (IsAdministrator())
             {
-                AutoStart(autoRunName, "", "");
+                AutoStart(_autoRunName, "", "");
             }
 
             if (run)
@@ -564,11 +557,11 @@ internal static class Utils
                 string exePath = $"\"{GetExePath()}\"";
                 if (IsAdministrator())
                 {
-                    AutoStart(autoRunName, exePath, "");
+                    AutoStart(_autoRunName, exePath, "");
                 }
                 else
                 {
-                    RegWriteValue(autoRunRegPath, autoRunName, exePath);
+                    RegWriteValue(AutoRunRegPath, _autoRunName, exePath);
                 }
             }
         }
@@ -586,7 +579,7 @@ internal static class Utils
     {
         try
         {
-            var value = RegReadValue(autoRunRegPath, autoRunName, "");
+            var value = RegReadValue(AutoRunRegPath, _autoRunName, "");
             var exePath = GetExePath();
             if (value?.Equals(exePath) == true || value?.Equals($"\"{exePath}\"") == true)
             {
@@ -692,16 +685,15 @@ internal static class Utils
     public static bool GetDotNetRelease(int release)
     {
         const string subkey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
-        using (RegistryKey ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
-                   .OpenSubKey(subkey))
-        {
-            if (ndpKey != null && ndpKey.GetValue("Release") != null)
-            {
-                return (int)ndpKey.GetValue("Release") >= release ? true : false;
-            }
+        using var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32)
+            .OpenSubKey(subkey);
 
-            return false;
+        if (ndpKey != null && ndpKey.GetValue("Release") != null)
+        {
+            return (int)ndpKey.GetValue("Release") >= release ? true : false;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -718,10 +710,10 @@ internal static class Utils
             return;
         }
 
-        string TaskName = taskName;
+        var TaskName = taskName;
         var logonUser = WindowsIdentity.GetCurrent().Name;
-        string taskDescription = description;
-        string deamonFileName = fileName;
+        var taskDescription = description;
+        var deamonFileName = fileName;
 
         using (var taskService = new TaskService())
         {
@@ -765,12 +757,12 @@ internal static class Utils
         long roundtripTime = -1;
         try
         {
-            int timeout = 30;
-            int echoNum = 2;
-            Ping pingSender = new Ping();
-            for (int i = 0; i < echoNum; i++)
+            var timeout = 30;
+            var echoNum = 2;
+            var pingSender = new Ping();
+            for (var i = 0; i < echoNum; i++)
             {
-                PingReply reply = pingSender.Send(host, timeout);
+                var reply = pingSender.Send(host, timeout);
                 if (reply.Status == IPStatus.Success)
                 {
                     if (reply.RoundtripTime < 0)
@@ -800,11 +792,11 @@ internal static class Utils
     /// <returns></returns>
     public static List<string> GetHostIPAddress()
     {
-        List<string> lstIPAddress = new List<string>();
+        var lstIPAddress = new List<string>();
         try
         {
-            IPHostEntry IpEntry = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (IPAddress ipa in IpEntry.AddressList)
+            var IpEntry = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ipa in IpEntry.AddressList)
             {
                 if (ipa.AddressFamily == AddressFamily.InterNetwork)
                     lstIPAddress.Add(ipa.ToString());
@@ -835,11 +827,11 @@ internal static class Utils
 
     public static bool PortInUse(int port)
     {
-        bool inUse = false;
+        var inUse = false;
         try
         {
-            IPGlobalProperties ipProperties = IPGlobalProperties.GetIPGlobalProperties();
-            IPEndPoint[] ipEndPoints = ipProperties.GetActiveTcpListeners();
+            var ipProperties = IPGlobalProperties.GetIPGlobalProperties();
+            var ipEndPoints = ipProperties.GetActiveTcpListeners();
 
             var lstIpEndPoints =
                 new List<IPEndPoint>(IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners());
@@ -874,17 +866,9 @@ internal static class Utils
         try
         {
             var location = GetExePath();
-            if (blFull)
-            {
-                return string.Format("ClashN - V{0} - {1}",
-                    FileVersionInfo.GetVersionInfo(location).FileVersion?.ToString(),
-                    File.GetLastWriteTime(location).ToString("yyyy/MM/dd"));
-            }
-            else
-            {
-                return string.Format("ClashN/{0}",
-                    FileVersionInfo.GetVersionInfo(location).FileVersion?.ToString());
-            }
+            return blFull
+                ? $"ClashN - V{FileVersionInfo.GetVersionInfo(location).FileVersion} - {File.GetLastWriteTime(location).ToString("yyyy/MM/dd")}"
+                : $"ClashN/{FileVersionInfo.GetVersionInfo(location).FileVersion}";
         }
         catch (Exception ex)
         {
@@ -1176,25 +1160,31 @@ internal static class Utils
     public static void SaveLog(string strContent)
     {
         var logger = LogManager.GetLogger("Log1");
-        logger.Info(strContent);
+        logger.Info($"[Thread:{Environment.CurrentManagedThreadId}] {strContent}");
     }
-    
+
     public static void SaveLogDebug(string strContent)
     {
         var logger = LogManager.GetLogger("Log1");
-        logger.Debug(strContent);
+        logger.Debug($"[Thread:{Environment.CurrentManagedThreadId}] {strContent}");
     }
-    
+
+    public static void SaveLogWarn(string strContent)
+    {
+        var logger = LogManager.GetLogger("Log1");
+        logger.Warn($"[Thread:{Environment.CurrentManagedThreadId}] {strContent}");
+    }
+
     public static void SaveLogError(string strContent)
     {
         var logger = LogManager.GetLogger("Log1");
-        logger.Error(strContent);
+        logger.Error($"[Thread:{Environment.CurrentManagedThreadId}] {strContent}");
     }
 
-    public static void SaveLog(string strTitle, Exception ex)
+    public static void SaveLog(string strContent, Exception ex)
     {
         var logger = LogManager.GetLogger("Log2");
-        logger.Debug(strTitle);
+        logger.Debug($"[Thread:{Environment.CurrentManagedThreadId}] {strContent}");
         logger.Debug(ex);
         if (ex.InnerException != null)
         {
@@ -1210,46 +1200,43 @@ internal static class Utils
     {
         try
         {
-            foreach (Screen screen in Screen.AllScreens)
+            foreach (var screen in Screen.AllScreens)
             {
-                using (Bitmap fullImage = new Bitmap(screen.Bounds.Width,
-                           screen.Bounds.Height))
+                using var fullImage = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
+
+                using (var g = Graphics.FromImage(fullImage))
                 {
-                    using (Graphics g = Graphics.FromImage(fullImage))
+                    g.CopyFromScreen(screen.Bounds.X,
+                        screen.Bounds.Y,
+                        0, 0,
+                        fullImage.Size,
+                        CopyPixelOperation.SourceCopy);
+                }
+
+                const int maxTry = 10;
+                for (var i = 0; i < maxTry; i++)
+                {
+                    var marginLeft = (int)((double)fullImage.Width * i / 2.5 / maxTry);
+                    var marginTop = (int)((double)fullImage.Height * i / 2.5 / maxTry);
+                    var cropRect = new Rectangle(marginLeft, marginTop, fullImage.Width - (marginLeft * 2),
+                        fullImage.Height - (marginTop * 2));
+                    var target = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
+
+                    var imageScale = (double)screen.Bounds.Width / cropRect.Width;
+                    using (var g = Graphics.FromImage(target))
                     {
-                        g.CopyFromScreen(screen.Bounds.X,
-                            screen.Bounds.Y,
-                            0, 0,
-                            fullImage.Size,
-                            CopyPixelOperation.SourceCopy);
+                        g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
+                            cropRect, GraphicsUnit.Pixel);
                     }
 
-                    int maxTry = 10;
-                    for (int i = 0; i < maxTry; i++)
+                    var source = new BitmapLuminanceSource(target);
+                    var bitmap = new BinaryBitmap(new HybridBinarizer(source));
+                    var reader = new QRCodeReader();
+                    var result = reader.decode(bitmap);
+                    if (result != null)
                     {
-                        int marginLeft = (int)((double)fullImage.Width * i / 2.5 / maxTry);
-                        int marginTop = (int)((double)fullImage.Height * i / 2.5 / maxTry);
-                        Rectangle cropRect = new Rectangle(marginLeft, marginTop, fullImage.Width - (marginLeft * 2),
-                            fullImage.Height - (marginTop * 2));
-                        Bitmap target = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
-
-                        double imageScale = (double)screen.Bounds.Width / (double)cropRect.Width;
-                        using (Graphics g = Graphics.FromImage(target))
-                        {
-                            g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
-                                cropRect,
-                                GraphicsUnit.Pixel);
-                        }
-
-                        BitmapLuminanceSource source = new BitmapLuminanceSource(target);
-                        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-                        QRCodeReader reader = new QRCodeReader();
-                        Result result = reader.decode(bitmap);
-                        if (result != null)
-                        {
-                            string ret = result.Text;
-                            return ret;
-                        }
+                        var ret = result.Text;
+                        return ret;
                     }
                 }
             }
