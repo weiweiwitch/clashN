@@ -194,7 +194,6 @@ internal class StatisticsHandler
                             serverStatItem.DownloadRemote += down;
                         }
                     }
-
                     _cbStatisticUpdateFunc(up, down);
                 }
 

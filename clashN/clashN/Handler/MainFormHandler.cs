@@ -209,7 +209,7 @@ public sealed class MainFormHandler
                 return;
             }
 
-            Thread.Sleep(5000);
+            await Task.Delay(5000);
         }
 
         update(null, null);
@@ -219,7 +219,7 @@ public sealed class MainFormHandler
     {
         Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest");
 
-        Task.Run(() =>
+        Task.Run(async () =>
         {
             if (blAll)
             {
@@ -230,7 +230,7 @@ public sealed class MainFormHandler
                         break;
                     }
 
-                    Thread.Sleep(5000);
+                    await Task.Delay(5000);
                 }
 
                 var proxies = LazyConfig.Instance.GetProxies();
@@ -240,7 +240,7 @@ public sealed class MainFormHandler
                 }
 
                 lstProxy = new List<ProxyModel>();
-                foreach (KeyValuePair<string, ProxiesItem> kv in proxies)
+                foreach (var kv in proxies)
                 {
                     if (Global.NotAllowTestType.Contains(kv.Value.type.ToLower()))
                     {
@@ -280,9 +280,11 @@ public sealed class MainFormHandler
                 }));
             }
 
+            Utils.SaveLog("MainFormHandler:ClashProxiesDelayTest - Start to wait all task");
             Task.WaitAll(tasks.ToArray());
 
-            Thread.Sleep(1000);
+            await Task.Delay(1000);
+            
             update(null, "");
         });
     }

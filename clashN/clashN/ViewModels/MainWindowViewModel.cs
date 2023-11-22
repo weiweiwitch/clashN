@@ -217,7 +217,7 @@ public class MainWindowViewModel : ReactiveObject
         try
         {
             _statistics?.Close();
-            
+
             CoreHandler.Instance.CoreStop();
 
             if (blWindowsShutDown)
@@ -235,7 +235,6 @@ public class MainWindowViewModel : ReactiveObject
         }
         catch
         {
-            
         }
         finally
         {
@@ -323,6 +322,7 @@ public class MainWindowViewModel : ReactiveObject
 
     private void CbStatisticUpdate(ulong up, ulong down)
     {
+        Utils.SaveLogDebug("MainWindowViewModel:CbStatisticUpdate - Start");
         try
         {
             Application.Current.Dispatcher.Invoke((Action)(() =>

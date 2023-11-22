@@ -96,6 +96,8 @@ public static class SysProxyHandle
         {
             Utils.SaveLog(ex.Message, ex);
         }
+        
+        Utils.SaveLogDebug($"SysProxyHandle:UpdateSysProxy - Finished. type: {type}");
 
         return true;
     }
@@ -112,7 +114,7 @@ public static class SysProxyHandle
         }
     }
 
-    public static void SetIEProxy(bool global, string strProxy, string strExceptions)
+    private static void SetIEProxy(bool global, string strProxy, string strExceptions)
     {
         var arguments = global
             ? $"global {strProxy} {strExceptions}"
@@ -122,7 +124,7 @@ public static class SysProxyHandle
     }
 
     // set system proxy to 1 (null) (null) (null)
-    public static bool ResetIEProxy()
+    private static bool ResetIEProxy()
     {
         try
         {

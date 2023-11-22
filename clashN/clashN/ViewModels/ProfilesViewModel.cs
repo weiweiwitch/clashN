@@ -127,7 +127,7 @@ public class ProfilesViewModel : ReactiveObject
             }
         }
 
-        ProfileEditWindow dialog = new ProfileEditWindow(item)
+        var dialog = new ProfileEditWindow(item)
         {
             Owner = App.Current.MainWindow,
         };
@@ -159,6 +159,7 @@ public class ProfilesViewModel : ReactiveObject
                     if (ret == 0)
                     {
                         RefreshProfiles();
+
                         NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedProfileViaScan);
                     }
                 }
@@ -224,12 +225,10 @@ public class ProfilesViewModel : ReactiveObject
 
             if (success)
             {
-                Utils.SaveLog($"ProfilesViewModel:UpdateSubscriptionProcess - UpdateSubscriptionProcess Finished: {msg}");
-                
-                Application.Current.Dispatcher.Invoke((Action)(() =>
-                {
-                    RefreshProfiles();
-                }));
+                Utils.SaveLog(
+                    $"ProfilesViewModel:UpdateSubscriptionProcess - UpdateSubscriptionProcess Finished: {msg}");
+
+                Application.Current.Dispatcher.Invoke((Action)(() => { RefreshProfiles(); }));
             }
         });
     }
@@ -314,7 +313,7 @@ public class ProfilesViewModel : ReactiveObject
             model.IsActive = config.IsActiveNode(item);
             lstModel.Add(model);
         }
-        
+
         _profileItems.Clear();
         _profileItems.AddRange(lstModel);
 

@@ -450,10 +450,12 @@ public class ProxiesViewModel : ReactiveObject
 
     private void ProxiesDelayTest(bool blAll)
     {
-        UpdateHandler("Clash Proxies Latency Test");
+        UpdateHandler("ProxiesViewModel:ProxiesDelayTest - Clash Proxies Latency Test");
 
         MainFormHandler.Instance.ClashProxiesDelayTest(blAll, _proxyDetails.ToList(), (item, result) =>
         {
+            UpdateHandler("ProxiesViewModel:ProxiesDelayTest - Exec Clash Proxies Latency Test Callback");
+            
             if (item == null)
             {
                 GetClashProxies(true);
@@ -498,7 +500,7 @@ public class ProxiesViewModel : ReactiveObject
 
     #region task
 
-    public void DelayTestTask()
+    private void DelayTestTask()
     {
         var autoDelayTestTime = DateTime.Now;
 
@@ -517,10 +519,9 @@ public class ProxiesViewModel : ReactiveObject
                     if ((dtNow - autoDelayTestTime).Minutes % LazyConfig.Instance.Config.AutoDelayTestInterval == 0)
                     {
                         ProxiesDelayTest();
+
                         autoDelayTestTime = dtNow;
                     }
-
-                    Thread.Sleep(1000);
                 }
             });
     }

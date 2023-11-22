@@ -15,14 +15,11 @@ namespace ClashN.ViewModels;
 
 public class ProfileEditViewModel : ReactiveValidationObject
 {
-        
     private ProfileEditWindow _view;
 
-    [Reactive]
-    public ProfileItem SelectedSource { get; set; }
+    [Reactive] public ProfileItem SelectedSource { get; set; }
 
-    [Reactive]
-    public string CoreType { get; set; }
+    [Reactive] public string CoreType { get; set; }
 
     public ReactiveCommand<Unit, Unit> BrowseProfileCmd { get; }
     public ReactiveCommand<Unit, Unit> EditProfileCmd { get; }
@@ -42,20 +39,11 @@ public class ProfileEditViewModel : ReactiveValidationObject
         _view = view;
         CoreType = (SelectedSource.CoreType ?? CoreKind.Clash).ToString();
 
-        BrowseProfileCmd = ReactiveCommand.Create(() =>
-        {
-            BrowseProfile();
-        });
+        BrowseProfileCmd = ReactiveCommand.Create(() => { BrowseProfile(); });
 
-        EditProfileCmd = ReactiveCommand.Create(() =>
-        {
-            EditProfile();
-        });
+        EditProfileCmd = ReactiveCommand.Create(() => { EditProfile(); });
 
-        SaveProfileCmd = ReactiveCommand.Create(() =>
-        {
-            SaveProfile();
-        });
+        SaveProfileCmd = ReactiveCommand.Create(() => { SaveProfile(); });
 
         Utils.SetDarkBorder(view, LazyConfig.Instance.Config.UiItem.ColorModeDark);
     }
@@ -108,31 +96,35 @@ public class ProfileEditViewModel : ReactiveValidationObject
 
     private void BrowseProfile()
     {
-        OpenFileDialog fileDialog = new OpenFileDialog
+        var fileDialog = new OpenFileDialog
         {
             Multiselect = false,
             Filter = "YAML|*.yaml;*.yml|All|*.*"
         };
 
-        IWin32Window parent = App.Current.MainWindow.WpfWindow2WinFormWin32Window();
+        var parent = App.Current.MainWindow.WpfWindow2WinFormWin32Window();
         if (fileDialog.ShowDialog(parent) != DialogResult.OK)
         {
             return;
         }
+
         if (UI.ShowYesNo(ResUI.MsgSureContinue) == DialogResult.No)
         {
             return;
         }
-        string fileName = fileDialog.FileName;
+
+        var fileName = fileDialog.FileName;
         if (string.IsNullOrEmpty(fileName))
         {
             return;
         }
+
         var item = LazyConfig.Instance.Config.GetProfileItem(SelectedSource.IndexId);
         if (item is null)
         {
             item = SelectedSource;
         }
+
         if (ConfigProc.AddProfileViaPath(item, fileName) == 0)
         {
             NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedCustomProfile);

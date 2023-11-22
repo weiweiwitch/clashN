@@ -148,6 +148,8 @@ internal class UpdateHandle
 
     public void UpdateSubscriptionProcess(bool blProxy, List<ProfileItem> profileItems, Action<bool, string> cbUpdateSubscription)
     {
+        Utils.SaveLog("UpdateHandler:UpdateSubscriptionProcess - Start ");
+        
         cbUpdateSubscription(false, ResUI.MsgUpdateSubscriptionStart);
 
         if (LazyConfig.Instance.Config.ProfileItems.Count == 0 || LazyConfig.Instance.Config.ProfileItems.Count == 0)
@@ -163,6 +165,7 @@ internal class UpdateHandle
                 profileItems = LazyConfig.Instance.Config.ProfileItems;
             }
 
+            Utils.SaveLogDebug($"UpdateHandler:UpdateSubscriptionProcess - profileItems num: {profileItems.Count} ");
             foreach (var item in profileItems)
             {
                 var indexId = item.IndexId.TrimEx();
@@ -212,6 +215,7 @@ internal class UpdateHandle
                 else
                 {
                     cbUpdateSubscription(false, $"{hashCode}{ResUI.MsgGetSubscriptionSuccessfully}");
+                    
                     if (result.Item1.Length < 99)
                     {
                         cbUpdateSubscription(false, $"{hashCode}{result}");
