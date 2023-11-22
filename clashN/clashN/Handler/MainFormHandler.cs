@@ -2,7 +2,6 @@
 using System.IO;
 using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Threading;
 using ClashN.Base;
 using ClashN.Mode;
 using ClashN.Properties;

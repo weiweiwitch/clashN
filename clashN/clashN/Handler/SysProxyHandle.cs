@@ -1,25 +1,26 @@
-﻿using ClashN.Mode;
-using ClashN.Properties;
-using ClashN.Tool;
-using PacLib;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using ClashN.Mode;
+using ClashN.Properties;
+using ClashN.Tool;
+using PacLib;
 
 namespace ClashN.Handler;
 
+internal enum RetErrors
+{
+    RetNoError = 0,
+    InvalidFormat = 1,
+    NoPermission = 2,
+    SyscallFailed = 3,
+    NoMemory = 4,
+    InvalidOptionCount = 5,
+}
+
 public static class SysProxyHandle
 {
-    private enum RET_ERRORS : int
-    {
-        RET_NO_ERROR = 0,
-        INVALID_FORMAT = 1,
-        NO_PERMISSION = 2,
-        SYSCALL_FAILED = 3,
-        NO_MEMORY = 4,
-        INVAILD_OPTION_COUNT = 5,
-    };
-
     static SysProxyHandle()
     {
         try
@@ -36,7 +37,7 @@ public static class SysProxyHandle
     public static bool UpdateSysProxy(bool forceDisable)
     {
         Utils.SaveLogDebug($"SysProxyHandle:UpdateSysProxy - Start, forceDisable: {forceDisable}");
-        
+
         var config = LazyConfig.Instance.Config;
         var type = config.SysProxyType;
 
@@ -96,7 +97,7 @@ public static class SysProxyHandle
         {
             Utils.SaveLog(ex.Message, ex);
         }
-        
+
         Utils.SaveLogDebug($"SysProxyHandle:UpdateSysProxy - Finished. type: {type}");
 
         return true;
@@ -167,8 +168,8 @@ public static class SysProxyHandle
 
                 process.StartInfo.CreateNoWindow = true;
 
-                StringBuilder output = new StringBuilder();
-                StringBuilder error = new StringBuilder();
+                var output = new StringBuilder();
+                var error = new StringBuilder();
 
                 process.OutputDataReceived += (sender, e) =>
                 {
@@ -201,7 +202,7 @@ public static class SysProxyHandle
 
                     process.WaitForExit();
                 }
-                catch (System.ComponentModel.Win32Exception e)
+                catch (Win32Exception e)
                 {
                     // log the arguments
                     throw new Exception(process.StartInfo.Arguments, e);
@@ -211,19 +212,10 @@ public static class SysProxyHandle
                 var stdout = output.ToString();
 
                 var exitCode = process.ExitCode;
-                if (exitCode != (int)RET_ERRORS.RET_NO_ERROR)
+                if (exitCode != (int)RetErrors.RetNoError)
                 {
                     throw new Exception(stderr);
                 }
-
-                //if (arguments == "query")
-                //{
-                //    if (stdout.IsNullOrWhiteSpace() || stdout.IsNullOrEmpty())
-                //    {
-                //        throw new Exception("failed to query wininet settings");
-                //    }
-                //    _queryStr = stdout;
-                //}
             }
         }
     }

@@ -25,8 +25,8 @@ internal class DownloadHandle
 
         public ResultEventArgs(bool success, string msg)
         {
-            this.Success = success;
-            this.Msg = msg;
+            Success = success;
+            Msg = msg;
         }
     }
 
