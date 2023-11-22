@@ -163,17 +163,18 @@ public class MainWindowViewModel : ReactiveObject
             
             StartAllTimerTask();
             
-            // ShowHideWindow(true);
-            
             var clipboardData = Utils.GetClipboardData();
             Utils.SaveLogDebug($"MainWindowViewModel:OnProgramStarted - After GetClipboardData {clipboardData}, ClashProtocol: {Global.ClashProtocol}");
             if (state != null && clipboardData != null)
             {
                 if (string.IsNullOrEmpty(clipboardData) || !clipboardData.StartsWith(Global.ClashProtocol))
                 {
+                    Utils.SaveLogDebug($"MainWindowViewModel:OnProgramStarted - After GetClipboardData. No clipboard data, then return");
                     return;
                 }
             }
+            
+            ShowHideWindow(true);
             
             Locator.Current.GetService<ProfilesViewModel>()?.AddProfilesViaClipboard(true);
             
