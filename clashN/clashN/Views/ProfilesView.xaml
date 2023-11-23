@@ -146,7 +146,7 @@
                                     Grid.Row="0"
                                     Margin="8,8,8,0"
                                     Style="{StaticResource TabItemTitle}"
-                                    Text="{Binding remarks}" />
+                                    Text="{Binding Remarks}" />
 
                                 <Separator Grid.Row="1" Style="{StaticResource MaterialDesignLightSeparator}" />
 
@@ -170,7 +170,7 @@
                                     <CheckBox
                                         Padding="0,0,8,0"
                                         Content="{x:Static resx:ResUI.TbEnableUpdate}"
-                                        IsChecked="{Binding enabled}"
+                                        IsChecked="{Binding Enabled}"
                                         IsHitTestVisible="False"
                                         Style="{StaticResource ListItemCheckBox}" />
 
