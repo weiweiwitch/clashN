@@ -17,7 +17,7 @@
     x:TypeArguments="vms:ProfileEditViewModel"
     Background="{DynamicResource MaterialDesignPaper}"
     FontFamily="{x:Static conv:MaterialDesignFonts.MyFont}"
-    KeyDown="PorfileEditWindow_KeyDown"
+    KeyDown="ProfileEditWindow_KeyDown"
     ResizeMode="NoResize"
     TextElement.FontFamily="{x:Static conv:MaterialDesignFonts.MyFont}"
     TextElement.Foreground="{DynamicResource MaterialDesignBody}"

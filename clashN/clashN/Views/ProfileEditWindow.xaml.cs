@@ -41,7 +41,7 @@ public partial class ProfileEditWindow
         this.Close();
     }
 
-    private void PorfileEditWindow_KeyDown(object sender, KeyEventArgs e)
+    private void ProfileEditWindow_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape)
         {

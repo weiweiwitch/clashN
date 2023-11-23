@@ -23,6 +23,8 @@ public class ProfilesViewModel : ReactiveObject
 
     public IObservableCollection<ProfileItemModel> ProfileItems => _profileItems;
 
+    [Reactive] public ProfileItemModel SelectedSource { get; set; }
+    
     public ReactiveCommand<Unit, Unit> EditLocalFileCmd { get; }
     public ReactiveCommand<Unit, Unit> EditProfileCmd { get; }
     public ReactiveCommand<Unit, Unit> AddProfileCmd { get; }
@@ -41,9 +43,7 @@ public class ProfilesViewModel : ReactiveObject
     public ReactiveCommand<Unit, Unit> ClearStatisticCmd { get; }
     public ReactiveCommand<Unit, Unit> ProfileReloadCmd { get; }
     public ReactiveCommand<Unit, Unit> ProfileQrcodeCmd { get; }
-
-    [Reactive] public ProfileItemModel SelectedSource { get; set; }
-
+    
     public ProfilesViewModel()
     {
         SelectedSource = new();
@@ -288,7 +288,7 @@ public class ProfilesViewModel : ReactiveObject
             return;
         }
 
-        if (ConfigHandler.SetDefaultProfile(config, item) == 0)
+        if (ConfigHandler.Set2SpecialProfile(item) == 0)
         {
             NoticeHandler.SendMessage4ClashN(ResUI.OperationSuccess);
 
@@ -303,7 +303,7 @@ public class ProfilesViewModel : ReactiveObject
         Utils.SaveLog("ProfilesViewModel:RefreshProfiles - Start");
 
         var config = LazyConfig.Instance.Config;
-        ConfigHandler.PointDefaultProfile(config, config.ProfileItems);
+        ConfigHandler.Point2DefaultProfile();
 
         var lstModel = new List<ProfileItemModel>();
         foreach (var item in config.ProfileItems.OrderBy(it => it.Sort))

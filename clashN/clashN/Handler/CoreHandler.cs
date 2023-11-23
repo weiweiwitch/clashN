@@ -34,9 +34,8 @@ internal class CoreHandler
         {
             return;
         }
-
-        var config = LazyConfig.Instance.Config;
-        var item = ConfigHandler.GetDefaultProfile(ref config);
+        
+        var item = ConfigHandler.GetDefaultProfile();
         if (item == null)
         {
             CoreStop();
@@ -45,6 +44,7 @@ internal class CoreHandler
             return;
         }
 
+        var config = LazyConfig.Instance.Config;
         if (config.EnableTun && !Utils.IsAdministrator())
         {
             ShowMsg(true, LogType.Log4ClashN, ResUI.EnableTunModeFailed);

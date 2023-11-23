@@ -173,8 +173,11 @@ public class MainWindowViewModel : ReactiveObject
                     return;
                 }
             }
-            
-            ShowHideWindow(true);
+
+            if (state == null)
+            {
+                ShowHideWindow(true);
+            }
             
             Locator.Current.GetService<ProfilesViewModel>()?.AddProfilesViaClipboard(true);
             

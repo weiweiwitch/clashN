@@ -72,6 +72,7 @@ public class Config
         {
             return -1;
         }
+
         return ProfileItems.FindIndex(it => it.IndexId == id);
     }
 
@@ -95,5 +96,3 @@ public class Config
 
     #endregion function
 }
-
-

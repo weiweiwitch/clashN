@@ -194,12 +194,13 @@ internal static class ConfigHandler
     /// <summary>
     /// 设置活动配置文件
     /// </summary>
-    /// <param name="config"></param>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static int SetDefaultProfile(Config config, ProfileItem item)
+    public static int Set2SpecialProfile(ProfileItem item)
     {
+        var config = LazyConfig.Instance.Config;
         config.IndexId = item.IndexId;
+        
         Global.ReloadCore = true;
 
         ToJsonFile(config);
@@ -207,46 +208,38 @@ internal static class ConfigHandler
         return 0;
     }
 
-    public static int PointDefaultProfile(Config config, List<ProfileItem> lstProfile)
+    public static void Point2DefaultProfile()
     {
+        var config = LazyConfig.Instance.Config;
+        var lstProfile = config.ProfileItems;
         if (lstProfile.Exists(t => t.IndexId == config.IndexId))
         {
-            return 0;
-        }
-
-        if (config.ProfileItems.Exists(t => t.IndexId == config.IndexId))
-        {
-            return 0;
+            return;
         }
 
         if (lstProfile.Count > 0)
         {
-            return SetDefaultProfile(config, lstProfile[0]);
+            Set2SpecialProfile(lstProfile[0]);
         }
-
-        if (config.ProfileItems.Count > 0)
-        {
-            return SetDefaultProfile(config, config.ProfileItems[0]);
-        }
-
-        return -1;
     }
 
-    public static ProfileItem? GetDefaultProfile(ref Config config)
+    public static ProfileItem? GetDefaultProfile()
     {
-        if (config.ProfileItems.Count <= 0)
+        var config = LazyConfig.Instance.Config;
+        var profileItems = config.ProfileItems;
+        if (profileItems.Count <= 0)
         {
             return null;
         }
-
+        
         var index = config.FindIndexId(config.IndexId);
         if (index < 0)
         {
-            SetDefaultProfile(config, config.ProfileItems[0]);
-            return config.ProfileItems[0];
+            Set2SpecialProfile(profileItems[0]);
+            return profileItems[0];
         }
 
-        return config.ProfileItems[index];
+        return profileItems[index];
     }
 
     /// <summary>
@@ -363,6 +356,7 @@ internal static class ConfigHandler
         }
 
         profileItem.Enabled = true;
+        
         AddProfileCommon(profileItem);
 
         ToJsonFile(config);
@@ -407,28 +401,41 @@ internal static class ConfigHandler
         return 0;
     }
 
-    public static int EditProfile(ProfileItem profileItem)
+    public static void AddOrModifyProfile(ProfileItem profileItem)
+    {
+        var config = LazyConfig.Instance.Config;
+        var item = config.GetProfileItem(profileItem.IndexId);
+        if (item is null)
+        {
+            AddProfileCommon(profileItem);
+        }
+        else
+        {
+            // override
+            item.Remarks = profileItem.Remarks;
+            item.Url = profileItem.Url;
+            item.Address = profileItem.Address;
+            item.UserAgent = profileItem.UserAgent;
+            item.CoreType = profileItem.CoreType;
+            item.Enabled = profileItem.Enabled;
+            item.EnableConvert = profileItem.EnableConvert;
+
+            EditProfile(item);
+        }
+    }
+    
+    public static void EditProfile(ProfileItem profileItem)
     {
         var config = LazyConfig.Instance.Config;
         if (!string.IsNullOrEmpty(profileItem.IndexId) && config.IndexId == profileItem.IndexId)
         {
+            // current profile has been modified, reload core
             Global.ReloadCore = true;
         }
 
         AddProfileCommon(profileItem);
 
-        //TODO auto update via url
-        //if (!string.IsNullOrEmpty(profileItem.url))
-        //{
-        //    var httpClient = new HttpClient();
-        //    string result = httpClient.GetStringAsync(profileItem.url).Result;
-        //    httpClient.Dispose();
-        //    int ret = AddBatchProfiles(ref config, result, profileItem.indexId, profileItem.groupId);
-        //}
-
         ToJsonFile(config);
-
-        return 0;
     }
 
     public static int SortProfiles(ref Config config, ref List<ProfileItem> lstProfile, EProfileColName name, bool asc)
@@ -472,7 +479,7 @@ internal static class ConfigHandler
         return 0;
     }
 
-    private static int AddProfileCommon(ProfileItem profileItem)
+    private static void AddProfileCommon(ProfileItem profileItem)
     {
         if (string.IsNullOrEmpty(profileItem.IndexId))
         {
@@ -492,8 +499,6 @@ internal static class ConfigHandler
 
             config.ProfileItems.Add(profileItem);
         }
-
-        return 0;
     }
 
     private static int RemoveProfileItem(Config config, int index)
@@ -553,7 +558,9 @@ internal static class ConfigHandler
                 Remarks = "clash_subscription"
             };
 
-            return EditProfile(item);
+             EditProfile(item);
+
+             return 0;
         }
 
         //maybe clashProtocol
@@ -576,7 +583,9 @@ internal static class ConfigHandler
                         Remarks = "clash_subscription"
                     };
 
-                    return EditProfile(item);
+                    EditProfile(item);
+                    
+                    return 0;
                 }
             }
         }

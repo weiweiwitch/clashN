@@ -37,7 +37,7 @@ public class ProfileEditViewModel : ReactiveValidationObject
         }
 
         _view = view;
-        
+
         CoreType = (SelectedSource.CoreType ?? CoreKind.Clash).ToString();
 
         BrowseProfileCmd = ReactiveCommand.Create(() => { BrowseProfile(); });
@@ -51,6 +51,7 @@ public class ProfileEditViewModel : ReactiveValidationObject
 
     private void SaveProfile()
     {
+        // remarks
         var remarks = SelectedSource.Remarks;
         if (string.IsNullOrEmpty(remarks))
         {
@@ -58,6 +59,7 @@ public class ProfileEditViewModel : ReactiveValidationObject
             return;
         }
 
+        // core type
         if (string.IsNullOrEmpty(CoreType))
         {
             SelectedSource.CoreType = null;
@@ -67,34 +69,13 @@ public class ProfileEditViewModel : ReactiveValidationObject
             SelectedSource.CoreType = (CoreKind)Enum.Parse(typeof(CoreKind), CoreType);
         }
 
-        var item = LazyConfig.Instance.Config.GetProfileItem(SelectedSource.IndexId);
-        if (item is null)
-        {
-            item = SelectedSource;
-        }
-        else
-        {
-            item.Remarks = SelectedSource.Remarks;
-            item.Url = SelectedSource.Url;
-            item.Address = SelectedSource.Address;
-            item.UserAgent = SelectedSource.UserAgent;
-            item.CoreType = SelectedSource.CoreType;
-            item.Enabled = SelectedSource.Enabled;
-            item.EnableConvert = SelectedSource.EnableConvert;
-        }
+        ConfigHandler.AddOrModifyProfile(SelectedSource);
 
-        if (ConfigHandler.EditProfile(item) == 0)
-        {
-            Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
-            
-            NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
-            
-            _view.Close();
-        }
-        else
-        {
-            NoticeHandler.Instance.Enqueue(ResUI.OperationFailed);
-        }
+        Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
+
+        NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
+
+        _view.Close();
     }
 
     private void BrowseProfile()
@@ -131,9 +112,9 @@ public class ProfileEditViewModel : ReactiveValidationObject
         if (ConfigHandler.AddProfileViaPath(item, fileName) == 0)
         {
             NoticeHandler.Instance.Enqueue(ResUI.SuccessfullyImportedCustomProfile);
-            
+
             Locator.Current.GetService<ProfilesViewModel>()?.RefreshProfiles();
-            
+
             _view.Close();
         }
         else
