@@ -19,6 +19,5 @@ public class UIItem
     public int ProxiesSorting { get; set; }
     public bool ProxiesAutoRefresh { get; set; }
 
-    public int ConnectionsSorting { get; set; }
     public bool ConnectionsAutoRefresh { get; set; }
 }

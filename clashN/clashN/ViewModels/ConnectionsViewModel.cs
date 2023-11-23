@@ -20,8 +20,8 @@ public class ConnectionsViewModel : ReactiveObject
 
     public ICollectionView ConnectionItems => CollectionViewSource.GetDefaultView(_connectionItems);
 
+    [Reactive] public string MsgFilter { get; set; }
     [Reactive] public int ConnectionItemsCount { get; set; }
-    [Reactive] public int SortingSelected { get; set; }
     [Reactive] public bool AutoRefresh { get; set; }
 
     [Reactive] public ConnectionModel? SelectedSource { get; set; }
@@ -36,21 +36,32 @@ public class ConnectionsViewModel : ReactiveObject
     {
         var config = LazyConfig.Instance.Config;
         ConnectionItemsCount = _connectionItems.Count;
-        SortingSelected = config.UiItem.ConnectionsSorting;
         AutoRefresh = config.UiItem.ConnectionsAutoRefresh;
+        MsgFilter = "";
         
         var canEditRemove = this.WhenAnyValue(
             x => x.SelectedSource,
             selectedSource => selectedSource != null && !string.IsNullOrEmpty(selectedSource.Id));
 
         this.WhenAnyValue(
-                x => x._connectionItems.Count)
-            .Subscribe(_ => { ConnectionItemsCount = _connectionItems.Count; });
+                x => x.MsgFilter)
+            .Subscribe(_ =>
+            {
+                if (!string.IsNullOrEmpty(MsgFilter))
+                {
+                    Utils.SaveLog($"MsgFilter true {MsgFilter}");
+                    ConnectionItems.Filter = item => (item as ConnectionModel).Host.Contains(MsgFilter);
+                }
+                else
+                {
+                    Utils.SaveLog($"MsgFilter false {MsgFilter}");
+                    ConnectionItems.Filter = _ => true;
+                }
+            });
 
         this.WhenAnyValue(
-                x => x.SortingSelected,
-                y => y >= 0)
-            .Subscribe(DoSortingSelected);
+                x => x._connectionItems.Count)
+            .Subscribe(_ => { ConnectionItemsCount = _connectionItems.Count; });
 
         this.WhenAnyValue(
                 x => x.AutoRefresh,
@@ -62,22 +73,6 @@ public class ConnectionsViewModel : ReactiveObject
         ConnectionCloseAllCmd = ReactiveCommand.Create(() => { ClashConnectionClose(true); });
 
         Init();
-    }
-
-    private void DoSortingSelected(bool c)
-    {
-        if (!c)
-        {
-            return;
-        }
-
-        var config = LazyConfig.Instance.Config;
-        if (SortingSelected != config.UiItem.ConnectionsSorting)
-        {
-            config.UiItem.ConnectionsSorting = SortingSelected;
-        }
-
-        GetClashConnections();
     }
 
     private void Init()
@@ -141,18 +136,6 @@ public class ConnectionsViewModel : ReactiveObject
         {
             return;
         }
-
-        //sort
-        lstModel = SortingSelected switch
-        {
-            0 => lstModel.OrderBy(t => t.Upload / t.Time).ToList(),
-            1 => lstModel.OrderBy(t => t.Download / t.Time).ToList(),
-            2 => lstModel.OrderBy(t => t.Upload).ToList(),
-            3 => lstModel.OrderBy(t => t.Download).ToList(),
-            4 => lstModel.OrderBy(t => t.Time).ToList(),
-            5 => lstModel.OrderBy(t => t.Host).ToList(),
-            _ => lstModel
-        };
 
         _connectionItems.AddRange(lstModel);
     }

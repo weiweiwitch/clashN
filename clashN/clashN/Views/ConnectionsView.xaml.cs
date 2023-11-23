@@ -20,6 +20,8 @@ public partial class ConnectionsView
         
         this.WhenActivated(disposables =>
         {
+            this.Bind(ViewModel, vm => vm.MsgFilter, v => v.TxtFilter.Text).DisposeWith(disposables);
+            
             this.OneWayBind(ViewModel, vm => vm.ConnectionItems, v => v.LstConnections.ItemsSource)
                 .DisposeWith(disposables);
 
@@ -32,7 +34,6 @@ public partial class ConnectionsView
             this.BindCommand(ViewModel, vm => vm.ConnectionCloseAllCmd, v => v.MenuConnectionCloseAll)
                 .DisposeWith(disposables);
 
-            this.Bind(ViewModel, vm => vm.SortingSelected, v => v.CmbSorting.SelectedIndex).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.ConnectionCloseAllCmd, v => v.BtnConnectionCloseAll)
                 .DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.AutoRefresh, v => v.TogAutoRefresh.IsChecked).DisposeWith(disposables);
