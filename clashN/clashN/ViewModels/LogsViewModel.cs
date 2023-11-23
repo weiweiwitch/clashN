@@ -15,7 +15,7 @@ public enum LogType
 
 public class LogsViewModel : ReactiveObject
 {
-    private IObservableCollection<MetaLogModel> _metaLogItems = new ObservableCollectionExtended<MetaLogModel>();
+    private readonly IObservableCollection<MetaLogModel> _metaLogItems = new ObservableCollectionExtended<MetaLogModel>();
 
     public ICollectionView MetaLogItems => CollectionViewSource.GetDefaultView(_metaLogItems);
 

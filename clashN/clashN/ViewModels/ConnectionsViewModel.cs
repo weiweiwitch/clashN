@@ -1,50 +1,56 @@
+using System.ComponentModel;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Windows;
+using System.Windows.Data;
 using ClashN.Handler;
 using ClashN.Mode;
+using ClashN.Tool;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Splat;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Windows;
-using System.Windows.Threading;
-using ClashN.Tool;
 
 namespace ClashN.ViewModels;
 
 public class ConnectionsViewModel : ReactiveObject
 {
-    private IObservableCollection<ConnectionModel> _connectionItems =
+    private readonly IObservableCollection<ConnectionModel> _connectionItems =
         new ObservableCollectionExtended<ConnectionModel>();
 
-    public IObservableCollection<ConnectionModel> ConnectionItems => _connectionItems;
+    public ICollectionView ConnectionItems => CollectionViewSource.GetDefaultView(_connectionItems);
 
-    [Reactive] public ConnectionModel SelectedSource { get; set; }
+    [Reactive] public int ConnectionItemsCount { get; set; }
+    [Reactive] public int SortingSelected { get; set; }
+    [Reactive] public bool AutoRefresh { get; set; }
+
+    [Reactive] public ConnectionModel? SelectedSource { get; set; }
 
     public ReactiveCommand<Unit, Unit> ConnectionCloseCmd { get; }
     public ReactiveCommand<Unit, Unit> ConnectionCloseAllCmd { get; }
 
-    [Reactive] public int SortingSelected { get; set; }
 
-    [Reactive] public bool AutoRefresh { get; set; }
-
-    private const int AutoRefreshInterval = 10;
+    private const int AutoRefreshInterval = 1;
 
     public ConnectionsViewModel()
     {
         var config = LazyConfig.Instance.Config;
+        ConnectionItemsCount = _connectionItems.Count;
         SortingSelected = config.UiItem.ConnectionsSorting;
         AutoRefresh = config.UiItem.ConnectionsAutoRefresh;
-
+        
         var canEditRemove = this.WhenAnyValue(
             x => x.SelectedSource,
-            selectedSource => selectedSource != null && !string.IsNullOrEmpty(selectedSource.id));
+            selectedSource => selectedSource != null && !string.IsNullOrEmpty(selectedSource.Id));
+
+        this.WhenAnyValue(
+                x => x._connectionItems.Count)
+            .Subscribe(_ => { ConnectionItemsCount = _connectionItems.Count; });
 
         this.WhenAnyValue(
                 x => x.SortingSelected,
                 y => y >= 0)
-            .Subscribe(c => DoSortingSelected(c));
+            .Subscribe(DoSortingSelected);
 
         this.WhenAnyValue(
                 x => x.AutoRefresh,
@@ -81,7 +87,7 @@ public class ConnectionsViewModel : ReactiveObject
         Observable.Interval(TimeSpan.FromSeconds(AutoRefreshInterval))
             .Subscribe(x =>
             {
-                Utils.SaveLog($"ConnectionsViewModel:Init - Try GetClashConnections after delay {AutoRefreshInterval}");
+                // Utils.SaveLogDebug($"ConnectionsViewModel:Init - Try GetClashConnections after delay {AutoRefreshInterval}");
                 if (AutoRefresh && Global.ShowInTaskbar)
                 {
                     GetClashConnections();
@@ -110,23 +116,23 @@ public class ConnectionsViewModel : ReactiveObject
         var lstModel = new List<ConnectionModel>();
         foreach (var item in connections)
         {
+            var sp = dtNow - item.start;
+
             ConnectionModel model = new()
             {
-                id = item.Id,
-                network = item.metadata.Network,
-                type = item.metadata.Type,
-                host =
-                    $"{(string.IsNullOrEmpty(item.metadata.Host) ? item.metadata.DestinationIP : item.metadata.Host)}:{item.metadata.DestinationPort}"
+                Id = item.Id,
+                Network = item.metadata.Network,
+                Type = item.metadata.Type,
+                Host =
+                    $"{(string.IsNullOrEmpty(item.metadata.Host) ? item.metadata.DestinationIP : item.metadata.Host)}:{item.metadata.DestinationPort}",
+                Time = sp.TotalSeconds < 0 ? 1 : sp.TotalSeconds,
+                Upload = item.upload,
+                Download = item.download,
+                UploadTraffic = $"{Utils.HumanFy(item.upload)}",
+                DownloadTraffic = $"{Utils.HumanFy(item.download)}",
+                Elapsed = sp.ToString(@"hh\:mm\:ss"),
+                Chain = item.Chains.Count > 0 ? item.Chains[0] : string.Empty
             };
-
-            var sp = (dtNow - item.start);
-            model.time = sp.TotalSeconds < 0 ? 1 : sp.TotalSeconds;
-            model.upload = item.upload;
-            model.download = item.download;
-            model.uploadTraffic = $"{Utils.HumanFy(item.upload)}";
-            model.downloadTraffic = $"{Utils.HumanFy(item.download)}";
-            model.elapsed = sp.ToString(@"hh\:mm\:ss");
-            model.chain = item.Chains.Count > 0 ? item.Chains[0] : String.Empty;
 
             lstModel.Add(model);
         }
@@ -139,12 +145,12 @@ public class ConnectionsViewModel : ReactiveObject
         //sort
         lstModel = SortingSelected switch
         {
-            0 => lstModel.OrderBy(t => t.upload / t.time).ToList(),
-            1 => lstModel.OrderBy(t => t.download / t.time).ToList(),
-            2 => lstModel.OrderBy(t => t.upload).ToList(),
-            3 => lstModel.OrderBy(t => t.download).ToList(),
-            4 => lstModel.OrderBy(t => t.time).ToList(),
-            5 => lstModel.OrderBy(t => t.host).ToList(),
+            0 => lstModel.OrderBy(t => t.Upload / t.Time).ToList(),
+            1 => lstModel.OrderBy(t => t.Download / t.Time).ToList(),
+            2 => lstModel.OrderBy(t => t.Upload).ToList(),
+            3 => lstModel.OrderBy(t => t.Download).ToList(),
+            4 => lstModel.OrderBy(t => t.Time).ToList(),
+            5 => lstModel.OrderBy(t => t.Host).ToList(),
             _ => lstModel
         };
 
@@ -162,7 +168,7 @@ public class ConnectionsViewModel : ReactiveObject
                 return;
             }
 
-            id = item.id;
+            id = item.Id;
         }
         else
         {
