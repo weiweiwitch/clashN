@@ -49,12 +49,10 @@ public class ConnectionsViewModel : ReactiveObject
             {
                 if (!string.IsNullOrEmpty(MsgFilter))
                 {
-                    Utils.SaveLog($"MsgFilter true {MsgFilter}");
                     ConnectionItems.Filter = item => (item as ConnectionModel).Host.Contains(MsgFilter);
                 }
                 else
                 {
-                    Utils.SaveLog($"MsgFilter false {MsgFilter}");
                     ConnectionItems.Filter = _ => true;
                 }
             });
