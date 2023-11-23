@@ -436,9 +436,6 @@ public class ProxiesViewModel : ReactiveObject
 
         MainFormHandler.Instance.ClashProxiesDelayTest(blAll, _proxyDetails.ToList(), (item, result) =>
         {
-            NoticeHandler.SendMessage4ClashN(
-                "ProxiesViewModel:ProxiesDelayTest - Exec Clash Proxies Latency Test Callback");
-
             if (string.IsNullOrEmpty(result))
             {
                 return;

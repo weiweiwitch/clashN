@@ -74,39 +74,22 @@ public partial class LogsView
 
         if (logType == LogType.Log4Clash)
         {
-            var vm = ViewModel;
-            if (vm != null)
-            {
-                var msgFilter = vm.MsgFilter;
-                if (msgFilter != vm.OldMsgFilterStr)
-                {
-                    // update
-                    vm.OldMsgFilterStr = msgFilter;
-
-                    if (!string.IsNullOrEmpty(msgFilter))
-                    {
-                        vm.MetaLogItems.Filter = item => (item as MetaLogModel).Msg.Contains(msgFilter);
-
-                        // if (!Regex.IsMatch(msg, msgFilter))
-                        // {
-                        //     return;
-                        // }
-                    }
-                    else
-                    {
-                        vm.MetaLogItems.Filter = _ => true;
-                    }
-                }
-            }
-            
             var metaLogInfos = msg.Split(" ", 3);
             if (metaLogInfos.Length >= 3)
             {
+                var time = metaLogInfos[0].Split("=");
+                var timeStr = time.Length >= 2 ? time[1].Substring(1, time[1].Length - 2) : "Unknown";
+
+                var logLv = metaLogInfos[1].Split("=");
+                var logLvStr = logLv.Length >= 2 ? logLv[1] : "Unknown";
+                
+                var logMsg = metaLogInfos[2].Split("=");
+                var msgStr =  logMsg.Length >= 2 ? logMsg[1].Substring(1, logMsg[1].Length - 2) : "Unknown";
                 var metaLog = new MetaLogModel
                 {
-                    Time = metaLogInfos[0],
-                    LogLevel = metaLogInfos[1],
-                    Msg = metaLogInfos[2],
+                    Time = timeStr,
+                    LogLevel = logLvStr,
+                    Msg = msgStr,
                 };
                 ViewModel?.AddLog(metaLog);
             }

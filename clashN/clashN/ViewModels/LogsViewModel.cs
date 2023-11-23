@@ -19,17 +19,33 @@ public class LogsViewModel : ReactiveObject
 
     public ICollectionView MetaLogItems => CollectionViewSource.GetDefaultView(_metaLogItems);
 
-    [Reactive] public int SortingSelected { get; set; }
-
     [Reactive] public bool ScrollToEnd { get; set; }
-
     [Reactive] public bool AutoRefresh { get; set; }
-
     [Reactive] public string MsgFilter { get; set; }
-    public string OldMsgFilterStr { get; set; }
-    
     [Reactive] public int LineCount { get; set; }
 
+    public LogsViewModel()
+    {
+        ScrollToEnd = true;
+        AutoRefresh = true;
+        MsgFilter = string.Empty;
+        LineCount = 1000;
+        
+        this.WhenAnyValue(
+                x => x.MsgFilter)
+            .Subscribe(_ =>
+            {
+                if (!string.IsNullOrEmpty(MsgFilter))
+                {
+                    MetaLogItems.Filter = item => (item as MetaLogModel).Msg.Contains(MsgFilter);
+                }
+                else
+                {
+                    MetaLogItems.Filter = _ => true;
+                }
+            });
+        
+    }
     public void AddLog(MetaLogModel metaLog)
     {
         _metaLogItems.Add(metaLog);
@@ -49,12 +65,5 @@ public class LogsViewModel : ReactiveObject
     {
         _metaLogItems.Clear();
     }
-
-    public LogsViewModel()
-    {
-        ScrollToEnd = true;
-        AutoRefresh = true;
-        MsgFilter = string.Empty;
-        LineCount = 1000;
-    }
+    
 }
