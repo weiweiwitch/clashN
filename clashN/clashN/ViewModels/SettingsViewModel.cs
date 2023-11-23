@@ -121,9 +121,9 @@ public class SettingsViewModel : ReactiveValidationObject
                 this.IsValid());
         SetGlobalHotkeyCmd = ReactiveCommand.Create(() =>
         {
-            var dialog = new GlobalHotkeySettingWindow()
+            var dialog = new GlobalHotkeySettingWindow
             {
-                Owner = App.Current.MainWindow
+                Owner = Application.Current.MainWindow
             };
 
             dialog.ShowDialog();
@@ -259,7 +259,7 @@ public class SettingsViewModel : ReactiveValidationObject
         if (ConfigHandler.SaveConfig() == 0)
         {
             NoticeHandler.Instance.Enqueue(ResUI.OperationSuccess);
-                
+
             Locator.Current.GetService<MainWindowViewModel>()?.LoadCore();
         }
         else
@@ -268,7 +268,7 @@ public class SettingsViewModel : ReactiveValidationObject
         }
     }
 
-    private void EditMixinContent()
+    private static void EditMixinContent()
     {
         var address = Utils.GetConfigPath(Global.MixinConfigFileName);
         if (!File.Exists(address))
@@ -280,13 +280,12 @@ public class SettingsViewModel : ReactiveValidationObject
             }
         }
 
-        if (File.Exists(address))
-        {
-            Utils.ProcessStart(address);
-        }
-        else
+        if (!File.Exists(address))
         {
             NoticeHandler.Instance.Enqueue(ResUI.FailedReadConfiguration);
+            return;
         }
+
+        Utils.ViewOrEditConfigFileOutside(address);
     }
 }

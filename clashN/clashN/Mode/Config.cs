@@ -22,7 +22,6 @@ public class Config
 
     public bool EnableIpv6 { get; set; }
 
-    public string IndexId { get; set; }
 
     public SysProxyType SysProxyType { get; set; }
 
@@ -52,9 +51,14 @@ public class Config
 
     #endregion property
 
-    #region other entities
+    #region profiles
 
     public List<ProfileItem> ProfileItems { get; } = new();
+    public string IndexId { get; set; }
+
+    #endregion profiles
+
+    #region other entities
 
     public UIItem UiItem { get; set; } = new();
 
@@ -78,20 +82,12 @@ public class Config
 
     public ProfileItem? GetProfileItem(string id)
     {
-        if (string.IsNullOrEmpty(id))
-            return null;
-
-        return ProfileItems.FirstOrDefault(it => it.IndexId == id);
+        return string.IsNullOrEmpty(id) ? null : ProfileItems.FirstOrDefault(it => it.IndexId == id);
     }
 
     public bool IsActiveNode(ProfileItem item)
     {
-        if (!string.IsNullOrEmpty(item.IndexId) && item.IndexId == IndexId)
-        {
-            return true;
-        }
-
-        return false;
+        return !string.IsNullOrEmpty(item.IndexId) && item.IndexId == IndexId;
     }
 
     #endregion function

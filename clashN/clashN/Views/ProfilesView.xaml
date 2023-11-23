@@ -65,7 +65,7 @@
                     </StackPanel>
                 </Button>
                 <Separator />
-                <Button x:Name="BtnSetDefaultProfile" ToolTip="{x:Static resx:ResUI.menuSetDefaultProfile}">
+                <Button x:Name="BtnActiveSpecialProfile" ToolTip="{x:Static resx:ResUI.menuSetDefaultProfile}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon
                             Margin="0,0,8,0"
@@ -110,7 +110,8 @@
                     <Separator />
                     <MenuItem x:Name="MenuRemoveProfile" Header="{x:Static resx:ResUI.menuRemoveProfile}" />
                     <MenuItem x:Name="MenuCloneProfile" Header="{x:Static resx:ResUI.menuCloneProfile}" />
-                    <MenuItem x:Name="MenuSetDefaultProfile" Header="{x:Static resx:ResUI.menuSetDefaultProfile}" />
+                    <Separator />
+                    <MenuItem x:Name="MenuActiveSpecialProfile" Header="{x:Static resx:ResUI.menuSetDefaultProfile}" />
                     <Separator />
                     <MenuItem x:Name="MenuClearStatistic" Header="{x:Static resx:ResUI.menuClearStatistic}" />
                     <MenuItem x:Name="MenuProfileReload" Header="{x:Static resx:ResUI.menuProfileReload}" />

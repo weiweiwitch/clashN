@@ -35,7 +35,7 @@ internal class CoreHandler
             return;
         }
         
-        var item = ConfigHandler.GetDefaultProfile();
+        var item = ConfigHandler.GetActiveProfile();
         if (item == null)
         {
             CoreStop();

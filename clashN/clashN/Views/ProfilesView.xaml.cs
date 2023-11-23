@@ -4,9 +4,18 @@ using ReactiveUI;
 using Splat;
 using System.Reactive.Disposables;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using ClashN.Resx;
+using ClashN.Tool;
+using DataObject = System.Windows.DataObject;
+using DragDropEffects = System.Windows.DragDropEffects;
+using DragEventArgs = System.Windows.DragEventArgs;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using ListView = System.Windows.Controls.ListView;
+using ListViewItem = System.Windows.Controls.ListViewItem;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace ClashN.Views;
 
@@ -54,20 +63,19 @@ public partial class ProfilesView
 
             this.BindCommand(ViewModel, vm => vm.RemoveProfileCmd, v => v.MenuRemoveProfile).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.CloneProfileCmd, v => v.MenuCloneProfile).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.SetDefaultProfileCmd, v => v.MenuSetDefaultProfile)
+            this.BindCommand(ViewModel, vm => vm.ActiveSpecialProfileCmd, v => v.MenuActiveSpecialProfile)
                 .DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.EditLocalFileCmd, v => v.MenuEditLocalFile).DisposeWith(disposables);
-
             this.BindCommand(ViewModel, vm => vm.ClearStatisticCmd, v => v.MenuClearStatistic).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.ProfileReloadCmd, v => v.MenuProfileReload).DisposeWith(disposables);
 
+            // Button
             this.BindCommand(ViewModel, vm => vm.AddProfileCmd, v => v.BtnAddProfile).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.AddProfileViaClipboardCmd, v => v.BtnAddProfileViaClipboard)
                 .DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.SubUpdateViaProxyCmd, v => v.BtnSubUpdateViaProxy)
                 .DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.EditProfileCmd, v => v.BtnEditProfile).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.SetDefaultProfileCmd, v => v.BtnSetDefaultProfile)
+            this.BindCommand(ViewModel, vm => vm.ActiveSpecialProfileCmd, v => v.BtnActiveSpecialProfile)
                 .DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.ProfileQrcodeCmd, v => v.BtnProfileQrcode).DisposeWith(disposables);
         });
@@ -98,14 +106,24 @@ public partial class ProfilesView
             }
             else if (Keyboard.IsKeyDown(Key.Enter))
             {
-                ViewModel?.SetDefaultProfile();
+                if (UI.ShowYesNo(ResUI.ActiveSpecialProfile) == DialogResult.No)
+                {
+                    return;
+                }
+
+                ViewModel?.ActiveSpecialProfile();
             }
         }
     }
 
     private void lstProfiles_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        ViewModel?.SetDefaultProfile();
+        if (UI.ShowYesNo(ResUI.ActiveSpecialProfile) == DialogResult.No)
+        {
+            return;
+        }
+
+        ViewModel?.ActiveSpecialProfile();
     }
 
     #region Drag and Drop

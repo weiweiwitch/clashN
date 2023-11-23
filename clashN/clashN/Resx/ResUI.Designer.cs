@@ -60,6 +60,15 @@ namespace ClashN.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure to active the configuration file?.
+        /// </summary>
+        public static string ActiveSpecialProfile {
+            get {
+                return ResourceManager.GetString("ActiveSpecialProfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All servers.
         /// </summary>
         public static string AllGroupProfiles {

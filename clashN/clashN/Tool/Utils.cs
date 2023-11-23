@@ -1015,10 +1015,22 @@ internal static class Utils
 
     public static bool IsGuidByParse(string strSrc)
     {
-        return Guid.TryParse(strSrc, out Guid g);
+        return Guid.TryParse(strSrc, out var g);
     }
 
     public static void ProcessStart(string fileName)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            SaveLog(ex.Message, ex);
+        }
+    }
+    
+    public static void ViewOrEditConfigFileOutside(string fileName)
     {
         try
         {

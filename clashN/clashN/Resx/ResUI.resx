@@ -378,6 +378,9 @@
   <data name="RemoveProfile" xml:space="preserve">
     <value>Are you sure to remove the configuration file?</value>
   </data>
+  <data name="ActiveSpecialProfile" xml:space="preserve">
+    <value>Are you sure to active the configuration file?</value>
+  </data>
   <data name="RunAsAdmin" xml:space="preserve">
     <value>Run As Admin</value>
   </data>

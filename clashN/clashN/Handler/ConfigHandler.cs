@@ -140,11 +140,11 @@ internal static class ConfigHandler
     /// <summary>
     /// 移除配置文件
     /// </summary>
-    /// <param name="config"></param>
     /// <param name="indexs"></param>
     /// <returns></returns>
-    public static int RemoveProfile(Config config, List<ProfileItem> indexs)
+    public static int RemoveProfile(List<ProfileItem> indexs)
     {
+        var config = LazyConfig.Instance.Config;
         foreach (var item in indexs)
         {
             var index = config.FindIndexId(item.IndexId);
@@ -196,7 +196,7 @@ internal static class ConfigHandler
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public static int Set2SpecialProfile(ProfileItem item)
+    public static int ActiveSpecialProfile(ProfileItem item)
     {
         var config = LazyConfig.Instance.Config;
         config.IndexId = item.IndexId;
@@ -208,7 +208,7 @@ internal static class ConfigHandler
         return 0;
     }
 
-    public static void Point2DefaultProfile()
+    public static void ChooseOneActiveProfile()
     {
         var config = LazyConfig.Instance.Config;
         var lstProfile = config.ProfileItems;
@@ -219,11 +219,11 @@ internal static class ConfigHandler
 
         if (lstProfile.Count > 0)
         {
-            Set2SpecialProfile(lstProfile[0]);
+            ActiveSpecialProfile(lstProfile[0]);
         }
     }
 
-    public static ProfileItem? GetDefaultProfile()
+    public static ProfileItem? GetActiveProfile()
     {
         var config = LazyConfig.Instance.Config;
         var profileItems = config.ProfileItems;
@@ -235,7 +235,7 @@ internal static class ConfigHandler
         var index = config.FindIndexId(config.IndexId);
         if (index < 0)
         {
-            Set2SpecialProfile(profileItems[0]);
+            ActiveSpecialProfile(profileItems[0]);
             return profileItems[0];
         }
 
@@ -501,13 +501,14 @@ internal static class ConfigHandler
         }
     }
 
-    private static int RemoveProfileItem(Config config, int index)
+    private static void RemoveProfileItem(Config config, int index)
     {
         try
         {
-            if (File.Exists(Utils.GetConfigPath(config.ProfileItems[index].Address)))
+            var configPath = Utils.GetConfigPath(config.ProfileItems[index].Address);
+            if (File.Exists(configPath))
             {
-                File.Delete(Utils.GetConfigPath(config.ProfileItems[index].Address));
+                File.Delete(configPath);
             }
         }
         catch (Exception ex)
@@ -516,8 +517,6 @@ internal static class ConfigHandler
         }
 
         config.ProfileItems.RemoveAt(index);
-
-        return 0;
     }
 
     public static string GetProfileContent(ProfileItem item)

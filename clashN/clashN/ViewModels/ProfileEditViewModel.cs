@@ -133,13 +133,12 @@ public class ProfileEditViewModel : ReactiveValidationObject
         }
 
         address = Path.Combine(Utils.GetConfigPath(), address);
-        if (File.Exists(address))
-        {
-            Utils.ProcessStart(address);
-        }
-        else
+        if (!File.Exists(address))
         {
             NoticeHandler.Instance.Enqueue(ResUI.FailedReadConfiguration);
+            return;
         }
+
+        Utils.ViewOrEditConfigFileOutside(address);
     }
 }
