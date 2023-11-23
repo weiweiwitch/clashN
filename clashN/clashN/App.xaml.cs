@@ -28,9 +28,9 @@ public partial class App
 
     public App()
     {
-        // DispatcherUnhandledException += App_DispatcherUnhandledException;
-        // AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-        // TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+        DispatcherUnhandledException += App_DispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
     }
 
     /// <summary>
