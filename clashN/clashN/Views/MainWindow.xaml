@@ -25,6 +25,7 @@
     TextOptions.TextFormattingMode="Display"
     TextOptions.TextRenderingMode="Auto"
     WindowStartupLocation="CenterScreen"
+    materialDesign:TransitionAssist.DisableTransitions="True"
     mc:Ignorable="d">
 
     <materialDesign:DialogHost
