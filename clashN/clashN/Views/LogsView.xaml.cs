@@ -97,7 +97,6 @@ public partial class LogsView
                 var logMsg = logInfos[2].Split("=");
                 metaLogInfos[2]= logMsg.Length >= 2 ? logMsg[1].Substring(1, logMsg[1].Length - 2) : "Unknown";
             }
-            TxtMsg4ClashN.AppendText($"core type: {activeProfile?.CoreType}, msg: {metaLogInfos[0]}");
             
             if (metaLogInfos.Length >= 3)
             {
