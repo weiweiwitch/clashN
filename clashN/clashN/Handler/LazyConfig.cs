@@ -108,5 +108,18 @@ public sealed class LazyConfig
             CoreDownloadUrl64 = Global.ClashCoreUrl + "/download/{0}/clash-windows-amd64-{0}.zip",
             Match = "Clash"
         });
+        
+        _coreInfos.Add(new CoreInfo
+        {
+            CoreType = CoreKind.Mihomo,
+            CoreExes = new List<string>
+                { "mihomo-windows-amd64-v3", "mihomo-windows-amd64", "mihomo-windows-386", "mihomo" },
+            Arguments = "-f config.yaml",
+            CoreUrl = Global.ClashCoreUrl,
+            CoreLatestUrl = Global.ClashCoreUrl + "/latest",
+            CoreDownloadUrl32 = Global.ClashCoreUrl + "/download/{0}/mihomo-windows-386-{0}.zip",
+            CoreDownloadUrl64 = Global.ClashCoreUrl + "/download/{0}/mihomo-windows-amd64-{0}.zip",
+            Match = "Mihomo"
+        });
     }
 }

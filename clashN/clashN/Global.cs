@@ -109,7 +109,7 @@ internal static class Global
         ""
     };
 
-    public static readonly List<string> CoreTypes = new() { "Clash", "ClashPremium", "ClashMeta", };
+    public static readonly List<string> CoreTypes = new() { "Clash", "ClashPremium", "ClashMeta", "Mihomo" };
 
     public static readonly List<string> AllowSelectType = new() { "selector", "urltest", "loadbalance", "fallback" };
 

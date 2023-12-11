@@ -1,6 +1,7 @@
 using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Threading;
+using ClashN.Handler;
 using ClashN.Mode;
 using ClashN.ViewModels;
 using ReactiveUI;
@@ -74,22 +75,37 @@ public partial class LogsView
 
         if (logType == LogType.Log4Clash)
         {
-            var metaLogInfos = msg.Split(" ", 3);
+            // 根据当前激活的配置类型的不同，使用不同的方式解析日志。
+            var activeProfile = ConfigHandler.GetActiveProfile();
+            var metaLogInfos = new string[3];
+            if (activeProfile?.CoreType == CoreKind.Mihomo)
+            {
+                var logInfos = msg.Split(" ", 2);
+                metaLogInfos[0]= logInfos[0];
+                metaLogInfos[1]= "unknown";
+                metaLogInfos[2]= logInfos[1];
+            }
+            else
+            {
+                var logInfos = msg.Split(" ", 3);
+                var time = logInfos[0].Split("=");
+                metaLogInfos[0]= time.Length >= 2 ? time[1].Substring(1, time[1].Length - 2) : "Unknown";
+                
+                var logLv = logInfos[1].Split("=");
+                metaLogInfos[1]= logLv.Length >= 2 ? logLv[1] : "Unknown";
+                
+                var logMsg = logInfos[2].Split("=");
+                metaLogInfos[2]= logMsg.Length >= 2 ? logMsg[1].Substring(1, logMsg[1].Length - 2) : "Unknown";
+            }
+            TxtMsg4ClashN.AppendText($"core type: {activeProfile?.CoreType}, msg: {metaLogInfos[0]}");
+            
             if (metaLogInfos.Length >= 3)
             {
-                var time = metaLogInfos[0].Split("=");
-                var timeStr = time.Length >= 2 ? time[1].Substring(1, time[1].Length - 2) : "Unknown";
-
-                var logLv = metaLogInfos[1].Split("=");
-                var logLvStr = logLv.Length >= 2 ? logLv[1] : "Unknown";
-                
-                var logMsg = metaLogInfos[2].Split("=");
-                var msgStr =  logMsg.Length >= 2 ? logMsg[1].Substring(1, logMsg[1].Length - 2) : "Unknown";
                 var metaLog = new MetaLogModel
                 {
-                    Time = timeStr,
-                    LogLevel = logLvStr,
-                    Msg = msgStr,
+                    Time = metaLogInfos[0],
+                    LogLevel = metaLogInfos[1],
+                    Msg = metaLogInfos[2],
                 };
                 ViewModel?.AddLog(metaLog);
             }
